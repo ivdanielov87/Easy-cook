@@ -67,6 +67,7 @@ export class IngredientService {
    */
   async createIngredient(ingredient: IngredientCreate): Promise<{ success: boolean; data?: Ingredient; error?: string }> {
     try {
+      console.log('[IngredientService] Creating ingredient:', ingredient);
       this.loading.set(true);
 
       const { data, error } = await this.supabase.client
@@ -75,13 +76,20 @@ export class IngredientService {
         .select()
         .single();
 
-      if (error) throw error;
+      console.log('[IngredientService] Insert result:', { data, error });
 
+      if (error) {
+        console.error('[IngredientService] Insert error:', error);
+        throw error;
+      }
+
+      console.log('[IngredientService] Ingredient created successfully:', data);
       return { success: true, data: data as Ingredient };
     } catch (error: any) {
-      console.error('Error creating ingredient:', error);
+      console.error('[IngredientService] Exception creating ingredient:', error);
       return { success: false, error: error.message };
     } finally {
+      console.log('[IngredientService] Setting loading to false');
       this.loading.set(false);
     }
   }
