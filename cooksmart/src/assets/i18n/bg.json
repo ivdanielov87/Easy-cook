@@ -106,7 +106,13 @@
     "MATCHING_RECIPES": "Съвпадащи рецепти",
     "NO_RECIPES_FOUND": "Не са намерени рецепти",
     "WHAT_CAN_I_COOK": "Какво мога да сготвя сега?",
-    "MATCH_COUNT": "{{count}} съвпадения"
+    "MATCH_COUNT": "{{count}} съвпадения",
+    "SELECTED": "избрани",
+    "SEARCH_INGREDIENTS": "Търси съставки...",
+    "NO_INGREDIENTS_FOUND": "Не са намерени съставки",
+    "CLEAR_SELECTION": "Изчисти избора",
+    "TRY_DIFFERENT_INGREDIENTS": "Опитайте с други съставки",
+    "FOUND_RECIPES": "Намерени {{count}} рецепти"
   },
   "FILTERS": {
     "FILTER_BY": "Филтрирай по",

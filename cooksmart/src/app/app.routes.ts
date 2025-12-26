@@ -3,6 +3,7 @@ import { MainLayout } from './layout/main-layout/main-layout';
 import { Home } from './features/public/home/home';
 import { RecipeList } from './features/public/recipe-list/recipe-list';
 import { RecipeDetail } from './features/public/recipe-detail/recipe-detail';
+import { Pantry } from './features/public/pantry/pantry';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,10 @@ export const routes: Routes = [
       {
         path: 'recipes/:slug',
         component: RecipeDetail
+      },
+      {
+        path: 'pantry',
+        component: Pantry
       }
     ]
   }

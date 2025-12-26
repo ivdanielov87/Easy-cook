@@ -106,7 +106,13 @@
     "MATCHING_RECIPES": "Matching Recipes",
     "NO_RECIPES_FOUND": "No recipes found",
     "WHAT_CAN_I_COOK": "What can I cook now?",
-    "MATCH_COUNT": "{{count}} matches"
+    "MATCH_COUNT": "{{count}} matches",
+    "SELECTED": "selected",
+    "SEARCH_INGREDIENTS": "Search ingredients...",
+    "NO_INGREDIENTS_FOUND": "No ingredients found",
+    "CLEAR_SELECTION": "Clear Selection",
+    "TRY_DIFFERENT_INGREDIENTS": "Try different ingredients",
+    "FOUND_RECIPES": "Found {{count}} recipes"
   },
   "FILTERS": {
     "FILTER_BY": "Filter By",
