@@ -87,7 +87,12 @@
     "DELETE_CONFIRM": "Are you sure you want to delete this recipe?",
     "RECIPE_CREATED": "Recipe created successfully",
     "RECIPE_UPDATED": "Recipe updated successfully",
-    "RECIPE_DELETED": "Recipe deleted successfully"
+    "RECIPE_DELETED": "Recipe deleted successfully",
+    "WELCOME_MESSAGE": "Welcome to the admin panel",
+    "QUICK_ACTIONS": "Quick Actions",
+    "MANAGE_RECIPES_DESC": "Create, edit, and delete recipes",
+    "VIEW_SITE": "View Site",
+    "VIEW_SITE_DESC": "Go to the public site"
   },
   "PROFILE": {
     "MY_PROFILE": "My Profile",

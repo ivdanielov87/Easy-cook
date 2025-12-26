@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
+import { AdminLayout } from './layout/admin-layout/admin-layout';
 import { Home } from './features/public/home/home';
 import { RecipeList } from './features/public/recipe-list/recipe-list';
 import { RecipeDetail } from './features/public/recipe-detail/recipe-detail';
 import { Pantry } from './features/public/pantry/pantry';
+import { Dashboard } from './features/admin/dashboard/dashboard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -25,6 +28,17 @@ export const routes: Routes = [
       {
         path: 'pantry',
         component: Pantry
+      }
+    ]
+  },
+  {
+    path: 'admin',
+    component: AdminLayout,
+    canActivate: [adminGuard],
+    children: [
+      {
+        path: '',
+        component: Dashboard
       }
     ]
   }

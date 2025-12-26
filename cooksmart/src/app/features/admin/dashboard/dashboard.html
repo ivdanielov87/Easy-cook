@@ -1,0 +1,39 @@
+<div class="dashboard-page" [@fadeIn]>
+  <div class="page-header">
+    <h1 class="page-title">{{ 'NAV.DASHBOARD' | translate }}</h1>
+    <p class="page-subtitle">{{ 'ADMIN.WELCOME_MESSAGE' | translate }}</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
+  } @else {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📝</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ totalRecipes() }}</div>
+          <div class="stat-label">{{ 'ADMIN.TOTAL_RECIPES' | translate }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <h2 class="section-title">{{ 'ADMIN.QUICK_ACTIONS' | translate }}</h2>
+      <div class="actions-grid">
+        <a routerLink="/admin/recipes" class="action-card">
+          <div class="action-icon">📝</div>
+          <div class="action-title">{{ 'NAV.MANAGE_RECIPES' | translate }}</div>
+          <div class="action-description">{{ 'ADMIN.MANAGE_RECIPES_DESC' | translate }}</div>
+        </a>
+        <a routerLink="/" class="action-card">
+          <div class="action-icon">🏠</div>
+          <div class="action-title">{{ 'ADMIN.VIEW_SITE' | translate }}</div>
+          <div class="action-description">{{ 'ADMIN.VIEW_SITE_DESC' | translate }}</div>
+        </a>
+      </div>
+    </div>
+  }
+</div>
