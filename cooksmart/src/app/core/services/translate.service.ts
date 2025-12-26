@@ -13,6 +13,11 @@ export class TranslateService {
   currentLang = signal<SupportedLanguage>('bg');
 
   constructor(private translate: NgxTranslateService) {
+    // Set available languages
+    this.translate.addLangs(['bg', 'en']);
+    // Set default language
+    this.translate.setDefaultLang('bg');
+    
     this.initializeLanguage();
   }
 
