@@ -70,11 +70,19 @@ export class IngredientService {
       console.log('[IngredientService] Creating ingredient:', ingredient);
       this.loading.set(true);
 
-      const { data, error } = await this.supabase.client
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Database operation timed out after 10 seconds')), 10000);
+      });
+
+      const insertPromise = this.supabase.client
         .from('ingredients')
         .insert(ingredient)
         .select()
         .single();
+
+      console.log('[IngredientService] Waiting for database response...');
+      const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
 
       console.log('[IngredientService] Insert result:', { data, error });
 
@@ -84,10 +92,14 @@ export class IngredientService {
       }
 
       console.log('[IngredientService] Ingredient created successfully:', data);
+      
+      // Refresh ingredients list after successful creation
+      await this.getIngredients();
+      
       return { success: true, data: data as Ingredient };
     } catch (error: any) {
       console.error('[IngredientService] Exception creating ingredient:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.message || 'Failed to create ingredient' };
     } finally {
       console.log('[IngredientService] Setting loading to false');
       this.loading.set(false);
