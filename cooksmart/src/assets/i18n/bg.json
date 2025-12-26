@@ -59,7 +59,8 @@
     "SAVE_TO_FAVORITES": "Запази в любими",
     "REMOVE_FROM_FAVORITES": "Премахни от любими",
     "MINUTES": "минути",
-    "SERVINGS_COUNT": "{{count}} порции"
+    "SERVINGS_COUNT": "{{count}} порции",
+    "NO_STEPS": "Няма добавени стъпки"
   },
   "AUTH": {
     "EMAIL": "Имейл",

@@ -59,7 +59,8 @@
     "SAVE_TO_FAVORITES": "Save to Favorites",
     "REMOVE_FROM_FAVORITES": "Remove from Favorites",
     "MINUTES": "minutes",
-    "SERVINGS_COUNT": "{{count}} servings"
+    "SERVINGS_COUNT": "{{count}} servings",
+    "NO_STEPS": "No steps added"
   },
   "AUTH": {
     "EMAIL": "Email",
