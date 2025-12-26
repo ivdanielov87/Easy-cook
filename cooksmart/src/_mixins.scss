@@ -2,7 +2,7 @@
 // SCSS Mixins - Mobile-First Media Queries
 // ============================================================================
 
-@import 'variables';
+@use 'variables' as *;
 
 // Mobile-First Media Query Mixins
 @mixin tablet {

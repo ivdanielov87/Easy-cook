@@ -2,8 +2,8 @@
 // Global Styles - CookSmart
 // ============================================================================
 
-@import 'variables';
-@import 'mixins';
+@use 'variables' as *;
+@use 'mixins' as *;
 
 * {
   box-sizing: border-box;
