@@ -1,0 +1,82 @@
+<div class="home-page">
+  <!-- Hero Section -->
+  <section class="hero" [@fadeIn]>
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">{{ 'RECIPE.FEATURED_RECIPES' | translate }}</h1>
+        <p class="hero-subtitle">{{ 'PANTRY.WHAT_CAN_I_COOK' | translate }}</p>
+        <div class="hero-actions">
+          <a routerLink="/recipes" class="btn btn-primary btn-lg">
+            {{ 'RECIPE.ALL_RECIPES' | translate }}
+          </a>
+          <a routerLink="/pantry" class="btn btn-secondary btn-lg">
+            {{ 'COMMON.MY_PANTRY' | translate }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Recipes Section -->
+  <section class="featured-recipes">
+    <div class="container">
+      <h2 class="section-title">{{ 'RECIPE.FEATURED_RECIPES' | translate }}</h2>
+      
+      @if (loading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>{{ 'COMMON.LOADING' | translate }}</p>
+        </div>
+      } @else if (featuredRecipes().length === 0) {
+        <div class="empty-state">
+          <p>{{ 'PANTRY.NO_RECIPES_FOUND' | translate }}</p>
+        </div>
+      } @else {
+        <div class="recipe-grid" [@staggerList]>
+          @for (recipe of featuredRecipes(); track recipe.id) {
+            <div class="recipe-card" [@fadeIn]>
+              <a [routerLink]="['/recipes', recipe.slug]" class="recipe-card-link">
+                <div class="recipe-image">
+                  @if (recipe.image_url) {
+                    <img [src]="recipe.image_url" [alt]="recipe.title" />
+                  } @else {
+                    <div class="recipe-image-placeholder">
+                      <span class="placeholder-icon">🍳</span>
+                    </div>
+                  }
+                  <div class="recipe-difficulty">
+                    <span class="difficulty-badge" [class]="'difficulty-' + recipe.difficulty.toLowerCase()">
+                      {{ 'RECIPE.' + recipe.difficulty.toUpperCase() | translate }}
+                    </span>
+                  </div>
+                </div>
+                <div class="recipe-content">
+                  <h3 class="recipe-title">{{ recipe.title }}</h3>
+                  <p class="recipe-description">{{ recipe.description }}</p>
+                  <div class="recipe-meta">
+                    <span class="meta-item">
+                      <span class="meta-icon">⏱️</span>
+                      {{ recipe.prep_time }} {{ 'RECIPE.MINUTES' | translate }}
+                    </span>
+                    <span class="meta-item">
+                      <span class="meta-icon">🍽️</span>
+                      {{ recipe.servings }} {{ 'RECIPE.SERVINGS' | translate }}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          }
+        </div>
+      }
+      
+      @if (!loading() && featuredRecipes().length > 0) {
+        <div class="view-all-section">
+          <a routerLink="/recipes" class="btn btn-outline">
+            {{ 'RECIPE.ALL_RECIPES' | translate }}
+          </a>
+        </div>
+      }
+    </div>
+  </section>
+</div>
