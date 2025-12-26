@@ -19,12 +19,20 @@ ALTER TABLE ingredients
 ALTER COLUMN name_bg SET NOT NULL,
 ALTER COLUMN name_en SET NOT NULL;
 
--- Step 4: Drop the old name column (optional - uncomment if you want to remove it)
--- ALTER TABLE ingredients DROP COLUMN IF EXISTS name;
+-- Step 4: Remove NOT NULL constraint from old name column (to allow new inserts)
+ALTER TABLE ingredients 
+ALTER COLUMN name DROP NOT NULL;
 
--- Step 5: Create indexes for better search performance
+-- Step 5: Set a default value for the old name column (for backward compatibility)
+ALTER TABLE ingredients 
+ALTER COLUMN name SET DEFAULT '';
+
+-- Step 6: Create indexes for better search performance
 CREATE INDEX IF NOT EXISTS idx_ingredients_name_bg ON ingredients(name_bg);
 CREATE INDEX IF NOT EXISTS idx_ingredients_name_en ON ingredients(name_en);
 
--- Step 6: Update RLS policies if needed (they should still work with the new columns)
+-- Step 7: Update RLS policies if needed (they should still work with the new columns)
 -- No changes needed to RLS policies as they don't reference the name column directly
+
+-- Note: You can optionally drop the 'name' column later once you're sure everything works:
+-- ALTER TABLE ingredients DROP COLUMN IF EXISTS name;
