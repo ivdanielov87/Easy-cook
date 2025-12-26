@@ -1,0 +1,29 @@
+// ============================================================================
+// SCSS Mixins - Mobile-First Media Queries
+// ============================================================================
+
+@import 'variables';
+
+// Mobile-First Media Query Mixins
+@mixin tablet {
+  @media (min-width: #{$breakpoint-mobile}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-tablet}) {
+    @content;
+  }
+}
+
+// Usage example:
+// .container {
+//   width: 100%;           // Mobile (base)
+//   @include tablet {
+//     width: 90%;          // Tablet
+//   }
+//   @include desktop {
+//     max-width: 1200px;   // Desktop
+//   }
+// }

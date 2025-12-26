@@ -5,9 +5,22 @@
     * Use **Standalone Components**.
     * Use **Angular Signals** for state management.
     * Use **RxJS** for complex async flows (http requests).
+* **Internationalization (i18n):** Use `@ngx-translate/core` for runtime language switching (BG/EN).
+    * Store translation JSON files in `src/assets/i18n/`.
+* **UI/UX & Animations:**
+    * **Design System:** Modern, minimalist, "Airy" look with ample whitespace.
+    * **Animations:** Use `@angular/animations` for smooth transitions (fade-in on route change, slide-in for lists).
+* **Responsive Design Strategy:**
+    * **Mobile-First Approach:** Write base styles for mobile devices first, then use `@media (min-width: ...)` to override for Tablet and Desktop.
+    * **Breakpoints:** Define and use standard SCSS mixins/variables:
+        * `$mobile`: < 768px (1 column layout, hamburger menu).
+        * `$tablet`: 768px - 1024px (2 column grids).
+        * `$desktop`: > 1024px (Max width container, 3-4 column grids).
+    * **Grid System:** Use CSS Grid or Flexbox for layouts. Avoid fixed pixel widths for containers (use `%`, `rem`, or `vw`).
 * **Styling:** SCSS (Sass).
     * Use variable files (`_variables.scss`) for colors/fonts.
     * Use component-scoped styles (`ViewEncapsulation`).
+    * Components should feel "premium" (subtle shadows, rounded corners, hover effects).
 * **Backend:** Supabase Cloud (Hosted).
     * Database: PostgreSQL.
     * Auth: Supabase Auth.

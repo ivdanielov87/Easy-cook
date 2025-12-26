@@ -1,9 +1,10 @@
 # Implementation Plan: CookSmart Recipe & Pantry Assistant
 
-**Version:** 1.0  
-**Date:** 2025-12-25  
+**Version:** 1.2  
+**Date:** 2025-12-26  
 **Methodology:** Spec Kit Phase 1 → Incremental Implementation  
-**Estimated Duration:** 8-10 days (single developer)
+**Estimated Duration:** 10-12 days (single developer)  
+**Updated:** Added i18n (BG/EN), design system, and mobile-first responsive design
 
 ---
 
@@ -83,7 +84,40 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
       ├── pipes/
       └── directives/
   ```
-- [ ] **1.2.3** Create `_variables.scss` with color/font system
+- [ ] **1.2.3** Create `_variables.scss` with color/font system and responsive breakpoints:
+  ```scss
+  // Responsive Breakpoints
+  $breakpoint-mobile: 768px;
+  $breakpoint-tablet: 1024px;
+  
+  // Colors, fonts, etc. (to be expanded in Milestone 1.5)
+  ```
+- [ ] **1.2.3b** Create `_mixins.scss` with mobile-first media query helpers:
+  ```scss
+  // Mobile-First Media Query Mixins
+  @mixin tablet {
+    @media (min-width: #{$breakpoint-mobile}) {
+      @content;
+    }
+  }
+  
+  @mixin desktop {
+    @media (min-width: #{$breakpoint-tablet}) {
+      @content;
+    }
+  }
+  
+  // Usage example:
+  // .container {
+  //   width: 100%;           // Mobile (base)
+  //   @include tablet {
+  //     width: 90%;          // Tablet
+  //   }
+  //   @include desktop {
+  //     max-width: 1200px;   // Desktop
+  //   }
+  // }
+  ```
 - [ ] **1.2.4** Configure `angular.json` to include global styles
 - [ ] **1.2.5** Create environment files with Supabase placeholders
   ```typescript
@@ -97,6 +131,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   ```bash
   npm install @supabase/supabase-js
   npm install @angular/material (optional)
+  npm install @ngx-translate/core @ngx-translate/http-loader
   ```
 
 **Validation:** `ng build` succeeds without errors
@@ -105,12 +140,339 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 
 ---
 
-### Milestone 1.3: Core Models & Interfaces
+### Milestone 1.4: Internationalization Setup (i18n)
+**Duration:** 0.5 days  
+**Goal:** Configure ngx-translate for Bulgarian/English language switching
+
+#### Tasks
+- [ ] **1.4.1** Configure `@ngx-translate/core` in `app.config.ts`:
+  - Import `TranslateModule`, `TranslateLoader`, `TranslateHttpLoader`
+  - Set default language to 'bg' (Bulgarian)
+  - Set fallback language to 'en' (English)
+  - Configure loader to read from `assets/i18n/{lang}.json`
+- [ ] **1.4.2** Create translation directory structure:
+  ```
+  src/assets/i18n/
+  ├── bg.json
+  └── en.json
+  ```
+- [ ] **1.4.3** Create initial Bulgarian translation file (`bg.json`):
+  ```json
+  {
+    "COMMON": {
+      "HOME": "Начало",
+      "MY_PANTRY": "Моят Килер",
+      "LOGIN": "Вход",
+      "LOGOUT": "Изход",
+      "REGISTER": "Регистрация",
+      "PROFILE": "Профил",
+      "SEARCH": "Търсене",
+      "SAVE": "Запази",
+      "CANCEL": "Отказ",
+      "DELETE": "Изтрий",
+      "EDIT": "Редактирай"
+    },
+    "NAV": {
+      "RECIPES": "Рецепти",
+      "ADMIN": "Администрация"
+    },
+    "RECIPE": {
+      "TITLE": "Заглавие",
+      "DESCRIPTION": "Описание",
+      "INGREDIENTS": "Съставки",
+      "STEPS": "Стъпки",
+      "PREP_TIME": "Време за приготвяне",
+      "SERVINGS": "Порции",
+      "DIFFICULTY": "Трудност",
+      "EASY": "Лесна",
+      "MEDIUM": "Средна",
+      "HARD": "Трудна"
+    },
+    "AUTH": {
+      "EMAIL": "Имейл",
+      "PASSWORD": "Парола",
+      "DISPLAY_NAME": "Име за показване",
+      "LOGIN_TITLE": "Вход в системата",
+      "REGISTER_TITLE": "Регистрация"
+    },
+    "ADMIN": {
+      "DASHBOARD": "Табло",
+      "MANAGE_RECIPES": "Управление на рецепти",
+      "TOTAL_RECIPES": "Общо рецепти",
+      "TOTAL_USERS": "Общо потребители"
+    }
+  }
+  ```
+- [ ] **1.4.4** Create initial English translation file (`en.json`):
+  ```json
+  {
+    "COMMON": {
+      "HOME": "Home",
+      "MY_PANTRY": "My Pantry",
+      "LOGIN": "Login",
+      "LOGOUT": "Logout",
+      "REGISTER": "Register",
+      "PROFILE": "Profile",
+      "SEARCH": "Search",
+      "SAVE": "Save",
+      "CANCEL": "Cancel",
+      "DELETE": "Delete",
+      "EDIT": "Edit"
+    },
+    "NAV": {
+      "RECIPES": "Recipes",
+      "ADMIN": "Administration"
+    },
+    "RECIPE": {
+      "TITLE": "Title",
+      "DESCRIPTION": "Description",
+      "INGREDIENTS": "Ingredients",
+      "STEPS": "Steps",
+      "PREP_TIME": "Prep Time",
+      "SERVINGS": "Servings",
+      "DIFFICULTY": "Difficulty",
+      "EASY": "Easy",
+      "MEDIUM": "Medium",
+      "HARD": "Hard"
+    },
+    "AUTH": {
+      "EMAIL": "Email",
+      "PASSWORD": "Password",
+      "DISPLAY_NAME": "Display Name",
+      "LOGIN_TITLE": "Login",
+      "REGISTER_TITLE": "Register"
+    },
+    "ADMIN": {
+      "DASHBOARD": "Dashboard",
+      "MANAGE_RECIPES": "Manage Recipes",
+      "TOTAL_RECIPES": "Total Recipes",
+      "TOTAL_USERS": "Total Users"
+    }
+  }
+  ```
+- [ ] **1.4.5** Create `TranslateService` wrapper in `src/app/core/services/translate.service.ts`:
+  - Method to switch language: `setLanguage(lang: 'bg' | 'en')`
+  - Signal for current language: `currentLang$`
+  - Store selected language in localStorage
+  - Load saved language preference on app init
+- [ ] **1.4.6** Test language switching:
+  - Verify JSON files load correctly
+  - Verify language persists after page reload
+  - Verify all keys resolve properly
+
+**Validation:**
+- Translation files load without errors
+- Language can be switched programmatically
+- Default language is Bulgarian
+
+**Commit:** `feat(i18n): setup ngx-translate with BG/EN translation files`
+
+---
+
+### Milestone 1.5: Design System & Animations Setup
+**Duration:** 0.5 days  
+**Goal:** Establish modern design system with Angular animations
+
+#### Tasks
+- [ ] **1.5.1** Import `BrowserAnimationsModule` in `app.config.ts`:
+  ```typescript
+  import { provideAnimations } from '@angular/platform-browser/animations';
+  // Add to providers array
+  ```
+- [ ] **1.5.2** Enhance `_variables.scss` with modern design tokens:
+  ```scss
+  // Responsive Breakpoints (Mobile-First)
+  $breakpoint-mobile: 768px;   // < 768px = Mobile (base styles)
+  $breakpoint-tablet: 1024px;  // 768px - 1024px = Tablet
+  // > 1024px = Desktop
+  
+  // Color Palette - Modern & Airy
+  $primary-color: #6366f1;        // Indigo
+  $primary-light: #818cf8;
+  $primary-dark: #4f46e5;
+  
+  $secondary-color: #10b981;      // Emerald
+  $accent-color: #f59e0b;         // Amber
+  
+  $background-light: #ffffff;
+  $background-gray: #f9fafb;
+  $surface: #ffffff;
+  
+  $text-primary: #111827;
+  $text-secondary: #6b7280;
+  $text-muted: #9ca3af;
+  
+  $border-color: #e5e7eb;
+  $border-radius: 12px;           // Rounded corners
+  $border-radius-sm: 8px;
+  $border-radius-lg: 16px;
+  
+  // Shadows - Subtle & Premium
+  $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  // Spacing - Generous Whitespace
+  $spacing-xs: 0.5rem;   // 8px
+  $spacing-sm: 1rem;     // 16px
+  $spacing-md: 1.5rem;   // 24px
+  $spacing-lg: 2rem;     // 32px
+  $spacing-xl: 3rem;     // 48px
+  $spacing-2xl: 4rem;    // 64px
+  
+  // Typography
+  $font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  $font-size-base: 16px;
+  $font-weight-normal: 400;
+  $font-weight-medium: 500;
+  $font-weight-semibold: 600;
+  $font-weight-bold: 700;
+  
+  // Transitions
+  $transition-fast: 150ms ease-in-out;
+  $transition-base: 250ms ease-in-out;
+  $transition-slow: 350ms ease-in-out;
+  
+  // Container Max Width
+  $container-max-width: 1200px;
+  ```
+- [ ] **1.5.3** Create reusable animation definitions in `src/app/shared/animations/`:
+  - `fade.animation.ts` - Fade in/out for route transitions
+  - `slide.animation.ts` - Slide in from bottom for lists
+  - `scale.animation.ts` - Scale up for modals/dialogs
+- [ ] **1.5.4** Create `fade.animation.ts`:
+  ```typescript
+  import { trigger, transition, style, animate } from '@angular/animations';
+  
+  export const fadeInOut = trigger('fadeInOut', [
+    transition(':enter', [
+      style({ opacity: 0 }),
+      animate('250ms ease-in-out', style({ opacity: 1 }))
+    ]),
+    transition(':leave', [
+      animate('250ms ease-in-out', style({ opacity: 0 }))
+    ])
+  ]);
+  
+  export const fadeIn = trigger('fadeIn', [
+    transition(':enter', [
+      style({ opacity: 0, transform: 'translateY(10px)' }),
+      animate('350ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+    ])
+  ]);
+  ```
+- [ ] **1.5.5** Create `slide.animation.ts`:
+  ```typescript
+  import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
+  
+  export const slideInUp = trigger('slideInUp', [
+    transition(':enter', [
+      style({ opacity: 0, transform: 'translateY(20px)' }),
+      animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+    ])
+  ]);
+  
+  export const staggerList = trigger('staggerList', [
+    transition('* => *', [
+      query(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        stagger('50ms', [
+          animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+        ])
+      ], { optional: true })
+    ])
+  ]);
+  ```
+- [ ] **1.5.6** Create global styles in `src/styles.scss` with mobile-first approach:
+  ```scss
+  @import 'variables';
+  @import 'mixins';
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: $font-family;
+    font-size: $font-size-base;
+    color: $text-primary;
+    background-color: $background-gray;
+    line-height: 1.6;
+  }
+  
+  // Responsive Container
+  .container {
+    width: 100%;
+    padding: 0 $spacing-md;
+    margin: 0 auto;
+    
+    @include tablet {
+      padding: 0 $spacing-lg;
+    }
+    
+    @include desktop {
+      max-width: $container-max-width;
+    }
+  }
+  
+  // Premium hover effects
+  .card {
+    background: $surface;
+    border-radius: $border-radius;
+    box-shadow: $shadow-sm;
+    transition: all $transition-base;
+    
+    &:hover {
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+  }
+  
+  .btn {
+    border-radius: $border-radius-sm;
+    padding: $spacing-sm $spacing-md;
+    font-weight: $font-weight-medium;
+    transition: all $transition-fast;
+    border: none;
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: $shadow-md;
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+  ```
+- [ ] **1.5.7** Add Google Fonts (Inter) to `index.html`:
+  ```html
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  ```
+
+**Validation:**
+- Animations module imported without errors
+- Design tokens accessible in all SCSS files
+- Animation triggers compile successfully
+- Google Fonts load correctly
+
+**Commit 1:** `style(design): create modern design system with variables`  
+**Commit 2:** `feat(animations): setup Angular animations with reusable triggers`
+
+---
+
+### Milestone 1.6: Core Models & Interfaces
 **Duration:** 0.5 days  
 **Goal:** TypeScript interfaces for all domain entities
 
 #### Tasks
-- [ ] **1.3.1** Create `src/app/core/models/profile.model.ts`
+- [ ] **1.6.1** Create `src/app/core/models/profile.model.ts`
   ```typescript
   export interface Profile {
     id: string;
@@ -120,7 +482,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     role: 'user' | 'admin';
   }
   ```
-- [ ] **1.3.2** Create `src/app/core/models/recipe.model.ts`
+- [ ] **1.6.2** Create `src/app/core/models/recipe.model.ts`
   ```typescript
   export type Difficulty = 'Easy' | 'Medium' | 'Hard';
   
@@ -138,9 +500,9 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     steps?: string[]; // JSON array
   }
   ```
-- [ ] **1.3.3** Create `src/app/core/models/ingredient.model.ts`
-- [ ] **1.3.4** Create `src/app/core/models/recipe-ingredient.model.ts`
-- [ ] **1.3.5** Create barrel export `src/app/core/models/index.ts`
+- [ ] **1.6.3** Create `src/app/core/models/ingredient.model.ts`
+- [ ] **1.6.4** Create `src/app/core/models/recipe-ingredient.model.ts`
+- [ ] **1.6.5** Create barrel export `src/app/core/models/index.ts`
 
 **Validation:** No TypeScript errors, models importable
 
@@ -181,19 +543,39 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 ---
 
 ### Milestone 2.2: Layout Components
-**Duration:** 1 day  
-**Goal:** Main and Admin layouts with navigation
+**Duration:** 1.5 days  
+**Goal:** Main and Admin layouts with navigation and language switcher
 
 #### Tasks
-- [ ] **2.2.1** Create `MainLayoutComponent` with:
-  - Navbar (logo, search bar, Home/My Pantry links, user menu)
-  - Router outlet
-  - Footer
-- [ ] **2.2.2** Create `AdminLayoutComponent` with:
-  - Sidebar (Dashboard, Manage Recipes, Logout)
+- [ ] **2.2.1** Create `LanguageSwitcherComponent` (shared):
+  - Dropdown with BG/EN flags/labels
+  - Calls `TranslateService.setLanguage()`
+  - Shows current language with visual indicator
+  - Styled with premium hover effects
+  - Responsive: Compact on mobile, full labels on desktop
+- [ ] **2.2.2** Create `MainLayoutComponent` with responsive navbar:
+  - **Mobile (< 768px):**
+    - Logo on left, hamburger menu icon on right
+    - Language switcher and user menu in collapsed menu
+    - Full-width search bar below header (optional)
+  - **Tablet/Desktop (≥ 768px):**
+    - Horizontal navbar with logo, links (Home, My Pantry), search bar, language switcher, user menu
+    - All navigation labels use `translate` pipe
+  - Router outlet with fade animation
+  - Footer with translated content (stacked on mobile, horizontal on desktop)
+- [ ] **2.2.3** Create `AdminLayoutComponent` with:
+  - Sidebar (Dashboard, Manage Recipes, Logout) - all translated
+  - Language switcher in top bar
   - Router outlet for admin content
-- [ ] **2.2.3** Style both layouts with SCSS using variables
-- [ ] **2.2.4** Configure routes:
+- [ ] **2.2.4** Style both layouts with mobile-first SCSS:
+  - **Mobile base styles:** Compact spacing, stacked elements, hamburger menu
+  - **Tablet (@include tablet):** 2-column grids where applicable
+  - **Desktop (@include desktop):** Max-width container, horizontal menus, 3-4 column grids
+  - Apply generous whitespace ($spacing-lg, $spacing-xl)
+  - Use subtle shadows ($shadow-md)
+  - Rounded corners ($border-radius)
+  - Smooth transitions on hover states and menu animations
+- [ ] **2.2.5** Configure routes with animations:
   ```typescript
   {
     path: '',
@@ -218,48 +600,80 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   ```
 
 **Validation:**
-- Layouts render correctly
-- Navigation works
+- Layouts render correctly with modern design
+- **Mobile:** Hamburger menu toggles, 1-column layout
+- **Tablet:** 2-column grids, horizontal nav
+- **Desktop:** Max-width container, full navigation
+- Navigation works with translations
+- Language switcher changes UI language instantly
+- Route transitions animate smoothly
 - Guards block unauthorized access
 
-**Commit:** `feat(layout): create main and admin layout components`
+**Commit 1:** `feat(i18n): create language switcher component`  
+**Commit 2:** `feat(layout): create main and admin layouts with translations`  
+**Commit 3:** `style(layout): apply modern design system to layouts`
 
 ---
 
 ## Phase 3: Public Features
 
 ### Milestone 3.1: Recipe List & Detail Pages
-**Duration:** 2 days  
-**Goal:** Users can browse and view recipes
+**Duration:** 2.5 days  
+**Goal:** Users can browse and view recipes with modern UI and animations
 
 #### Tasks
 - [ ] **3.1.1** Create `RecipeService` with methods:
   - `getRecipes(filters?: { difficulty?, prepTime? })`
   - `getRecipeBySlug(slug: string)`
   - `searchByIngredients(ingredientIds: string[])`
-- [ ] **3.1.2** Create `RecipeListComponent`:
-  - Grid layout with recipe cards
-  - Filter dropdowns (difficulty, prep time)
+- [ ] **3.1.2** Create `RecipeListComponent` with responsive grid:
+  - **Mobile:** 1 card per row (100% width)
+  - **Tablet:** 2 cards per row (CSS Grid: `grid-template-columns: repeat(2, 1fr)`)
+  - **Desktop:** 3-4 cards per row (CSS Grid: `repeat(auto-fill, minmax(280px, 1fr))`)
+  - Filter dropdowns (difficulty, prep time) - all translated
+  - Filters stack vertically on mobile, horizontal on desktop
   - Use Angular Signals for state
-- [ ] **3.1.3** Create `RecipeCardComponent` (shared):
+  - Apply `staggerList` animation to recipe grid
+  - Add loading skeleton with fade animation
+- [ ] **3.1.3** Create `RecipeCardComponent` (shared) with responsive design:
   - Display thumbnail, title, difficulty chip, prep time
+  - Premium card styling (shadow, rounded corners, hover lift effect)
+  - **Mobile:** Full-width card, larger touch targets
+  - **Desktop:** Fixed aspect ratio, hover effects
   - Click navigates to detail page
-- [ ] **3.1.4** Create `RecipeDetailComponent`:
-  - Hero image
-  - Metadata chips (time, servings, difficulty)
-  - Ingredients list with checkboxes
-  - Steps list
-  - "Save to Favorites" button (if authenticated)
-- [ ] **3.1.5** Style all components with SCSS
+  - Apply `fadeIn` animation on load
+  - All labels translated (difficulty, time units)
+- [ ] **3.1.4** Create `RecipeDetailComponent` with responsive layout:
+  - Hero image with subtle overlay (full-width on mobile, contained on desktop)
+  - **Mobile:** Stacked layout (image → metadata → ingredients → steps)
+  - **Desktop:** 2-column layout (ingredients sidebar, steps main column)
+  - Metadata chips (time, servings, difficulty) - translated
+  - Ingredients list with animated checkboxes
+  - Steps list with numbered badges
+  - "Save to Favorites" button with icon (if authenticated) - translated
+  - Apply `fadeIn` animation to sections
+- [ ] **3.1.5** Style all components with modern design system:
+  - Ample whitespace between sections
+  - Subtle shadows on cards
+  - Smooth transitions on interactive elements
+  - Rounded corners on all containers
+  - Premium hover effects
 
 **Validation:**
-- Recipe list loads from Supabase
-- Filters work correctly
-- Detail page displays all recipe data
+- Recipe list loads from Supabase with stagger animation
+- **Mobile:** 1 card per row, stacked filters, hamburger menu works
+- **Tablet:** 2 cards per row, horizontal filters
+- **Desktop:** 3-4 cards per row, full navigation
+- Filters work correctly with translated labels
+- Detail page displays all recipe data with animations
 - Routing via slug works
+- UI feels premium and airy on all screen sizes
+- All text displays in selected language
+- Touch targets are adequate on mobile (min 44px)
 
-**Commit 1:** `feat(recipes): implement recipe list with filters`  
-**Commit 2:** `feat(recipes): implement recipe detail page`
+**Commit 1:** `feat(recipes): implement recipe list with filters and animations`  
+**Commit 2:** `feat(recipes): implement recipe detail page with modern design`  
+**Commit 3:** `style(recipes): apply premium design system to recipe components`
 
 ---
 
@@ -435,21 +849,36 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 
 ---
 
-### Milestone 5.2: Responsive Design & Accessibility
+### Milestone 5.2: Responsive Design Testing & Accessibility
 **Duration:** 1 day  
-**Goal:** Mobile-friendly and accessible
+**Goal:** Verify mobile-first responsive design and accessibility
 
 #### Tasks
-- [ ] **5.2.1** Test all pages on mobile viewport
-- [ ] **5.2.2** Add responsive breakpoints in SCSS
-- [ ] **5.2.3** Ensure forms have proper labels and ARIA attributes
-- [ ] **5.2.4** Test keyboard navigation
-- [ ] **5.2.5** Add focus styles
+- [ ] **5.2.1** Test all pages on multiple viewports:
+  - Mobile (375px, 414px - iPhone sizes)
+  - Tablet (768px, 1024px - iPad sizes)
+  - Desktop (1280px, 1920px)
+- [ ] **5.2.2** Verify responsive breakpoints work correctly:
+  - Hamburger menu appears/disappears at correct breakpoint
+  - Grid columns adjust (1 → 2 → 3-4)
+  - Text sizes and spacing scale appropriately
+- [ ] **5.2.3** Test touch interactions on mobile:
+  - Buttons have min 44px touch targets
+  - Swipe gestures work (if applicable)
+  - No hover-only interactions
+- [ ] **5.2.4** Ensure forms have proper labels and ARIA attributes
+- [ ] **5.2.5** Test keyboard navigation
+- [ ] **5.2.6** Add focus styles (visible focus indicators)
+- [ ] **5.2.7** Test with browser DevTools responsive mode and real devices
 
 **Validation:**
-- App usable on mobile (320px width)
+- App usable on mobile (320px - 768px width)
+- Tablet layout works (768px - 1024px)
+- Desktop layout works (> 1024px)
+- No horizontal scroll on any viewport
 - Forms accessible via keyboard
 - Screen reader compatible (basic)
+- Touch targets meet accessibility standards (44px min)
 
 **Commit:** `style(responsive): implement mobile-friendly layouts`
 

@@ -8,7 +8,14 @@ The application has two distinct layout modes to separate public access from adm
 
 1.  **Public Layout (`MainLayoutComponent`):**
     * **Navbar:** Logo, Smart Search Bar, Links (Home, My Pantry), User Menu (Login/Profile/Logout).
+        * **Desktop:** Full horizontal menu with text links.
+        * **Mobile/Tablet:** Collapsible "Hamburger" menu. Logo on the left, Cart/Profile icon on the right.
+        * **Language Switcher:** In the navbar, there should be also a dropdown to switch between Bulgarian (BG) and English (EN) instantly. Default is BG.
     * **Main Content:** The router outlet for public pages.
+    * **Recipe Discovery (Grid Behavior):**
+        * **Mobile:** 1 card per row (stacked).
+        * **Tablet:** 2 cards per row.
+        * **Desktop:** 3 or 4 cards per row.
     * **Footer:** Copyright, Social Links, Quick Links.
 2.  **Admin Layout (`AdminLayoutComponent`):**
     * **Sidebar/TopBar:** Dashboard, Manage Recipes, Users, Logout.
