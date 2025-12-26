@@ -45,7 +45,7 @@
                 type="button"
               >
                 <span class="chip-icon">{{ isSelected(ingredient.id) ? '✓' : '+' }}</span>
-                <span class="chip-name">{{ ingredient.name }}</span>
+                <span class="chip-name">{{ getIngredientName(ingredient) }}</span>
               </button>
             }
           </div>

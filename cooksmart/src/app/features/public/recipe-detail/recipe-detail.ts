@@ -4,7 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { RecipeWithIngredients } from '../../../core/models';
+import { TranslateService } from '../../../core/services/translate.service';
+import { RecipeWithIngredients, RecipeIngredientDetail } from '../../../core/models';
 import { fadeIn } from '../../../shared/animations';
 
 @Component({
@@ -24,7 +25,8 @@ export class RecipeDetail implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private recipeService: RecipeService,
-    public authService: AuthService
+    public authService: AuthService,
+    private translateService: TranslateService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -77,5 +79,10 @@ export class RecipeDetail implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/recipes']);
+  }
+
+  getIngredientName(ingredient: RecipeIngredientDetail): string {
+    const currentLang = this.translateService.getCurrentLanguage();
+    return currentLang === 'bg' ? ingredient.name_bg : ingredient.name_en;
   }
 }

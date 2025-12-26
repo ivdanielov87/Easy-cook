@@ -21,7 +21,8 @@ export interface RecipeWithIngredients extends Recipe {
 
 export interface RecipeIngredientDetail {
   id: string;
-  name: string;
+  name_bg: string;
+  name_en: string;
   quantity: string;
   unit: string;
 }

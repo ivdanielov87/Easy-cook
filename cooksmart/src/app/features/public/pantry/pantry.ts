@@ -10,7 +10,8 @@ import { fadeIn, staggerList } from '../../../shared/animations';
 
 @Component({
   selector: 'app-pantry',
-  imports: [CommonModule, RouterLink, FormsModule, TranslateModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
   templateUrl: './pantry.html',
   styleUrl: './pantry.scss',
   animations: [fadeIn, staggerList]
@@ -47,7 +48,8 @@ export class Pantry implements OnInit {
       return this.allIngredients();
     }
     return this.allIngredients().filter(ing => 
-      ing.name.toLowerCase().includes(query)
+      ing.name_bg.toLowerCase().includes(query) ||
+      ing.name_en.toLowerCase().includes(query)
     );
   }
 
@@ -88,5 +90,9 @@ export class Pantry implements OnInit {
 
   onSearchChange(value: string): void {
     this.searchQuery.set(value);
+  }
+
+  getIngredientName(ingredient: Ingredient): string {
+    return this.ingredientService.getIngredientName(ingredient);
   }
 }
