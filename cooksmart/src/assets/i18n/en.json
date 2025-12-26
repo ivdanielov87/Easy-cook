@@ -22,7 +22,10 @@
     "NO": "No",
     "LOADING": "Loading...",
     "ERROR": "Error",
-    "SUCCESS": "Success"
+    "SUCCESS": "Success",
+    "LANGUAGE": "Language",
+    "LINKS": "Links",
+    "LEGAL": "Legal"
   },
   "NAV": {
     "RECIPES": "Recipes",
