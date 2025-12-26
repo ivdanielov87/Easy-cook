@@ -253,10 +253,18 @@ export class RecipeForm implements OnInit {
   }
 
   async createNewIngredient(): Promise<void> {
+    // Prevent double-clicking
+    if (this.creatingIngredient()) {
+      console.log('Already creating ingredient, ignoring duplicate call');
+      return;
+    }
+
     const nameBg = this.newIngredientNameBg().trim();
     const nameEn = this.newIngredientNameEn().trim();
     
+    console.log('=== Starting ingredient creation ===');
     console.log('Creating ingredient:', { nameBg, nameEn });
+    console.log('Current creatingIngredient state:', this.creatingIngredient());
     
     if (!nameBg || !nameEn) {
       this.error.set('Both Bulgarian and English names are required');
@@ -265,6 +273,7 @@ export class RecipeForm implements OnInit {
     }
 
     this.creatingIngredient.set(true);
+    console.log('Set creatingIngredient to true');
     this.error.set('');
 
     try {
@@ -277,15 +286,19 @@ export class RecipeForm implements OnInit {
       console.log('Create ingredient result:', result);
 
       if (result.success && result.data) {
+        console.log('Success! Adding ingredient to lists...');
+        
         // Add to available ingredients
         this.availableIngredients.update(ingredients => [...ingredients, result.data!]);
         this.filteredIngredients.update(ingredients => [...ingredients, result.data!]);
         
+        console.log('Resetting form...');
         // Reset form
         this.newIngredientNameBg.set('');
         this.newIngredientNameEn.set('');
         this.showNewIngredientForm.set(false);
         
+        console.log('Adding ingredient to selected...');
         // Optionally add to selected ingredients
         this.addIngredient(result.data);
         
@@ -304,15 +317,23 @@ export class RecipeForm implements OnInit {
       console.error('Exception creating ingredient:', err);
       alert('Error creating ingredient: ' + errorMsg);
     } finally {
+      console.log('Setting creatingIngredient to false');
       this.creatingIngredient.set(false);
+      console.log('Final creatingIngredient state:', this.creatingIngredient());
+      console.log('=== Ingredient creation complete ===');
     }
   }
 
   toggleNewIngredientForm(): void {
-    this.showNewIngredientForm.update(show => !show);
-    if (!this.showNewIngredientForm()) {
-      this.newIngredientNameBg.set('');
-      this.newIngredientNameEn.set('');
-    }
+    const willShow = !this.showNewIngredientForm();
+    console.log('Toggling ingredient form, will show:', willShow);
+    
+    // Always reset form state when toggling
+    this.newIngredientNameBg.set('');
+    this.newIngredientNameEn.set('');
+    this.creatingIngredient.set(false);
+    this.error.set('');
+    
+    this.showNewIngredientForm.set(willShow);
   }
 }
