@@ -1,0 +1,316 @@
+import { Injectable, signal } from '@angular/core';
+import { SupabaseService } from './supabase.service';
+import { Recipe, RecipeWithIngredients, RecipeCreate, RecipeUpdate, RecipeFilters } from '../models';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class RecipeService {
+  recipes = signal<Recipe[]>([]);
+  loading = signal<boolean>(false);
+
+  constructor(private supabase: SupabaseService) {}
+
+  /**
+   * Fetch all recipes with optional filters
+   */
+  async getRecipes(filters?: RecipeFilters): Promise<Recipe[]> {
+    try {
+      this.loading.set(true);
+      let query = this.supabase.client
+        .from('recipes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      // Apply filters
+      if (filters?.difficulty) {
+        query = query.eq('difficulty', filters.difficulty);
+      }
+
+      if (filters?.prepTime) {
+        switch (filters.prepTime) {
+          case 'less_than_15':
+            query = query.lt('prep_time', 15);
+            break;
+          case '15_to_30':
+            query = query.gte('prep_time', 15).lte('prep_time', 30);
+            break;
+          case '30_to_60':
+            query = query.gte('prep_time', 30).lte('prep_time', 60);
+            break;
+          case 'more_than_60':
+            query = query.gt('prep_time', 60);
+            break;
+        }
+      }
+
+      if (filters?.search) {
+        query = query.ilike('title', `%${filters.search}%`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      this.recipes.set(data as Recipe[]);
+      return data as Recipe[];
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+      return [];
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Get a single recipe by ID with ingredients
+   */
+  async getRecipeById(id: string): Promise<RecipeWithIngredients | null> {
+    try {
+      this.loading.set(true);
+
+      // Use the get_recipe_with_details RPC function
+      const { data, error } = await this.supabase.client
+        .rpc('get_recipe_with_details', { recipe_id: id });
+
+      if (error) throw error;
+
+      return data as RecipeWithIngredients;
+    } catch (error) {
+      console.error('Error fetching recipe:', error);
+      return null;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Get recipe by slug
+   */
+  async getRecipeBySlug(slug: string): Promise<RecipeWithIngredients | null> {
+    try {
+      this.loading.set(true);
+
+      const { data, error } = await this.supabase.client
+        .from('recipes')
+        .select('*')
+        .eq('slug', slug)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        return await this.getRecipeById(data.id);
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching recipe by slug:', error);
+      return null;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Create a new recipe (admin only)
+   */
+  async createRecipe(recipe: RecipeCreate): Promise<{ success: boolean; data?: Recipe; error?: string }> {
+    try {
+      this.loading.set(true);
+
+      // Insert recipe
+      const { data: recipeData, error: recipeError } = await this.supabase.client
+        .from('recipes')
+        .insert({
+          title: recipe.title,
+          slug: recipe.slug,
+          description: recipe.description,
+          image_url: recipe.image_url,
+          prep_time: recipe.prep_time,
+          servings: recipe.servings,
+          difficulty: recipe.difficulty,
+          steps: recipe.steps
+        })
+        .select()
+        .single();
+
+      if (recipeError) throw recipeError;
+
+      // Insert recipe ingredients
+      if (recipe.ingredients && recipe.ingredients.length > 0) {
+        const ingredientsToInsert = recipe.ingredients.map(ing => ({
+          recipe_id: recipeData.id,
+          ingredient_id: ing.ingredient_id,
+          quantity: ing.quantity,
+          unit: ing.unit
+        }));
+
+        const { error: ingredientsError } = await this.supabase.client
+          .from('recipe_ingredients')
+          .insert(ingredientsToInsert);
+
+        if (ingredientsError) throw ingredientsError;
+      }
+
+      return { success: true, data: recipeData as Recipe };
+    } catch (error: any) {
+      console.error('Error creating recipe:', error);
+      return { success: false, error: error.message };
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Update an existing recipe (admin only)
+   */
+  async updateRecipe(id: string, updates: RecipeUpdate): Promise<{ success: boolean; error?: string }> {
+    try {
+      this.loading.set(true);
+
+      const { error } = await this.supabase.client
+        .from('recipes')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // If ingredients are provided, update them
+      if (updates.ingredients) {
+        // Delete existing ingredients
+        await this.supabase.client
+          .from('recipe_ingredients')
+          .delete()
+          .eq('recipe_id', id);
+
+        // Insert new ingredients
+        if (updates.ingredients.length > 0) {
+          const ingredientsToInsert = updates.ingredients.map(ing => ({
+            recipe_id: id,
+            ingredient_id: ing.ingredient_id,
+            quantity: ing.quantity,
+            unit: ing.unit
+          }));
+
+          const { error: ingredientsError } = await this.supabase.client
+            .from('recipe_ingredients')
+            .insert(ingredientsToInsert);
+
+          if (ingredientsError) throw ingredientsError;
+        }
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error updating recipe:', error);
+      return { success: false, error: error.message };
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Delete a recipe (admin only)
+   */
+  async deleteRecipe(id: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      this.loading.set(true);
+
+      const { error } = await this.supabase.client
+        .from('recipes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error deleting recipe:', error);
+      return { success: false, error: error.message };
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Search recipes by ingredients
+   */
+  async searchByIngredients(ingredientIds: string[]): Promise<Recipe[]> {
+    try {
+      this.loading.set(true);
+
+      const { data, error } = await this.supabase.client
+        .rpc('search_recipes_by_ingredients', { ingredient_ids: ingredientIds });
+
+      if (error) throw error;
+
+      return data as Recipe[];
+    } catch (error) {
+      console.error('Error searching recipes by ingredients:', error);
+      return [];
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Save recipe to favorites
+   */
+  async saveRecipe(recipeId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { error } = await this.supabase.client
+        .from('saved_recipes')
+        .insert({ recipe_id: recipeId });
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error saving recipe:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Remove recipe from favorites
+   */
+  async unsaveRecipe(recipeId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { error } = await this.supabase.client
+        .from('saved_recipes')
+        .delete()
+        .eq('recipe_id', recipeId);
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error unsaving recipe:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Get user's saved recipes
+   */
+  async getSavedRecipes(): Promise<Recipe[]> {
+    try {
+      this.loading.set(true);
+
+      const { data, error } = await this.supabase.client
+        .from('saved_recipes')
+        .select('recipe_id, recipes(*)')
+        .order('saved_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data.map((item: any) => item.recipes) as Recipe[];
+    } catch (error) {
+      console.error('Error fetching saved recipes:', error);
+      return [];
+    } finally {
+      this.loading.set(false);
+    }
+  }
+}
