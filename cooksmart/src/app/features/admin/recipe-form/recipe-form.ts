@@ -235,4 +235,12 @@ export class RecipeForm implements OnInit {
   cancel(): void {
     this.router.navigate(['/admin/recipes']);
   }
+
+  isIngredientSelected(ingredientId: string): boolean {
+    return this.selectedIngredients().some(i => i.ingredient_id === ingredientId);
+  }
+
+  getIngredientName(ingredientId: string): string {
+    return this.availableIngredients().find(i => i.id === ingredientId)?.name || '';
+  }
 }

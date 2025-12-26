@@ -125,7 +125,7 @@
               type="button"
               class="chip"
               (click)="addIngredient(ingredient)"
-              [class.selected]="selectedIngredients().some(i => i.ingredient_id === ingredient.id)"
+              [class.selected]="isIngredientSelected(ingredient.id)"
             >
               {{ ingredient.name }}
             </button>
@@ -138,7 +138,7 @@
             @for (ingredient of selectedIngredients(); track ingredient.ingredient_id; let i = $index) {
               <div class="ingredient-row">
                 <span class="ingredient-name">
-                  {{ availableIngredients().find(ing => ing.id === ingredient.ingredient_id)?.name }}
+                  {{ getIngredientName(ingredient.ingredient_id) }}
                 </span>
                 <input
                   type="text"
