@@ -261,28 +261,41 @@ export class RecipeForm implements OnInit {
     this.creatingIngredient.set(true);
     this.error.set('');
 
-    const result = await this.ingredientService.createIngredient({
-      name_bg: this.newIngredientNameBg().trim(),
-      name_en: this.newIngredientNameEn().trim()
-    });
+    try {
+      const result = await this.ingredientService.createIngredient({
+        name_bg: this.newIngredientNameBg().trim(),
+        name_en: this.newIngredientNameEn().trim()
+      });
 
-    if (result.success && result.data) {
-      // Add to available ingredients
-      this.availableIngredients.update(ingredients => [...ingredients, result.data!]);
-      this.filteredIngredients.update(ingredients => [...ingredients, result.data!]);
-      
-      // Reset form
-      this.newIngredientNameBg.set('');
-      this.newIngredientNameEn.set('');
-      this.showNewIngredientForm.set(false);
-      
-      // Optionally add to selected ingredients
-      this.addIngredient(result.data);
-    } else {
-      this.error.set(result.error || 'Failed to create ingredient');
+      if (result.success && result.data) {
+        // Add to available ingredients
+        this.availableIngredients.update(ingredients => [...ingredients, result.data!]);
+        this.filteredIngredients.update(ingredients => [...ingredients, result.data!]);
+        
+        // Reset form
+        this.newIngredientNameBg.set('');
+        this.newIngredientNameEn.set('');
+        this.showNewIngredientForm.set(false);
+        
+        // Optionally add to selected ingredients
+        this.addIngredient(result.data);
+        
+        // Show success message
+        console.log('Ingredient created successfully:', result.data);
+      } else {
+        const errorMsg = result.error || 'Failed to create ingredient';
+        this.error.set(errorMsg);
+        console.error('Failed to create ingredient:', errorMsg);
+        alert('Error creating ingredient: ' + errorMsg);
+      }
+    } catch (err: any) {
+      const errorMsg = err.message || 'An unexpected error occurred';
+      this.error.set(errorMsg);
+      console.error('Exception creating ingredient:', err);
+      alert('Error creating ingredient: ' + errorMsg);
+    } finally {
+      this.creatingIngredient.set(false);
     }
-
-    this.creatingIngredient.set(false);
   }
 
   toggleNewIngredientForm(): void {
