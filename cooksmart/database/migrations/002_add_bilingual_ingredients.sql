@@ -19,11 +19,15 @@ ALTER TABLE ingredients
 ALTER COLUMN name_bg SET NOT NULL,
 ALTER COLUMN name_en SET NOT NULL;
 
--- Step 4: Remove NOT NULL constraint from old name column (to allow new inserts)
+-- Step 4: Drop the check constraint on name column
+ALTER TABLE ingredients 
+DROP CONSTRAINT IF EXISTS name_not_empty;
+
+-- Step 5: Remove NOT NULL constraint from old name column (to allow new inserts)
 ALTER TABLE ingredients 
 ALTER COLUMN name DROP NOT NULL;
 
--- Step 5: Set a default value for the old name column (for backward compatibility)
+-- Step 6: Set a default value for the old name column (for backward compatibility)
 ALTER TABLE ingredients 
 ALTER COLUMN name SET DEFAULT '';
 
