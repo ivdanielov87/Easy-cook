@@ -5,10 +5,15 @@ import { Home } from './features/public/home/home';
 import { RecipeList } from './features/public/recipe-list/recipe-list';
 import { RecipeDetail } from './features/public/recipe-detail/recipe-detail';
 import { Pantry } from './features/public/pantry/pantry';
+import { Login } from './features/auth/login/login';
 import { Dashboard } from './features/admin/dashboard/dashboard';
 import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
+  {
+    path: 'login',
+    component: Login
+  },
   {
     path: '',
     component: MainLayout,

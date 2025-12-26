@@ -1,0 +1,58 @@
+<div class="auth-page" [@fadeIn]>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1 class="auth-title">{{ 'AUTH.LOGIN_TITLE' | translate }}</h1>
+        <p class="auth-subtitle">{{ 'AUTH.LOGIN_SUBTITLE' | translate }}</p>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-error">
+          {{ error() | translate }}
+        </div>
+      }
+
+      <form class="auth-form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="email" class="form-label">{{ 'AUTH.EMAIL' | translate }}</label>
+          <input
+            type="email"
+            id="email"
+            class="form-input"
+            [value]="email()"
+            (input)="onEmailChange($any($event.target).value)"
+            [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">{{ 'AUTH.PASSWORD' | translate }}</label>
+          <input
+            type="password"
+            id="password"
+            class="form-input"
+            [value]="password()"
+            (input)="onPasswordChange($any($event.target).value)"
+            [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="loading()">
+          @if (loading()) {
+            <span class="btn-spinner"></span>
+          }
+          {{ 'COMMON.LOGIN' | translate }}
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>
+          {{ 'AUTH.NO_ACCOUNT' | translate }}
+          <a routerLink="/register" class="auth-link">{{ 'COMMON.REGISTER' | translate }}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
