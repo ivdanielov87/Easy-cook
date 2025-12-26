@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -9,7 +9,7 @@ import { fadeIn } from '../../../shared/animations';
 
 @Component({
   selector: 'app-recipe-detail',
-  imports: [CommonModule, RouterLink, TranslateModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.scss',
   animations: [fadeIn]
