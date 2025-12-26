@@ -253,8 +253,14 @@ export class RecipeForm implements OnInit {
   }
 
   async createNewIngredient(): Promise<void> {
-    if (!this.newIngredientNameBg().trim() || !this.newIngredientNameEn().trim()) {
+    const nameBg = this.newIngredientNameBg().trim();
+    const nameEn = this.newIngredientNameEn().trim();
+    
+    console.log('Creating ingredient:', { nameBg, nameEn });
+    
+    if (!nameBg || !nameEn) {
       this.error.set('Both Bulgarian and English names are required');
+      alert('Both Bulgarian and English names are required');
       return;
     }
 
@@ -262,10 +268,13 @@ export class RecipeForm implements OnInit {
     this.error.set('');
 
     try {
+      console.log('Calling ingredientService.createIngredient...');
       const result = await this.ingredientService.createIngredient({
-        name_bg: this.newIngredientNameBg().trim(),
-        name_en: this.newIngredientNameEn().trim()
+        name_bg: nameBg,
+        name_en: nameEn
       });
+
+      console.log('Create ingredient result:', result);
 
       if (result.success && result.data) {
         // Add to available ingredients
@@ -282,6 +291,7 @@ export class RecipeForm implements OnInit {
         
         // Show success message
         console.log('Ingredient created successfully:', result.data);
+        alert('Ingredient created successfully: ' + nameBg + ' / ' + nameEn);
       } else {
         const errorMsg = result.error || 'Failed to create ingredient';
         this.error.set(errorMsg);
