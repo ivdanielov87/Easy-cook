@@ -266,8 +266,8 @@
     border: 1px solid $border-color;
     
     &:hover:not(:disabled) {
-      background: darken($background-gray, 5%);
-      border-color: darken($border-color, 10%);
+      background: rgba($text-primary, 0.05);
+      border-color: rgba($text-primary, 0.2);
     }
     
     &:disabled {

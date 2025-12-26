@@ -48,16 +48,16 @@ export const routes: Routes = [
         component: Dashboard
       },
       {
-        path: 'recipes',
-        component: RecipeManagement
-      },
-      {
         path: 'recipes/new',
         component: RecipeForm
       },
       {
         path: 'recipes/edit/:id',
         component: RecipeForm
+      },
+      {
+        path: 'recipes',
+        component: RecipeManagement
       }
     ]
   }
