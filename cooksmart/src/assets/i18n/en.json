@@ -61,7 +61,9 @@
     "REMOVE_FROM_FAVORITES": "Remove from Favorites",
     "MINUTES": "minutes",
     "SERVINGS_COUNT": "{{count}} servings",
-    "NO_STEPS": "No steps added"
+    "NO_STEPS": "No steps added",
+    "BASIC_INFO": "Basic Information",
+    "SELECTED_INGREDIENTS": "Selected Ingredients"
   },
   "AUTH": {
     "EMAIL": "Email",

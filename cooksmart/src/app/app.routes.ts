@@ -8,6 +8,7 @@ import { Pantry } from './features/public/pantry/pantry';
 import { Login } from './features/auth/login/login';
 import { Dashboard } from './features/admin/dashboard/dashboard';
 import { RecipeManagement } from './features/admin/recipe-management/recipe-management';
+import { RecipeForm } from './features/admin/recipe-form/recipe-form';
 import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
@@ -49,6 +50,14 @@ export const routes: Routes = [
       {
         path: 'recipes',
         component: RecipeManagement
+      },
+      {
+        path: 'recipes/new',
+        component: RecipeForm
+      },
+      {
+        path: 'recipes/edit/:id',
+        component: RecipeForm
       }
     ]
   }

@@ -1,0 +1,219 @@
+<div class="recipe-form-page" [@fadeIn]>
+  <div class="page-header">
+    <h1 class="page-title">
+      @if (isEditMode()) {
+        {{ 'ADMIN.EDIT_RECIPE' | translate }}
+      } @else {
+        {{ 'ADMIN.CREATE_RECIPE' | translate }}
+      }
+    </h1>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      {{ error() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
+  } @else {
+    <form class="recipe-form" (ngSubmit)="onSubmit()">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h2 class="section-title">{{ 'RECIPE.BASIC_INFO' | translate }}</h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ 'RECIPE.TITLE' | translate }} *</label>
+            <input
+              type="text"
+              class="form-input"
+              [value]="title()"
+              (input)="title.set($any($event.target).value)"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ 'RECIPE.DESCRIPTION' | translate }}</label>
+            <textarea
+              class="form-textarea"
+              [value]="description()"
+              (input)="description.set($any($event.target).value)"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ 'RECIPE.IMAGE' | translate }} URL</label>
+            <input
+              type="url"
+              class="form-input"
+              [value]="imageUrl()"
+              (input)="imageUrl.set($any($event.target).value)"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+        </div>
+
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label class="form-label">{{ 'RECIPE.PREP_TIME' | translate }} *</label>
+            <input
+              type="number"
+              class="form-input"
+              [value]="prepTime()"
+              (input)="prepTime.set(+$any($event.target).value)"
+              min="1"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{{ 'RECIPE.SERVINGS' | translate }} *</label>
+            <input
+              type="number"
+              class="form-input"
+              [value]="servings()"
+              (input)="servings.set(+$any($event.target).value)"
+              min="1"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{{ 'RECIPE.DIFFICULTY' | translate }} *</label>
+            <select
+              class="form-select"
+              [value]="difficulty()"
+              (change)="difficulty.set($any($event.target).value)"
+              required
+            >
+              <option value="Easy">{{ 'RECIPE.EASY' | translate }}</option>
+              <option value="Medium">{{ 'RECIPE.MEDIUM' | translate }}</option>
+              <option value="Hard">{{ 'RECIPE.HARD' | translate }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ingredients -->
+      <div class="form-section">
+        <h2 class="section-title">{{ 'RECIPE.INGREDIENTS' | translate }} *</h2>
+        
+        <div class="ingredient-search">
+          <input
+            type="text"
+            class="form-input"
+            [value]="ingredientSearch()"
+            (input)="onIngredientSearchChange($any($event.target).value)"
+            [placeholder]="'PANTRY.SEARCH_INGREDIENTS' | translate"
+          />
+        </div>
+
+        <div class="ingredient-chips">
+          @for (ingredient of filteredIngredients().slice(0, 20); track ingredient.id) {
+            <button
+              type="button"
+              class="chip"
+              (click)="addIngredient(ingredient)"
+              [class.selected]="selectedIngredients().some(i => i.ingredient_id === ingredient.id)"
+            >
+              {{ ingredient.name }}
+            </button>
+          }
+        </div>
+
+        @if (selectedIngredients().length > 0) {
+          <div class="selected-ingredients">
+            <h3 class="subsection-title">{{ 'RECIPE.SELECTED_INGREDIENTS' | translate }}</h3>
+            @for (ingredient of selectedIngredients(); track ingredient.ingredient_id; let i = $index) {
+              <div class="ingredient-row">
+                <span class="ingredient-name">
+                  {{ availableIngredients().find(ing => ing.id === ingredient.ingredient_id)?.name }}
+                </span>
+                <input
+                  type="text"
+                  class="form-input-small"
+                  [value]="ingredient.quantity"
+                  (input)="updateIngredientQuantity(ingredient.ingredient_id, $any($event.target).value)"
+                  [placeholder]="'RECIPE.QUANTITY' | translate"
+                />
+                <input
+                  type="text"
+                  class="form-input-small"
+                  [value]="ingredient.unit"
+                  (input)="updateIngredientUnit(ingredient.ingredient_id, $any($event.target).value)"
+                  [placeholder]="'RECIPE.UNIT' | translate"
+                />
+                <button
+                  type="button"
+                  class="btn-icon btn-danger"
+                  (click)="removeIngredient(ingredient.ingredient_id)"
+                >
+                  ✕
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Steps -->
+      <div class="form-section">
+        <h2 class="section-title">{{ 'RECIPE.STEPS' | translate }} *</h2>
+        
+        @for (step of steps(); track $index; let i = $index) {
+          <div class="step-row">
+            <span class="step-number">{{ i + 1 }}</span>
+            <textarea
+              class="form-textarea"
+              [value]="step"
+              (input)="updateStep(i, $any($event.target).value)"
+              [placeholder]="'RECIPE.STEP_DESCRIPTION' | translate"
+              rows="2"
+            ></textarea>
+            @if (steps().length > 1) {
+              <button
+                type="button"
+                class="btn-icon btn-danger"
+                (click)="removeStep(i)"
+              >
+                ✕
+              </button>
+            }
+          </div>
+        }
+        
+        <button type="button" class="btn btn-secondary" (click)="addStep()">
+          ➕ {{ 'RECIPE.ADD_STEP' | translate }}
+        </button>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="saving()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          @if (saving()) {
+            <span class="btn-spinner"></span>
+          }
+          @if (isEditMode()) {
+            {{ 'COMMON.UPDATE' | translate }}
+          } @else {
+            {{ 'COMMON.CREATE' | translate }}
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

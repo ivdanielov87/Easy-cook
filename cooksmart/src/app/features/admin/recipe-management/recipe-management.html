@@ -14,10 +14,10 @@
         [placeholder]="'COMMON.SEARCH' | translate"
       />
     </div>
-    <button class="btn btn-primary" disabled>
+    <a routerLink="/admin/recipes/new" class="btn btn-primary">
       <span>➕</span>
       {{ 'ADMIN.CREATE_RECIPE' | translate }}
-    </button>
+    </a>
   </div>
 
   @if (loading()) {
@@ -76,9 +76,9 @@
                   <a [routerLink]="['/recipes', recipe.slug]" class="btn-icon" title="View">
                     👁️
                   </a>
-                  <button class="btn-icon" disabled title="Edit">
+                  <a [routerLink]="['/admin/recipes/edit', recipe.id]" class="btn-icon" title="Edit">
                     ✏️
-                  </button>
+                  </a>
                   <button class="btn-icon btn-danger" (click)="deleteRecipe(recipe.id)" title="Delete">
                     🗑️
                   </button>

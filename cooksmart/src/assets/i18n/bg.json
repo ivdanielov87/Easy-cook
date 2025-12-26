@@ -61,7 +61,9 @@
     "REMOVE_FROM_FAVORITES": "Премахни от любими",
     "MINUTES": "минути",
     "SERVINGS_COUNT": "{{count}} порции",
-    "NO_STEPS": "Няма добавени стъпки"
+    "NO_STEPS": "Няма добавени стъпки",
+    "BASIC_INFO": "Основна информация",
+    "SELECTED_INGREDIENTS": "Избрани съставки"
   },
   "AUTH": {
     "EMAIL": "Имейл",
