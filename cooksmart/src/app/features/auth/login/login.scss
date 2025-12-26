@@ -18,10 +18,10 @@
     background: $surface;
     border-radius: $border-radius;
     box-shadow: $shadow-lg;
-    padding: $spacing-2xl;
+    padding: $spacing-xl;
     
-    @include mobile {
-      padding: $spacing-xl;
+    @include tablet {
+      padding: $spacing-2xl;
     }
   }
   
