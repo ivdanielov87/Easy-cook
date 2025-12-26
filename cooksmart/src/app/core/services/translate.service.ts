@@ -58,4 +58,11 @@ export class TranslateService {
   get(key: string, params?: any) {
     return this.translate.get(key, params);
   }
+
+  /**
+   * Get current language code
+   */
+  getCurrentLanguage(): SupportedLanguage {
+    return this.currentLang();
+  }
 }

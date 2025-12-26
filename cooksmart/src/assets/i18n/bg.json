@@ -103,7 +103,11 @@
     "QUICK_ACTIONS": "Бързи действия",
     "MANAGE_RECIPES_DESC": "Създавайте, редактирайте и изтривайте рецепти",
     "VIEW_SITE": "Преглед на сайта",
-    "VIEW_SITE_DESC": "Отидете на публичната страница"
+    "VIEW_SITE_DESC": "Отидете на публичната страница",
+    "NEW_INGREDIENT": "Нова съставка",
+    "CREATE_NEW_INGREDIENT": "Създай нова съставка",
+    "INGREDIENT_NAME_BG": "Име на български",
+    "INGREDIENT_NAME_EN": "Име на английски"
   },
   "PROFILE": {
     "MY_PROFILE": "Моят профил",

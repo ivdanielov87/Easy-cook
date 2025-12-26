@@ -35,6 +35,12 @@ export class RecipeForm implements OnInit {
   ingredientSearch = signal<string>('');
   filteredIngredients = signal<Ingredient[]>([]);
   
+  // New ingredient form
+  showNewIngredientForm = signal<boolean>(false);
+  newIngredientNameBg = signal<string>('');
+  newIngredientNameEn = signal<string>('');
+  creatingIngredient = signal<boolean>(false);
+  
   // Steps
   steps = signal<string[]>(['']);
   
@@ -99,7 +105,8 @@ export class RecipeForm implements OnInit {
     }
     
     const filtered = this.availableIngredients().filter(ing =>
-      ing.name.toLowerCase().includes(query)
+      ing.name_bg.toLowerCase().includes(query) || 
+      ing.name_en.toLowerCase().includes(query)
     );
     this.filteredIngredients.set(filtered);
   }
@@ -112,7 +119,6 @@ export class RecipeForm implements OnInit {
       ...ingredients,
       {
         ingredient_id: ingredient.id,
-        ingredient_name: ingredient.name,
         quantity: '',
         unit: ''
       }
@@ -241,6 +247,49 @@ export class RecipeForm implements OnInit {
   }
 
   getIngredientName(ingredientId: string): string {
-    return this.availableIngredients().find(i => i.id === ingredientId)?.name || '';
+    const ingredient = this.availableIngredients().find(i => i.id === ingredientId);
+    if (!ingredient) return '';
+    return this.ingredientService.getIngredientName(ingredient);
+  }
+
+  async createNewIngredient(): Promise<void> {
+    if (!this.newIngredientNameBg().trim() || !this.newIngredientNameEn().trim()) {
+      this.error.set('Both Bulgarian and English names are required');
+      return;
+    }
+
+    this.creatingIngredient.set(true);
+    this.error.set('');
+
+    const result = await this.ingredientService.createIngredient({
+      name_bg: this.newIngredientNameBg().trim(),
+      name_en: this.newIngredientNameEn().trim()
+    });
+
+    if (result.success && result.data) {
+      // Add to available ingredients
+      this.availableIngredients.update(ingredients => [...ingredients, result.data!]);
+      this.filteredIngredients.update(ingredients => [...ingredients, result.data!]);
+      
+      // Reset form
+      this.newIngredientNameBg.set('');
+      this.newIngredientNameEn.set('');
+      this.showNewIngredientForm.set(false);
+      
+      // Optionally add to selected ingredients
+      this.addIngredient(result.data);
+    } else {
+      this.error.set(result.error || 'Failed to create ingredient');
+    }
+
+    this.creatingIngredient.set(false);
+  }
+
+  toggleNewIngredientForm(): void {
+    this.showNewIngredientForm.update(show => !show);
+    if (!this.showNewIngredientForm()) {
+      this.newIngredientNameBg.set('');
+      this.newIngredientNameEn.set('');
+    }
   }
 }

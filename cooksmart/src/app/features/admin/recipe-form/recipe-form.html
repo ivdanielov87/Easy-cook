@@ -109,15 +109,63 @@
       <div class="form-section">
         <h2 class="section-title">{{ 'RECIPE.INGREDIENTS' | translate }} *</h2>
         
-        <div class="ingredient-search">
-          <input
-            type="text"
-            class="form-input"
-            [value]="ingredientSearch()"
-            (input)="onIngredientSearchChange($any($event.target).value)"
-            [placeholder]="'PANTRY.SEARCH_INGREDIENTS' | translate"
-          />
+        <div class="ingredient-search-row">
+          <div class="ingredient-search">
+            <input
+              type="text"
+              class="form-input"
+              [value]="ingredientSearch()"
+              (input)="onIngredientSearchChange($any($event.target).value)"
+              [placeholder]="'PANTRY.SEARCH_INGREDIENTS' | translate"
+            />
+          </div>
+          <button type="button" class="btn btn-secondary" (click)="toggleNewIngredientForm()">
+            @if (showNewIngredientForm()) {
+              ✕ {{ 'COMMON.CANCEL' | translate }}
+            } @else {
+              ➕ {{ 'ADMIN.NEW_INGREDIENT' | translate }}
+            }
+          </button>
         </div>
+
+        @if (showNewIngredientForm()) {
+          <div class="new-ingredient-form">
+            <h3 class="subsection-title">{{ 'ADMIN.CREATE_NEW_INGREDIENT' | translate }}</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">{{ 'ADMIN.INGREDIENT_NAME_BG' | translate }} *</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  [value]="newIngredientNameBg()"
+                  (input)="newIngredientNameBg.set($any($event.target).value)"
+                  placeholder="Домати"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">{{ 'ADMIN.INGREDIENT_NAME_EN' | translate }} *</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  [value]="newIngredientNameEn()"
+                  (input)="newIngredientNameEn.set($any($event.target).value)"
+                  placeholder="Tomatoes"
+                />
+              </div>
+            </div>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              (click)="createNewIngredient()"
+              [disabled]="creatingIngredient()"
+            >
+              @if (creatingIngredient()) {
+                <span class="btn-spinner"></span>
+              }
+              {{ 'COMMON.CREATE' | translate }}
+            </button>
+          </div>
+        }
 
         <div class="ingredient-chips">
           @for (ingredient of filteredIngredients().slice(0, 20); track ingredient.id) {
@@ -127,7 +175,7 @@
               (click)="addIngredient(ingredient)"
               [class.selected]="isIngredientSelected(ingredient.id)"
             >
-              {{ ingredient.name }}
+              {{ getIngredientName(ingredient.id) }}
             </button>
           }
         </div>

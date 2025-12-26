@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { Ingredient, IngredientCreate } from '../models';
+import { TranslateService } from './translate.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,10 @@ export class IngredientService {
   ingredients = signal<Ingredient[]>([]);
   loading = signal<boolean>(false);
 
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private translateService: TranslateService
+  ) {}
 
   /**
    * Fetch all ingredients
@@ -18,10 +22,13 @@ export class IngredientService {
     try {
       this.loading.set(true);
 
+      const currentLang = this.translateService.getCurrentLanguage();
+      const orderBy = currentLang === 'bg' ? 'name_bg' : 'name_en';
+      
       const { data, error } = await this.supabase.client
         .from('ingredients')
         .select('*')
-        .order('name', { ascending: true });
+        .order(orderBy, { ascending: true });
 
       if (error) throw error;
 
@@ -126,17 +133,20 @@ export class IngredientService {
   }
 
   /**
-   * Search ingredients by name
+   * Search ingredients by name (searches both languages)
    */
   async searchIngredients(query: string): Promise<Ingredient[]> {
     try {
       this.loading.set(true);
 
+      const currentLang = this.translateService.getCurrentLanguage();
+      const orderBy = currentLang === 'bg' ? 'name_bg' : 'name_en';
+
       const { data, error } = await this.supabase.client
         .from('ingredients')
         .select('*')
-        .ilike('name', `%${query}%`)
-        .order('name', { ascending: true });
+        .or(`name_bg.ilike.%${query}%,name_en.ilike.%${query}%`)
+        .order(orderBy, { ascending: true });
 
       if (error) throw error;
 
@@ -147,5 +157,13 @@ export class IngredientService {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  /**
+   * Get ingredient name in current language
+   */
+  getIngredientName(ingredient: Ingredient): string {
+    const currentLang = this.translateService.getCurrentLanguage();
+    return currentLang === 'bg' ? ingredient.name_bg : ingredient.name_en;
   }
 }

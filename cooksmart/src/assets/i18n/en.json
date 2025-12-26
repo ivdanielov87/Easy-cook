@@ -103,7 +103,11 @@
     "QUICK_ACTIONS": "Quick Actions",
     "MANAGE_RECIPES_DESC": "Create, edit, and delete recipes",
     "VIEW_SITE": "View Site",
-    "VIEW_SITE_DESC": "Go to the public site"
+    "VIEW_SITE_DESC": "Go to the public site",
+    "NEW_INGREDIENT": "New Ingredient",
+    "CREATE_NEW_INGREDIENT": "Create New Ingredient",
+    "INGREDIENT_NAME_BG": "Bulgarian Name",
+    "INGREDIENT_NAME_EN": "English Name"
   },
   "PROFILE": {
     "MY_PROFILE": "My Profile",
