@@ -40,6 +40,7 @@ export class RecipeForm implements OnInit {
   newIngredientNameBg = signal<string>('');
   newIngredientNameEn = signal<string>('');
   creatingIngredient = signal<boolean>(false);
+  ingredientError = signal<string>('');
   
   // Steps
   steps = signal<string[]>(['']);
@@ -302,8 +303,7 @@ export class RecipeForm implements OnInit {
     console.log('Current creatingIngredient state:', this.creatingIngredient());
     
     if (!nameBg || !nameEn) {
-      this.error.set('Both Bulgarian and English names are required');
-      alert('Both Bulgarian and English names are required');
+      this.ingredientError.set('Both Bulgarian and English names are required');
       return;
     }
 
@@ -314,15 +314,13 @@ export class RecipeForm implements OnInit {
     );
 
     if (existingIngredient) {
-      const message = `Ingredient already exists: ${existingIngredient.name_bg} / ${existingIngredient.name_en}`;
-      this.error.set(message);
-      alert(message);
+      this.ingredientError.set(`Ingredient already exists: ${existingIngredient.name_bg} / ${existingIngredient.name_en}`);
       return;
     }
 
     this.creatingIngredient.set(true);
     console.log('Set creatingIngredient to true');
-    this.error.set('');
+    this.ingredientError.set('');
 
     try {
       console.log('Calling ingredientService.createIngredient...');
@@ -345,25 +343,22 @@ export class RecipeForm implements OnInit {
         this.newIngredientNameBg.set('');
         this.newIngredientNameEn.set('');
         this.showNewIngredientForm.set(false);
+        this.ingredientError.set('');
         
         console.log('Adding ingredient to selected...');
         // Optionally add to selected ingredients
         this.addIngredient(result.data);
         
-        // Show success message
         console.log('Ingredient created successfully:', result.data);
-        alert('Ingredient created successfully: ' + nameBg + ' / ' + nameEn);
       } else {
         const errorMsg = result.error || 'Failed to create ingredient';
-        this.error.set(errorMsg);
+        this.ingredientError.set(errorMsg);
         console.error('Failed to create ingredient:', errorMsg);
-        alert('Error creating ingredient: ' + errorMsg);
       }
     } catch (err: any) {
       const errorMsg = err.message || 'An unexpected error occurred';
-      this.error.set(errorMsg);
+      this.ingredientError.set(errorMsg);
       console.error('Exception creating ingredient:', err);
-      alert('Error creating ingredient: ' + errorMsg);
     } finally {
       console.log('Setting creatingIngredient to false');
       this.creatingIngredient.set(false);
@@ -380,6 +375,7 @@ export class RecipeForm implements OnInit {
     this.newIngredientNameBg.set('');
     this.newIngredientNameEn.set('');
     this.creatingIngredient.set(false);
+    this.ingredientError.set('');
     this.error.set('');
     
     this.showNewIngredientForm.set(willShow);

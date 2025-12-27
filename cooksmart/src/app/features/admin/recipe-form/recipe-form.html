@@ -153,6 +153,13 @@
                 />
               </div>
             </div>
+            
+            @if (ingredientError()) {
+              <div class="error-message">
+                {{ ingredientError() }}
+              </div>
+            }
+            
             <button 
               type="button" 
               class="btn btn-primary" 
