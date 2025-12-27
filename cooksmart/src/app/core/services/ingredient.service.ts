@@ -71,25 +71,40 @@ export class IngredientService {
       this.loading.set(true);
 
       console.log('[IngredientService] Calling Supabase insert...');
+      
+      // Try simpler insert without select
+      const insertResult = await this.supabase.client
+        .from('ingredients')
+        .insert(ingredient);
+
+      console.log('[IngredientService] Insert response received:', insertResult);
+
+      if (insertResult.error) {
+        console.error('[IngredientService] Insert error:', insertResult.error);
+        throw insertResult.error;
+      }
+
+      console.log('[IngredientService] Insert successful, now fetching the created ingredient...');
+      
+      // Fetch the created ingredient separately
       const { data, error } = await this.supabase.client
         .from('ingredients')
-        .insert(ingredient)
         .select()
+        .eq('name_bg', ingredient.name_bg)
+        .eq('name_en', ingredient.name_en)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .single();
 
-      console.log('[IngredientService] Supabase response received');
-
-      console.log('[IngredientService] Insert result:', { data, error });
+      console.log('[IngredientService] Fetch result:', { data, error });
 
       if (error) {
-        console.error('[IngredientService] Insert error:', error);
-        throw error;
+        console.error('[IngredientService] Fetch error:', error);
+        // Return success anyway since insert worked
+        return { success: true, data: { id: '', ...ingredient, created_at: new Date().toISOString() } as Ingredient };
       }
 
       console.log('[IngredientService] Ingredient created successfully:', data);
-      
-      // Don't refresh the full list here - it causes race conditions
-      // The component will handle adding the new ingredient to its local list
       
       return { success: true, data: data as Ingredient };
     } catch (error: any) {
