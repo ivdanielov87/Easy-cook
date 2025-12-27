@@ -75,7 +75,7 @@ export class RecipeService {
 
       // Use the get_recipe_with_ingredients RPC function
       const { data, error } = await this.supabase.client
-        .rpc('get_recipe_with_ingredients', { recipe_id: id });
+        .rpc('get_recipe_with_ingredients', { recipe_slug: id });
 
       if (error) throw error;
 
