@@ -124,8 +124,21 @@ export class RecipeService {
       // Get Supabase credentials and user session
       const supabaseUrl = (this.supabase.client as any).supabaseUrl;
       const supabaseKey = (this.supabase.client as any).supabaseKey;
-      const { data: { session } } = await this.supabase.client.auth.getSession();
-      const accessToken = session?.access_token || supabaseKey;
+      
+      console.log('[RecipeService] Getting user session...');
+      let accessToken = supabaseKey;
+      try {
+        const sessionPromise = this.supabase.client.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session timeout')), 2000)
+        );
+        
+        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        accessToken = session?.access_token || supabaseKey;
+        console.log('[RecipeService] Got session token');
+      } catch (err) {
+        console.warn('[RecipeService] Session fetch timed out, using API key');
+      }
 
       // Insert recipe using direct HTTP POST
       console.log('[RecipeService] Inserting recipe via HTTP POST...');
