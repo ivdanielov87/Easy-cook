@@ -249,9 +249,20 @@ export class RecipeForm implements OnInit {
   }
 
   generateSlug(title: string): string {
+    // Transliterate Cyrillic to Latin
+    const cyrillicToLatin: { [key: string]: string } = {
+      'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ж': 'zh', 'з': 'z',
+      'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p',
+      'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch',
+      'ш': 'sh', 'щ': 'sht', 'ъ': 'a', 'ь': 'y', 'ю': 'yu', 'я': 'ya'
+    };
+    
     return title
       .toLowerCase()
       .trim()
+      .split('')
+      .map(char => cyrillicToLatin[char] || char)
+      .join('')
       .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '');
