@@ -104,7 +104,7 @@ export class RecipeService {
       if (error) throw error;
 
       if (data) {
-        return await this.getRecipeById(data.id);
+        return await this.getRecipeById(data.slug);
       }
 
       return null;
