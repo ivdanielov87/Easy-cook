@@ -163,8 +163,15 @@ export class RecipeForm implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
-    if (!this.validateForm()) return;
+    console.log('=== Recipe Form Submit Started ===');
+    console.log('Form validation starting...');
     
+    if (!this.validateForm()) {
+      console.log('Form validation failed:', this.error());
+      return;
+    }
+    
+    console.log('Form validation passed');
     this.saving.set(true);
     this.error.set('');
     
@@ -172,6 +179,7 @@ export class RecipeForm implements OnInit {
       let result;
       
       if (this.isEditMode() && this.recipeId()) {
+        console.log('Edit mode - updating recipe:', this.recipeId());
         const updateData = {
           title: this.title(),
           description: this.description(),
@@ -182,8 +190,10 @@ export class RecipeForm implements OnInit {
           steps: this.steps().filter(s => s.trim()),
           ingredients: this.selectedIngredients()
         };
+        console.log('Update data:', updateData);
         result = await this.recipeService.updateRecipe(this.recipeId()!, updateData);
       } else {
+        console.log('Create mode - creating new recipe');
         const createData = {
           title: this.title(),
           slug: this.generateSlug(this.title()),
@@ -195,18 +205,30 @@ export class RecipeForm implements OnInit {
           steps: this.steps().filter(s => s.trim()),
           ingredients: this.selectedIngredients()
         };
+        console.log('Create data:', createData);
+        console.log('Calling recipeService.createRecipe...');
         result = await this.recipeService.createRecipe(createData);
+        console.log('Recipe service result:', result);
       }
       
       if (result.success) {
+        console.log('Recipe saved successfully, navigating to /admin/recipes');
         this.router.navigate(['/admin/recipes']);
       } else {
-        this.error.set(result.error || 'Failed to save recipe');
+        const errorMsg = result.error || 'Failed to save recipe';
+        console.error('Recipe save failed:', errorMsg);
+        this.error.set(errorMsg);
+        alert('Error: ' + errorMsg);
       }
     } catch (err: any) {
-      this.error.set(err.message || 'An error occurred');
+      const errorMsg = err.message || 'An error occurred';
+      console.error('Exception during recipe save:', err);
+      this.error.set(errorMsg);
+      alert('Error: ' + errorMsg);
     } finally {
+      console.log('Setting saving to false');
       this.saving.set(false);
+      console.log('=== Recipe Form Submit Complete ===');
     }
   }
 

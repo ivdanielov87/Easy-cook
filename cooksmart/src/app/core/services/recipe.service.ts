@@ -117,9 +117,12 @@ export class RecipeService {
    */
   async createRecipe(recipe: RecipeCreate): Promise<{ success: boolean; data?: Recipe; error?: string }> {
     try {
+      console.log('[RecipeService] Starting recipe creation...');
+      console.log('[RecipeService] Recipe data:', recipe);
       this.loading.set(true);
 
       // Insert recipe
+      console.log('[RecipeService] Inserting recipe into database...');
       const { data: recipeData, error: recipeError } = await this.supabase.client
         .from('recipes')
         .insert({
@@ -135,10 +138,18 @@ export class RecipeService {
         .select()
         .single();
 
-      if (recipeError) throw recipeError;
+      console.log('[RecipeService] Recipe insert result:', { recipeData, recipeError });
+
+      if (recipeError) {
+        console.error('[RecipeService] Recipe insert error:', recipeError);
+        throw recipeError;
+      }
+
+      console.log('[RecipeService] Recipe created successfully with ID:', recipeData.id);
 
       // Insert recipe ingredients
       if (recipe.ingredients && recipe.ingredients.length > 0) {
+        console.log('[RecipeService] Inserting', recipe.ingredients.length, 'ingredients...');
         const ingredientsToInsert = recipe.ingredients.map(ing => ({
           recipe_id: recipeData.id,
           ingredient_id: ing.ingredient_id,
@@ -146,18 +157,29 @@ export class RecipeService {
           unit: ing.unit
         }));
 
+        console.log('[RecipeService] Ingredients to insert:', ingredientsToInsert);
+
         const { error: ingredientsError } = await this.supabase.client
           .from('recipe_ingredients')
           .insert(ingredientsToInsert);
 
-        if (ingredientsError) throw ingredientsError;
+        console.log('[RecipeService] Ingredients insert result:', { ingredientsError });
+
+        if (ingredientsError) {
+          console.error('[RecipeService] Ingredients insert error:', ingredientsError);
+          throw ingredientsError;
+        }
+
+        console.log('[RecipeService] All ingredients inserted successfully');
       }
 
+      console.log('[RecipeService] Recipe creation complete!');
       return { success: true, data: recipeData as Recipe };
     } catch (error: any) {
-      console.error('Error creating recipe:', error);
+      console.error('[RecipeService] Exception during recipe creation:', error);
       return { success: false, error: error.message };
     } finally {
+      console.log('[RecipeService] Setting loading to false');
       this.loading.set(false);
     }
   }
