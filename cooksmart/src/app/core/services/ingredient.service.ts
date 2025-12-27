@@ -76,13 +76,19 @@ export class IngredientService {
       const supabaseUrl = (this.supabase.client as any).supabaseUrl;
       const supabaseKey = (this.supabase.client as any).supabaseKey;
       
+      // Get the user's session token for authentication
+      const { data: { session } } = await this.supabase.client.auth.getSession();
+      const accessToken = session?.access_token || supabaseKey;
+      
+      console.log('[IngredientService] Using access token for authentication');
+      
       // Make direct HTTP request to bypass the hanging Supabase client
       const response = await fetch(`${supabaseUrl}/rest/v1/ingredients`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Prefer': 'return=representation'
         },
         body: JSON.stringify(ingredient)
