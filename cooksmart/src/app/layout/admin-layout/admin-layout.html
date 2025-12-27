@@ -53,7 +53,7 @@
         <!-- Language Switcher -->
         <div class="dropdown" [class.open]="languageMenuOpen()">
           <button class="btn-icon" (click)="toggleLanguageMenu()" type="button">
-            <span class="lang-flag">{{ translateService.currentLang() === 'bg' ? '🇧🇬' : '🇬🇧' }}</span>
+            <!-- <span class="lang-flag">{{ translateService.currentLang() === 'bg' ? '🇧🇬' : '🇬🇧' }}</span> -->
             <span class="lang-code">{{ translateService.currentLang().toUpperCase() }}</span>
           </button>
           @if (languageMenuOpen()) {

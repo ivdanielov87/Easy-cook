@@ -1,17 +1,44 @@
 <div class="home-page">
   <!-- Hero Section -->
   <section class="hero" [@fadeIn]>
-    <div class="container">
+    <div class="hero-container">
       <div class="hero-content">
-        <h1 class="hero-title">{{ 'RECIPE.FEATURED_RECIPES' | translate }}</h1>
-        <p class="hero-subtitle">{{ 'PANTRY.WHAT_CAN_I_COOK' | translate }}</p>
+        <h1 class="hero-title">
+          {{ 'HOME.HERO_TITLE_1' | translate }}
+          <span class="hero-title-accent">{{ 'HOME.HERO_TITLE_2' | translate }}</span>
+          {{ 'HOME.HERO_TITLE_3' | translate }}
+        </h1>
+        <p class="hero-subtitle">{{ 'HOME.HERO_SUBTITLE' | translate }}</p>
         <div class="hero-actions">
-          <a routerLink="/recipes" class="btn btn-primary btn-lg">
-            {{ 'RECIPE.ALL_RECIPES' | translate }}
+          <a routerLink="/recipes" class="btn btn-hero-primary">
+            {{ 'HOME.BROWSE_RECIPES' | translate }}
           </a>
-          <a routerLink="/pantry" class="btn btn-secondary btn-lg">
-            {{ 'COMMON.MY_PANTRY' | translate }}
+          <a routerLink="/pantry" class="btn btn-hero-secondary">
+            {{ 'HOME.HOW_IT_WORKS' | translate }}
           </a>
+        </div>
+        <div class="hero-features">
+          <div class="feature-item">
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">{{ 'HOME.FEATURE_1' | translate }}</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">{{ 'HOME.FEATURE_2' | translate }}</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">{{ 'HOME.FEATURE_3' | translate }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-image-wrapper">
+        <div class="hero-image">
+          <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&h=600&fit=crop" alt="Cooking together" />
+        </div>
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span class="badge-text">{{ 'HOME.MENU_READY' | translate }}</span>
         </div>
       </div>
     </div>

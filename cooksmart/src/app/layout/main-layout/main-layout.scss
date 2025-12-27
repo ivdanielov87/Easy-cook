@@ -48,6 +48,7 @@
   .navbar-menu {
     display: flex;
     gap: $spacing-md;
+    height: 40px;
     
     .nav-link {
       text-decoration: none;
@@ -90,6 +91,7 @@
     border-radius: $border-radius-sm;
     cursor: pointer;
     transition: all $transition-fast;
+    height: 40px;
     
     &:hover {
       background: $background-gray;

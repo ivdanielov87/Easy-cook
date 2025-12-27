@@ -178,5 +178,17 @@
     "CONTACT": "Contact",
     "PRIVACY": "Privacy",
     "TERMS": "Terms of Service"
+  },
+  "HOME": {
+    "HERO_TITLE_1": "Eliminate Meal Planning",
+    "HERO_TITLE_2": "Stress",
+    "HERO_TITLE_3": "Forever",
+    "HERO_SUBTITLE": "Discover curated weekly menus with automated shopping lists. Perfect for busy professionals and families who want delicious home-cooked meals without the planning hassle.",
+    "BROWSE_RECIPES": "Browse This Week's Free Menus",
+    "HOW_IT_WORKS": "See How It Works",
+    "FEATURE_1": "3 free menus weekly",
+    "FEATURE_2": "Automated shopping lists",
+    "FEATURE_3": "No credit card required",
+    "MENU_READY": "Menu for tonight ready!"
   }
 }

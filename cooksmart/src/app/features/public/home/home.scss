@@ -4,51 +4,187 @@
 .home-page {
   // Hero Section
   .hero {
-    background: linear-gradient(135deg, $primary-light 0%, $primary-color 100%);
-    color: white;
-    padding: $spacing-2xl 0;
-    text-align: center;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    padding: $spacing-xl 0;
     
     @include tablet {
+      padding: $spacing-2xl 0;
+    }
+    
+    @include desktop {
       padding: 4rem 0;
     }
     
-    .hero-content {
-      max-width: 800px;
+    .hero-container {
+      max-width: $container-max-width;
       margin: 0 auto;
-    }
-    
-    .hero-title {
-      font-size: 2rem;
-      font-weight: $font-weight-bold;
-      margin-bottom: $spacing-md;
-      
-      @include tablet {
-        font-size: 3rem;
-      }
-    }
-    
-    .hero-subtitle {
-      font-size: 1.125rem;
-      margin-bottom: $spacing-xl;
-      opacity: 0.95;
-      
-      @include tablet {
-        font-size: 1.25rem;
-      }
-    }
-    
-    .hero-actions {
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-sm;
+      padding: 0 $spacing-md;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: $spacing-xl;
       align-items: center;
       
-      @include tablet {
-        flex-direction: row;
-        justify-content: center;
-        gap: $spacing-md;
+      @include desktop {
+        grid-template-columns: 1fr 1fr;
+        gap: $spacing-2xl;
+        padding: 0 $spacing-xl;
       }
+    }
+    
+    .hero-content {
+      .hero-title {
+        font-size: 2rem;
+        font-weight: $font-weight-bold;
+        color: $text-primary;
+        line-height: 1.2;
+        margin-bottom: $spacing-md;
+        
+        @include tablet {
+          font-size: 2.5rem;
+        }
+        
+        @include desktop {
+          font-size: 3rem;
+        }
+        
+        .hero-title-accent {
+          color: $primary-color;
+          display: inline-block;
+        }
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+        color: $text-secondary;
+        line-height: 1.6;
+        margin-bottom: $spacing-lg;
+        
+        @include tablet {
+          font-size: 1.125rem;
+        }
+      }
+      
+      .hero-actions {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+        margin-bottom: $spacing-lg;
+        
+        @include tablet {
+          flex-direction: row;
+          gap: $spacing-md;
+        }
+        
+        .btn-hero-primary {
+          background: $primary-color;
+          color: white;
+          padding: $spacing-md $spacing-lg;
+          border-radius: $border-radius-sm;
+          font-weight: $font-weight-semibold;
+          text-decoration: none;
+          text-align: center;
+          transition: all $transition-fast;
+          border: none;
+          white-space: nowrap;
+          
+          &:hover {
+            background: $primary-dark;
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+          }
+        }
+        
+        .btn-hero-secondary {
+          background: transparent;
+          color: $text-primary;
+          padding: $spacing-md $spacing-lg;
+          border-radius: $border-radius-sm;
+          font-weight: $font-weight-medium;
+          text-decoration: none;
+          text-align: center;
+          transition: all $transition-fast;
+          border: none;
+          white-space: nowrap;
+          
+          &:hover {
+            background: rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+      
+      .hero-features {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+        
+        .feature-item {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          font-size: 0.875rem;
+          color: $text-secondary;
+          
+          .feature-icon {
+            color: $primary-color;
+            font-weight: $font-weight-bold;
+          }
+        }
+      }
+    }
+    
+    .hero-image-wrapper {
+      position: relative;
+      
+      .hero-image {
+        border-radius: $border-radius-lg;
+        overflow: hidden;
+        box-shadow: $shadow-lg;
+        background: $background-gray;
+        
+        img {
+          width: 100%;
+          height: auto;
+          display: block;
+          min-height: 300px;
+          object-fit: cover;
+        }
+      }
+      
+      .hero-badge {
+        position: absolute;
+        bottom: $spacing-md;
+        right: $spacing-md;
+        background: white;
+        padding: $spacing-sm $spacing-md;
+        border-radius: $border-radius;
+        box-shadow: $shadow-md;
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+        
+        .badge-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: $primary-color;
+          animation: pulse 2s infinite;
+        }
+        
+        .badge-text {
+          font-size: 0.875rem;
+          font-weight: $font-weight-medium;
+          color: $text-primary;
+        }
+      }
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
     }
   }
   
