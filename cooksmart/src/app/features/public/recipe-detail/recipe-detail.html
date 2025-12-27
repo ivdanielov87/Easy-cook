@@ -44,8 +44,8 @@
                   {{ recipe()!.servings }} {{ 'RECIPE.SERVINGS' | translate }}
                 </span>
                 <span class="meta-item">
-                  <span class="difficulty-badge" [class]="'difficulty-' + recipe()!.difficulty.toLowerCase()">
-                    {{ 'RECIPE.' + recipe()!.difficulty.toUpperCase() | translate }}
+                  <span class="difficulty-badge" [class]="'difficulty-' + (recipe()!.difficulty || 'medium').toLowerCase()">
+                    {{ 'RECIPE.' + (recipe()!.difficulty || 'MEDIUM').toUpperCase() | translate }}
                   </span>
                 </span>
               </div>
