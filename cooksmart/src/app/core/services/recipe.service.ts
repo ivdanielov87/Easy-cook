@@ -121,11 +121,23 @@ export class RecipeService {
       console.log('[RecipeService] Recipe data:', recipe);
       this.loading.set(true);
 
-      // Insert recipe
-      console.log('[RecipeService] Inserting recipe into database...');
-      const { data: recipeData, error: recipeError } = await this.supabase.client
-        .from('recipes')
-        .insert({
+      // Get Supabase credentials and user session
+      const supabaseUrl = (this.supabase.client as any).supabaseUrl;
+      const supabaseKey = (this.supabase.client as any).supabaseKey;
+      const { data: { session } } = await this.supabase.client.auth.getSession();
+      const accessToken = session?.access_token || supabaseKey;
+
+      // Insert recipe using direct HTTP POST
+      console.log('[RecipeService] Inserting recipe via HTTP POST...');
+      const recipeResponse = await fetch(`${supabaseUrl}/rest/v1/recipes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${accessToken}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
           title: recipe.title,
           slug: recipe.slug,
           description: recipe.description,
@@ -135,16 +147,19 @@ export class RecipeService {
           difficulty: recipe.difficulty,
           steps: recipe.steps
         })
-        .select()
-        .single();
+      });
 
-      console.log('[RecipeService] Recipe insert result:', { recipeData, recipeError });
+      console.log('[RecipeService] Recipe HTTP response status:', recipeResponse.status);
 
-      if (recipeError) {
-        console.error('[RecipeService] Recipe insert error:', recipeError);
-        throw recipeError;
+      if (!recipeResponse.ok) {
+        const errorText = await recipeResponse.text();
+        console.error('[RecipeService] Recipe HTTP error:', errorText);
+        throw new Error(`HTTP ${recipeResponse.status}: ${errorText}`);
       }
 
+      const recipeDataArray = await recipeResponse.json();
+      const recipeData = Array.isArray(recipeDataArray) ? recipeDataArray[0] : recipeDataArray;
+      
       console.log('[RecipeService] Recipe created successfully with ID:', recipeData.id);
 
       // Insert recipe ingredients
@@ -159,15 +174,24 @@ export class RecipeService {
 
         console.log('[RecipeService] Ingredients to insert:', ingredientsToInsert);
 
-        const { error: ingredientsError } = await this.supabase.client
-          .from('recipe_ingredients')
-          .insert(ingredientsToInsert);
+        // Insert recipe_ingredients using direct HTTP POST
+        const ingredientsResponse = await fetch(`${supabaseUrl}/rest/v1/recipe_ingredients`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${accessToken}`,
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify(ingredientsToInsert)
+        });
 
-        console.log('[RecipeService] Ingredients insert result:', { ingredientsError });
+        console.log('[RecipeService] Ingredients HTTP response status:', ingredientsResponse.status);
 
-        if (ingredientsError) {
-          console.error('[RecipeService] Ingredients insert error:', ingredientsError);
-          throw ingredientsError;
+        if (!ingredientsResponse.ok) {
+          const errorText = await ingredientsResponse.text();
+          console.error('[RecipeService] Ingredients HTTP error:', errorText);
+          throw new Error(`HTTP ${ingredientsResponse.status}: ${errorText}`);
         }
 
         console.log('[RecipeService] All ingredients inserted successfully');
