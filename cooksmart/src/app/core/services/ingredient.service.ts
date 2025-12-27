@@ -70,61 +70,41 @@ export class IngredientService {
       console.log('[IngredientService] Creating ingredient:', ingredient);
       this.loading.set(true);
 
-      console.log('[IngredientService] Calling Supabase insert with timeout wrapper...');
+      console.log('[IngredientService] Using direct HTTP POST to bypass Supabase client...');
       
-      // Wrap the insert in a Promise.race with a 5-second timeout
-      const insertPromise = this.supabase.client
-        .from('ingredients')
-        .insert(ingredient);
+      // Get the Supabase URL and key from environment
+      const supabaseUrl = (this.supabase.client as any).supabaseUrl;
+      const supabaseKey = (this.supabase.client as any).supabaseKey;
       
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          console.error('[IngredientService] Insert timed out after 5 seconds');
-          reject(new Error('Insert operation timed out'));
-        }, 5000);
+      // Make direct HTTP request to bypass the hanging Supabase client
+      const response = await fetch(`${supabaseUrl}/rest/v1/ingredients`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(ingredient)
       });
 
-      const insertResult = await Promise.race([insertPromise, timeoutPromise]);
+      console.log('[IngredientService] HTTP response status:', response.status);
 
-      console.log('[IngredientService] Insert response received:', insertResult);
-
-      if (insertResult.error) {
-        console.error('[IngredientService] Insert error:', insertResult.error);
-        throw insertResult.error;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[IngredientService] HTTP error:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
-      console.log('[IngredientService] Insert successful, now fetching the created ingredient...');
+      const data = await response.json();
+      console.log('[IngredientService] HTTP response data:', data);
+
+      // The response should be an array with the inserted ingredient
+      const createdIngredient = Array.isArray(data) ? data[0] : data;
       
-      // Fetch the created ingredient separately with timeout
-      const fetchPromise = this.supabase.client
-        .from('ingredients')
-        .select()
-        .eq('name_bg', ingredient.name_bg)
-        .eq('name_en', ingredient.name_en)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+      console.log('[IngredientService] Ingredient created successfully:', createdIngredient);
       
-      const fetchTimeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          console.error('[IngredientService] Fetch timed out after 5 seconds');
-          reject(new Error('Fetch operation timed out'));
-        }, 5000);
-      });
-
-      const { data, error } = await Promise.race([fetchPromise, fetchTimeoutPromise]);
-
-      console.log('[IngredientService] Fetch result:', { data, error });
-
-      if (error) {
-        console.error('[IngredientService] Fetch error:', error);
-        // Return success anyway since insert worked
-        return { success: true, data: { id: '', ...ingredient, created_at: new Date().toISOString() } as Ingredient };
-      }
-
-      console.log('[IngredientService] Ingredient created successfully:', data);
-      
-      return { success: true, data: data as Ingredient };
+      return { success: true, data: createdIngredient as Ingredient };
     } catch (error: any) {
       console.error('[IngredientService] Exception creating ingredient:', error);
       return { success: false, error: error.message || 'Failed to create ingredient' };
