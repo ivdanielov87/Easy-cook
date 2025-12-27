@@ -26,7 +26,9 @@
     "LANGUAGE": "Language",
     "LINKS": "Links",
     "LEGAL": "Legal",
-    "ACTIONS": "Actions"
+    "ACTIONS": "Actions",
+    "EMAIL": "Email",
+    "SAVE_CHANGES": "Save Changes"
   },
   "NAV": {
     "RECIPES": "Recipes",
@@ -116,7 +118,17 @@
     "AVATAR": "Avatar",
     "UPLOAD_AVATAR": "Upload Avatar",
     "PROFILE_UPDATED": "Profile updated successfully",
-    "NO_SAVED_RECIPES": "You have no saved recipes"
+    "NO_SAVED_RECIPES": "You have no saved recipes",
+    "MANAGE_YOUR_ACCOUNT": "Manage your account information",
+    "PERSONAL_INFO": "Personal Information",
+    "DISPLAY_NAME": "Display Name",
+    "ENTER_NAME": "Enter your name",
+    "NAME_HINT": "This name will be displayed in the navbar and throughout the site",
+    "EMAIL_CANNOT_CHANGE": "Email address cannot be changed",
+    "ACCOUNT_INFO": "Account Information",
+    "ACCOUNT_TYPE": "Account Type",
+    "ADMIN": "Administrator",
+    "USER": "User"
   },
   "PANTRY": {
     "MY_PANTRY": "My Pantry",

@@ -107,16 +107,28 @@
   }
   
   .user-avatar {
-    width: 40px;
+    min-width: 40px;
     height: 40px;
     border-radius: 50%;
     padding: 0;
     overflow: hidden;
     
+    &:has(.user-display-name) {
+      width: auto;
+      border-radius: $border-radius-sm;
+      padding: $spacing-xs $spacing-sm;
+    }
+    
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+    
+    .user-display-name {
+      font-weight: $font-weight-medium;
+      color: $text-primary;
+      white-space: nowrap;
     }
     
     .avatar-placeholder {

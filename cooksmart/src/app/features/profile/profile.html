@@ -1,0 +1,95 @@
+<div class="profile-page" [@fadeIn]>
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">{{ 'COMMON.PROFILE' | translate }}</h1>
+      <p class="page-subtitle">{{ 'PROFILE.MANAGE_YOUR_ACCOUNT' | translate }}</p>
+    </div>
+
+    <!-- Profile Form -->
+    <div class="profile-content">
+      <div class="profile-card">
+        <div class="card-header">
+          <h2 class="card-title">{{ 'PROFILE.PERSONAL_INFO' | translate }}</h2>
+        </div>
+
+        <div class="card-body">
+          <!-- Success Message -->
+          @if (success()) {
+            <div class="alert alert-success">
+              {{ success() }}
+            </div>
+          }
+
+          <!-- Error Message -->
+          @if (error()) {
+            <div class="alert alert-error">
+              {{ error() }}
+            </div>
+          }
+
+          <form (ngSubmit)="updateProfile()">
+            <!-- Email (Read-only) -->
+            <div class="form-group">
+              <label class="form-label">{{ 'COMMON.EMAIL' | translate }}</label>
+              <input
+                type="email"
+                class="form-input"
+                [value]="email()"
+                disabled
+              />
+              <p class="form-hint">{{ 'PROFILE.EMAIL_CANNOT_CHANGE' | translate }}</p>
+            </div>
+
+            <!-- Display Name -->
+            <div class="form-group">
+              <label class="form-label">{{ 'PROFILE.DISPLAY_NAME' | translate }}</label>
+              <input
+                type="text"
+                class="form-input"
+                [value]="displayName()"
+                (input)="displayName.set($any($event.target).value)"
+                [placeholder]="'PROFILE.ENTER_NAME' | translate"
+              />
+              <p class="form-hint">{{ 'PROFILE.NAME_HINT' | translate }}</p>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="saving()"
+              >
+                @if (saving()) {
+                  <span class="btn-spinner"></span>
+                }
+                {{ 'COMMON.SAVE_CHANGES' | translate }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Account Info Card -->
+      <div class="profile-card">
+        <div class="card-header">
+          <h2 class="card-title">{{ 'PROFILE.ACCOUNT_INFO' | translate }}</h2>
+        </div>
+
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label">{{ 'PROFILE.ACCOUNT_TYPE' | translate }}:</span>
+            <span class="info-value">
+              @if (authService.isAdmin()) {
+                <span class="badge badge-admin">{{ 'PROFILE.ADMIN' | translate }}</span>
+              } @else {
+                <span class="badge badge-user">{{ 'PROFILE.USER' | translate }}</span>
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

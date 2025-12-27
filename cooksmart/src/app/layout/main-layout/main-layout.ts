@@ -73,4 +73,10 @@ export class MainLayout {
   closeMobileMenu(): void {
     this.mobileMenuOpen.set(false);
   }
+
+  getUserInitial(): string {
+    const email = this.authService.currentUser()?.email;
+    if (!email) return 'U';
+    return email.charAt(0).toUpperCase();
+  }
 }

@@ -44,10 +44,12 @@
         @if (authService.isAuthenticated()) {
           <div class="dropdown" [class.open]="userMenuOpen()">
             <button class="btn-icon user-avatar" (click)="toggleUserMenu()" type="button">
-              @if (authService.currentProfile()?.avatar_url) {
+              @if (authService.currentProfile()?.display_name) {
+                <span class="user-display-name">{{ authService.currentProfile()?.display_name }}</span>
+              } @else if (authService.currentProfile()?.avatar_url) {
                 <img [src]="authService.currentProfile()?.avatar_url" alt="Avatar" />
               } @else {
-                <span class="avatar-placeholder">{{ authService.currentProfile()?.display_name?.charAt(0) || 'U' }}</span>
+                <span class="avatar-placeholder">{{ getUserInitial() }}</span>
               }
             </button>
             @if (userMenuOpen()) {

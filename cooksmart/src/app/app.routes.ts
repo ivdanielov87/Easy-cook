@@ -5,6 +5,7 @@ import { Home } from './features/public/home/home';
 import { RecipeList } from './features/public/recipe-list/recipe-list';
 import { RecipeDetail } from './features/public/recipe-detail/recipe-detail';
 import { Pantry } from './features/public/pantry/pantry';
+import { Profile } from './features/profile/profile';
 import { Login } from './features/auth/login/login';
 import { Dashboard } from './features/admin/dashboard/dashboard';
 import { RecipeManagement } from './features/admin/recipe-management/recipe-management';
@@ -35,6 +36,10 @@ export const routes: Routes = [
       {
         path: 'pantry',
         component: Pantry
+      },
+      {
+        path: 'profile',
+        component: Profile
       }
     ]
   },
