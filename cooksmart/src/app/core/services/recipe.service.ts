@@ -83,6 +83,17 @@ export class RecipeService {
       console.log('[RecipeService] Data type:', typeof data);
       console.log('[RecipeService] Is array:', Array.isArray(data));
 
+      // The RPC function returns {recipe: {...}, ingredients: [...]}
+      // We need to combine them into the RecipeWithIngredients format
+      if (data && typeof data === 'object' && 'recipe' in data && 'ingredients' in data) {
+        const result = {
+          ...data.recipe,
+          ingredients: data.ingredients
+        };
+        console.log('[RecipeService] Mapped result:', result);
+        return result as RecipeWithIngredients;
+      }
+
       return data as RecipeWithIngredients;
     } catch (error) {
       console.error('Error fetching recipe:', error);
