@@ -93,8 +93,8 @@ export class IngredientService {
 
       console.log('[IngredientService] Ingredient created successfully:', data);
       
-      // Refresh ingredients list after successful creation
-      await this.getIngredients();
+      // Don't refresh the full list here - it causes race conditions
+      // The component will handle adding the new ingredient to its local list
       
       return { success: true, data: data as Ingredient };
     } catch (error: any) {
