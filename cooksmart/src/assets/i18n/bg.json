@@ -109,7 +109,10 @@
     "NEW_INGREDIENT": "Нова съставка",
     "CREATE_NEW_INGREDIENT": "Създай нова съставка",
     "INGREDIENT_NAME_BG": "Име на български",
-    "INGREDIENT_NAME_EN": "Име на английски"
+    "INGREDIENT_NAME_EN": "Име на английски",
+    "INGREDIENT_REQUIRED_FIELDS": "И двете имена (на български и английски) са задължителни",
+    "INGREDIENT_ALREADY_EXISTS": "Съставката вече съществува: {{name}}",
+    "INGREDIENT_CREATED_SUCCESS": "Съставката е създадена успешно: {{name}}"
   },
   "PROFILE": {
     "MY_PROFILE": "Моят профил",

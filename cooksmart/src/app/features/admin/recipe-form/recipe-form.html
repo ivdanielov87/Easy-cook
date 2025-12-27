@@ -155,8 +155,14 @@
             </div>
             
             @if (ingredientError()) {
-              <div class="error-message">
+              <div class="ingredient-error-message">
                 {{ ingredientError() }}
+              </div>
+            }
+            
+            @if (ingredientSuccess()) {
+              <div class="ingredient-success-message">
+                {{ ingredientSuccess() }}
               </div>
             }
             

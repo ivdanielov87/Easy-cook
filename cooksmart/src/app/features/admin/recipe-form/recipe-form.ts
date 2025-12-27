@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { IngredientService } from '../../../core/services/ingredient.service';
 import { Recipe, Ingredient, RecipeIngredient } from '../../../core/models';
@@ -41,6 +41,7 @@ export class RecipeForm implements OnInit {
   newIngredientNameEn = signal<string>('');
   creatingIngredient = signal<boolean>(false);
   ingredientError = signal<string>('');
+  ingredientSuccess = signal<string>('');
   
   // Steps
   steps = signal<string[]>(['']);
@@ -51,7 +52,8 @@ export class RecipeForm implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private recipeService: RecipeService,
-    private ingredientService: IngredientService
+    private ingredientService: IngredientService,
+    private translate: TranslateService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -303,7 +305,7 @@ export class RecipeForm implements OnInit {
     console.log('Current creatingIngredient state:', this.creatingIngredient());
     
     if (!nameBg || !nameEn) {
-      this.ingredientError.set('Both Bulgarian and English names are required');
+      this.ingredientError.set(this.translate.instant('ADMIN.INGREDIENT_REQUIRED_FIELDS'));
       return;
     }
 
@@ -314,13 +316,15 @@ export class RecipeForm implements OnInit {
     );
 
     if (existingIngredient) {
-      this.ingredientError.set(`Ingredient already exists: ${existingIngredient.name_bg} / ${existingIngredient.name_en}`);
+      const name = `${existingIngredient.name_bg} / ${existingIngredient.name_en}`;
+      this.ingredientError.set(this.translate.instant('ADMIN.INGREDIENT_ALREADY_EXISTS', { name }));
       return;
     }
 
     this.creatingIngredient.set(true);
     console.log('Set creatingIngredient to true');
     this.ingredientError.set('');
+    this.ingredientSuccess.set('');
 
     try {
       console.log('Calling ingredientService.createIngredient...');
@@ -338,12 +342,19 @@ export class RecipeForm implements OnInit {
         this.availableIngredients.update(ingredients => [...ingredients, result.data!]);
         this.filteredIngredients.update(ingredients => [...ingredients, result.data!]);
         
+        // Show success message
+        const name = `${result.data.name_bg} / ${result.data.name_en}`;
+        this.ingredientSuccess.set(this.translate.instant('ADMIN.INGREDIENT_CREATED_SUCCESS', { name }));
+        
         console.log('Resetting form...');
-        // Reset form
-        this.newIngredientNameBg.set('');
-        this.newIngredientNameEn.set('');
-        this.showNewIngredientForm.set(false);
-        this.ingredientError.set('');
+        // Reset form after a short delay to show success message
+        setTimeout(() => {
+          this.newIngredientNameBg.set('');
+          this.newIngredientNameEn.set('');
+          this.showNewIngredientForm.set(false);
+          this.ingredientError.set('');
+          this.ingredientSuccess.set('');
+        }, 2000);
         
         console.log('Adding ingredient to selected...');
         // Optionally add to selected ingredients
@@ -353,11 +364,13 @@ export class RecipeForm implements OnInit {
       } else {
         const errorMsg = result.error || 'Failed to create ingredient';
         this.ingredientError.set(errorMsg);
+        this.ingredientSuccess.set('');
         console.error('Failed to create ingredient:', errorMsg);
       }
     } catch (err: any) {
       const errorMsg = err.message || 'An unexpected error occurred';
       this.ingredientError.set(errorMsg);
+      this.ingredientSuccess.set('');
       console.error('Exception creating ingredient:', err);
     } finally {
       console.log('Setting creatingIngredient to false');

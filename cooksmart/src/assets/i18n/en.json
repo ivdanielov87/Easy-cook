@@ -109,7 +109,10 @@
     "NEW_INGREDIENT": "New Ingredient",
     "CREATE_NEW_INGREDIENT": "Create New Ingredient",
     "INGREDIENT_NAME_BG": "Bulgarian Name",
-    "INGREDIENT_NAME_EN": "English Name"
+    "INGREDIENT_NAME_EN": "English Name",
+    "INGREDIENT_REQUIRED_FIELDS": "Both Bulgarian and English names are required",
+    "INGREDIENT_ALREADY_EXISTS": "Ingredient already exists: {{name}}",
+    "INGREDIENT_CREATED_SUCCESS": "Ingredient created successfully: {{name}}"
   },
   "PROFILE": {
     "MY_PROFILE": "My Profile",
