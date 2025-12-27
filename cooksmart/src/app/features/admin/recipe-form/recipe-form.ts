@@ -112,9 +112,19 @@ export class RecipeForm implements OnInit {
   }
 
   addIngredient(ingredient: Ingredient): void {
-    const exists = this.selectedIngredients().some(i => i.ingredient_id === ingredient.id);
-    if (exists) return;
+    console.log('=== Adding ingredient ===');
+    console.log('Ingredient:', ingredient);
+    console.log('Current selected ingredients:', this.selectedIngredients());
     
+    const exists = this.selectedIngredients().some(i => i.ingredient_id === ingredient.id);
+    console.log('Already exists?', exists);
+    
+    if (exists) {
+      console.log('Ingredient already selected, skipping');
+      return;
+    }
+    
+    console.log('Adding ingredient to selected list');
     this.selectedIngredients.update(ingredients => [
       ...ingredients,
       {
@@ -123,6 +133,9 @@ export class RecipeForm implements OnInit {
         unit: ''
       }
     ]);
+    
+    console.log('Updated selected ingredients:', this.selectedIngredients());
+    console.log('=== Ingredient added ===');
   }
 
   removeIngredient(ingredientId: string): void {
