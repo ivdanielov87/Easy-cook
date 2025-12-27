@@ -93,6 +93,8 @@
     display: flex;
     flex-direction: column;
     transition: all $transition-base;
+    min-width: 0;
+    overflow-x: hidden;
     
     .topbar {
       position: sticky;
@@ -185,9 +187,15 @@
     
     .page-content {
       flex: 1;
-      padding: $spacing-xl;
+      padding: $spacing-md;
+      max-width: 100%;
+      overflow-x: hidden;
       
       @include tablet {
+        padding: $spacing-xl;
+      }
+      
+      @include desktop {
         padding: $spacing-2xl;
       }
     }

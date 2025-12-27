@@ -34,7 +34,7 @@
       font-size: 1.25rem;
       
       .logo-icon {
-        font-size: 1.5rem;
+        font-size: 2rem;
       }
       
       .logo-text {
@@ -161,7 +161,6 @@
     
     .dropdown-header {
       padding: $spacing-sm $spacing-md;
-      border-bottom: 1px solid $border-color;
       
       .user-name {
         font-weight: $font-weight-semibold;
@@ -221,7 +220,7 @@
   
   &.active {
     span:nth-child(1) {
-      transform: rotate(45deg) translate(5px, 5px);
+      transform: rotate(45deg) translate(3px, 3px);
     }
     
     span:nth-child(2) {
@@ -229,7 +228,7 @@
     }
     
     span:nth-child(3) {
-      transform: rotate(-45deg) translate(7px, -6px);
+      transform: rotate(-45deg) translate(6px, -6px);
     }
   }
 }
@@ -349,7 +348,7 @@
       margin-bottom: $spacing-sm;
       
       .logo-icon {
-        font-size: 1.5rem;
+        font-size: 2rem;
       }
     }
     

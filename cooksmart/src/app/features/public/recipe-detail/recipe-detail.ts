@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { RecipeService } from '../../../core/services/recipe.service';
@@ -10,7 +11,7 @@ import { fadeIn } from '../../../shared/animations';
 
 @Component({
   selector: 'app-recipe-detail',
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.scss',
   animations: [fadeIn]
@@ -20,6 +21,7 @@ export class RecipeDetail implements OnInit {
   loading = signal<boolean>(true);
   isSaved = signal<boolean>(false);
   savingRecipe = signal<boolean>(false);
+  checkedIngredients = signal<boolean[]>([]);
 
   constructor(
     private route: ActivatedRoute,
@@ -44,6 +46,8 @@ export class RecipeDetail implements OnInit {
     
     if (recipe) {
       this.recipe.set(recipe);
+      // Initialize checkbox states for all ingredients
+      this.checkedIngredients.set(new Array(recipe.ingredients?.length || 0).fill(false));
     } else {
       this.router.navigate(['/recipes']);
     }

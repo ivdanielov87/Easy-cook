@@ -497,7 +497,8 @@ BEGIN
             SELECT json_agg(
                 json_build_object(
                     'id', i.id,
-                    'name', i.name,
+                    'name_bg', i.name_bg,
+                    'name_en', i.name_en,
                     'quantity', ri.quantity,
                     'unit', ri.unit
                 )

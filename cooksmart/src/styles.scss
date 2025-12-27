@@ -64,3 +64,25 @@ body {
     transform: translateY(0);
   }
 }
+
+// Button icon styles
+.btn-icon-plus,
+.btn-icon-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+  margin-right: 0.25rem;
+}
+
+.btn-primary .btn-icon-plus,
+.btn-primary .btn-icon-close {
+  color: white;
+}
+
+.btn-secondary .btn-icon-plus,
+.btn-secondary .btn-icon-close {
+  color: $primary-color;
+}

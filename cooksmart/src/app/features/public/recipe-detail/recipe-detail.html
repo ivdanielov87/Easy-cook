@@ -72,11 +72,18 @@
           <div class="ingredients-section">
             <h2 class="section-title">{{ 'RECIPE.INGREDIENTS' | translate }}</h2>
             <ul class="ingredients-list">
-              @for (ingredient of recipe()!.ingredients; track ingredient.id) {
+              @for (ingredient of recipe()!.ingredients; track ingredient.id; let i = $index) {
                 <li class="ingredient-item">
-                  <span class="ingredient-checkbox">✓</span>
-                  <span class="ingredient-quantity">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
-                  <span class="ingredient-name">{{ getIngredientName(ingredient) }}</span>
+                  <input 
+                    type="checkbox" 
+                    class="ingredient-checkbox"
+                    [id]="'ingredient-' + i"
+                    [(ngModel)]="checkedIngredients()[i]"
+                  />
+                  <label [for]="'ingredient-' + i" class="ingredient-content">
+                    <span class="ingredient-name">{{ getIngredientName(ingredient) }}</span>
+                    <span class="ingredient-quantity">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
+                  </label>
                 </li>
               }
             </ul>

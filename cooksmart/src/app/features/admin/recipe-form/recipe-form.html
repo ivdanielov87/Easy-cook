@@ -121,9 +121,9 @@
           </div>
           <button type="button" class="btn btn-secondary" (click)="toggleNewIngredientForm()">
             @if (showNewIngredientForm()) {
-              ✕ {{ 'COMMON.CANCEL' | translate }}
+              <span class="btn-icon-close">×</span> {{ 'COMMON.CANCEL' | translate }}
             } @else {
-              ➕ {{ 'ADMIN.NEW_INGREDIENT' | translate }}
+              <span class="btn-icon-plus">+</span> {{ 'ADMIN.NEW_INGREDIENT' | translate }}
             }
           </button>
         </div>
@@ -255,7 +255,7 @@
         }
         
         <button type="button" class="btn btn-secondary" (click)="addStep()">
-          ➕ {{ 'RECIPE.ADD_STEP' | translate }}
+          <span class="btn-icon-plus">+</span> {{ 'RECIPE.ADD_STEP' | translate }}
         </button>
       </div>
 

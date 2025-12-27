@@ -67,15 +67,69 @@ export class RecipeService {
   }
 
   /**
-   * Get a single recipe by ID with ingredients
+   * Get a single recipe by ID with ingredients (for editing)
    */
   async getRecipeById(id: string): Promise<RecipeWithIngredients | null> {
     try {
       this.loading.set(true);
 
+      // First get the recipe by ID
+      const { data: recipe, error: recipeError } = await this.supabase.client
+        .from('recipes')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (recipeError) throw recipeError;
+      if (!recipe) return null;
+
+      // Then get the recipe ingredients
+      const { data: ingredients, error: ingredientsError } = await this.supabase.client
+        .from('recipe_ingredients')
+        .select(`
+          quantity,
+          unit,
+          ingredient:ingredients (
+            id,
+            name_bg,
+            name_en
+          )
+        `)
+        .eq('recipe_id', id);
+
+      if (ingredientsError) throw ingredientsError;
+
+      // Map ingredients to the expected format
+      const mappedIngredients = (ingredients || []).map((ing: any) => ({
+        id: ing.ingredient.id,
+        name_bg: ing.ingredient.name_bg,
+        name_en: ing.ingredient.name_en,
+        quantity: ing.quantity,
+        unit: ing.unit
+      }));
+
+      return {
+        ...recipe,
+        ingredients: mappedIngredients
+      } as RecipeWithIngredients;
+    } catch (error) {
+      console.error('Error fetching recipe by ID:', error);
+      return null;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Get a single recipe by slug with ingredients (for viewing)
+   */
+  async getRecipeBySlugWithIngredients(slug: string): Promise<RecipeWithIngredients | null> {
+    try {
+      this.loading.set(true);
+
       // Use the get_recipe_with_ingredients RPC function
       const { data, error } = await this.supabase.client
-        .rpc('get_recipe_with_ingredients', { recipe_slug: id });
+        .rpc('get_recipe_with_ingredients', { recipe_slug: slug });
 
       if (error) throw error;
 
@@ -96,7 +150,7 @@ export class RecipeService {
 
       return data as RecipeWithIngredients;
     } catch (error) {
-      console.error('Error fetching recipe:', error);
+      console.error('Error fetching recipe by slug:', error);
       return null;
     } finally {
       this.loading.set(false);
@@ -119,7 +173,7 @@ export class RecipeService {
       if (error) throw error;
 
       if (data) {
-        return await this.getRecipeById(data.slug);
+        return await this.getRecipeBySlugWithIngredients(data.slug);
       }
 
       return null;

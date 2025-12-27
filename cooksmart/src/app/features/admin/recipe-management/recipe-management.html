@@ -15,7 +15,7 @@
       />
     </div>
     <a routerLink="/admin/recipes/new" class="btn btn-primary">
-      <span>➕</span>
+      <span class="btn-icon-plus">+</span>
       {{ 'ADMIN.CREATE_RECIPE' | translate }}
     </a>
   </div>
@@ -38,6 +38,55 @@
     </div>
   } @else {
     <div class="recipes-table" [@staggerList]>
+      <!-- Mobile Card View -->
+      @for (recipe of filteredRecipes(); track recipe.id) {
+        <div class="mobile-recipe-card">
+          <div class="card-header">
+            @if (recipe.image_url) {
+              <img [src]="recipe.image_url" [alt]="recipe.title" class="recipe-thumb" />
+            }
+            <div class="recipe-info-mobile">
+              <div class="recipe-title">{{ recipe.title }}</div>
+              @if (recipe.description) {
+                <div class="recipe-description">{{ recipe.description }}</div>
+              }
+            </div>
+          </div>
+          
+          <div class="card-meta">
+            <div class="meta-item">
+              <div class="meta-label">{{ 'RECIPE.DIFFICULTY' | translate }}</div>
+              <div class="meta-value">
+                <span class="badge" [class]="'badge-' + recipe.difficulty">
+                  {{ getDifficultyLabel(recipe.difficulty) | translate }}
+                </span>
+              </div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">{{ 'RECIPE.PREP_TIME' | translate }}</div>
+              <div class="meta-value">{{ recipe.prep_time }}m</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">{{ 'RECIPE.SERVINGS' | translate }}</div>
+              <div class="meta-value">{{ recipe.servings }}</div>
+            </div>
+          </div>
+          
+          <div class="card-actions">
+            <a [routerLink]="['/recipes', recipe.slug]" class="btn-icon" title="View">
+              👁️
+            </a>
+            <a [routerLink]="['/admin/recipes/edit', recipe.id]" class="btn-icon" title="Edit">
+              ✏️
+            </a>
+            <button class="btn-icon btn-danger" (click)="deleteRecipe(recipe.id)" title="Delete">
+              🗑️
+            </button>
+          </div>
+        </div>
+      }
+      
+      <!-- Desktop Table View -->
       <table>
         <thead>
           <tr>

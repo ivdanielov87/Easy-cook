@@ -279,42 +279,34 @@
       .ingredient-item {
         display: flex;
         align-items: center;
-        gap: $spacing-sm;
+        gap: $spacing-md;
         padding: $spacing-sm 0;
-        border-bottom: 1px solid $border-color;
-        
-        &:last-child {
-          border-bottom: none;
-        }
         
         .ingredient-checkbox {
           flex-shrink: 0;
-          width: 24px;
-          height: 24px;
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+          accent-color: $primary-color;
+        }
+        
+        .ingredient-content {
           display: flex;
           align-items: center;
-          justify-content: center;
-          border: 2px solid $border-color;
-          border-radius: $border-radius-sm;
-          color: transparent;
-          transition: all $transition-fast;
+          gap: $spacing-md;
+          flex: 1;
           cursor: pointer;
           
-          &:hover {
-            border-color: $primary-color;
+          .ingredient-name {
+            font-weight: $font-weight-semibold;
             color: $primary-color;
+            flex: 1;
           }
-        }
-        
-        .ingredient-quantity {
-          font-weight: $font-weight-semibold;
-          color: $primary-color;
-          min-width: 80px;
-        }
-        
-        .ingredient-name {
-          color: $text-primary;
-          flex: 1;
+          
+          .ingredient-quantity {
+            color: $primary-color;
+            min-width: 80px;
+          }
         }
       }
     }

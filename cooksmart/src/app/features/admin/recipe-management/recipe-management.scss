@@ -2,6 +2,9 @@
 @use '../../../../mixins' as *;
 
 .recipe-management-page {
+  max-width: 100%;
+  overflow-x: hidden;
+  
   .page-header {
     margin-bottom: $spacing-2xl;
     
@@ -26,7 +29,13 @@
     
     .search-box {
       flex: 1;
-      min-width: 250px;
+      min-width: 0;
+      width: 100%;
+      
+      @include tablet {
+        min-width: 250px;
+        width: auto;
+      }
       
       .search-input {
         width: 100%;
@@ -52,6 +61,11 @@
     
     .btn {
       white-space: nowrap;
+      width: 100%;
+      
+      @include tablet {
+        width: auto;
+      }
     }
   }
   
@@ -90,14 +104,29 @@
   }
   
   .recipes-table {
-    background: $surface;
-    border-radius: $border-radius;
-    box-shadow: $shadow-sm;
-    overflow-x: auto;
+    // Mobile: Show as stacked cards
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    max-width: 100%;
     
+    @include tablet {
+      background: $surface;
+      border-radius: $border-radius;
+      box-shadow: $shadow-sm;
+      display: block;
+    }
+    
+    // Mobile: Hide table, show cards
     table {
-      width: 100%;
-      border-collapse: collapse;
+      display: none !important;
+      
+      @include tablet {
+        display: table !important;
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+      }
       
       thead {
         background: $background-gray;
@@ -172,7 +201,10 @@
           color: $text-secondary;
           overflow: hidden;
           text-overflow: ellipsis;
-          white-space: nowrap;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          max-width: 300px;
         }
       }
     }
@@ -233,6 +265,87 @@
         &.btn-danger:hover:not(:disabled) {
           background: rgba(#ef4444, 0.1);
         }
+      }
+    }
+    
+    // Mobile card view
+    .mobile-recipe-card {
+      display: block;
+      background: $surface;
+      border-radius: $border-radius;
+      box-shadow: $shadow-sm;
+      padding: $spacing-md;
+      
+      @include tablet {
+        display: none;
+      }
+      
+      .card-header {
+        display: flex;
+        gap: $spacing-md;
+        margin-bottom: $spacing-md;
+        
+        .recipe-thumb {
+          width: 80px;
+          height: 80px;
+          object-fit: cover;
+          border-radius: $border-radius-sm;
+          flex-shrink: 0;
+        }
+        
+        .recipe-info-mobile {
+          flex: 1;
+          min-width: 0;
+          
+          .recipe-title {
+            font-weight: $font-weight-semibold;
+            color: $text-primary;
+            margin-bottom: $spacing-xs;
+            font-size: 1.125rem;
+          }
+          
+          .recipe-description {
+            font-size: 0.875rem;
+            color: $text-secondary;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+        }
+      }
+      
+      .card-meta {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: $spacing-sm;
+        padding: $spacing-sm 0;
+        border-top: 1px solid $border-color;
+        border-bottom: 1px solid $border-color;
+        margin-bottom: $spacing-md;
+        
+        .meta-item {
+          text-align: center;
+          
+          .meta-label {
+            font-size: 0.75rem;
+            color: $text-muted;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+          }
+          
+          .meta-value {
+            font-weight: $font-weight-semibold;
+            color: $text-primary;
+          }
+        }
+      }
+      
+      .card-actions {
+        display: flex;
+        gap: $spacing-sm;
+        justify-content: flex-end;
       }
     }
   }
