@@ -240,7 +240,7 @@
               [value]="step"
               (input)="updateStep(i, $any($event.target).value)"
               [placeholder]="'RECIPE.STEP_DESCRIPTION' | translate"
-              rows="3"
+              rows="2"
             ></textarea>
             @if (steps().length > 1) {
               <button
