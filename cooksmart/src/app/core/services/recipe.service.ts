@@ -127,6 +127,7 @@ export class RecipeService {
       
       console.log('[RecipeService] Getting user session...');
       let accessToken = supabaseKey;
+      let userId: string | null = null;
       try {
         const sessionPromise = this.supabase.client.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => 
@@ -135,9 +136,14 @@ export class RecipeService {
         
         const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
         accessToken = session?.access_token || supabaseKey;
-        console.log('[RecipeService] Got session token');
+        userId = session?.user?.id || null;
+        console.log('[RecipeService] Got session token and user ID:', userId);
       } catch (err) {
         console.warn('[RecipeService] Session fetch timed out, using API key');
+      }
+
+      if (!userId) {
+        throw new Error('User not authenticated');
       }
 
       // Insert recipe using direct HTTP POST
@@ -158,7 +164,8 @@ export class RecipeService {
           prep_time: recipe.prep_time,
           servings: recipe.servings,
           difficulty: recipe.difficulty,
-          steps: recipe.steps
+          steps: recipe.steps,
+          author_id: userId
         })
       });
 
