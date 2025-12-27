@@ -307,6 +307,19 @@ export class RecipeForm implements OnInit {
       return;
     }
 
+    // Check if ingredient already exists
+    const existingIngredient = this.availableIngredients().find(
+      ing => ing.name_bg.toLowerCase() === nameBg.toLowerCase() || 
+             ing.name_en.toLowerCase() === nameEn.toLowerCase()
+    );
+
+    if (existingIngredient) {
+      const message = `Ingredient already exists: ${existingIngredient.name_bg} / ${existingIngredient.name_en}`;
+      this.error.set(message);
+      alert(message);
+      return;
+    }
+
     this.creatingIngredient.set(true);
     console.log('Set creatingIngredient to true');
     this.error.set('');
