@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
@@ -28,6 +28,25 @@ export class MainLayout {
     public authService: AuthService,
     public translateService: TranslateService
   ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    
+    // Find all dropdown containers
+    const languageDropdown = document.querySelector('.navbar-actions .dropdown:first-child');
+    const userDropdown = document.querySelector('.navbar-actions .dropdown:last-child');
+    
+    // Check if click is outside language dropdown
+    if (this.languageMenuOpen() && languageDropdown && !languageDropdown.contains(target)) {
+      this.languageMenuOpen.set(false);
+    }
+    
+    // Check if click is outside user dropdown
+    if (this.userMenuOpen() && userDropdown && !userDropdown.contains(target)) {
+      this.userMenuOpen.set(false);
+    }
+  }
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen.update(value => !value);
