@@ -70,12 +70,21 @@ export class IngredientService {
       console.log('[IngredientService] Creating ingredient:', ingredient);
       this.loading.set(true);
 
-      console.log('[IngredientService] Calling Supabase insert...');
+      console.log('[IngredientService] Calling Supabase insert with timeout wrapper...');
       
-      // Try simpler insert without select
-      const insertResult = await this.supabase.client
+      // Wrap the insert in a Promise.race with a 5-second timeout
+      const insertPromise = this.supabase.client
         .from('ingredients')
         .insert(ingredient);
+      
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          console.error('[IngredientService] Insert timed out after 5 seconds');
+          reject(new Error('Insert operation timed out'));
+        }, 5000);
+      });
+
+      const insertResult = await Promise.race([insertPromise, timeoutPromise]);
 
       console.log('[IngredientService] Insert response received:', insertResult);
 
@@ -86,8 +95,8 @@ export class IngredientService {
 
       console.log('[IngredientService] Insert successful, now fetching the created ingredient...');
       
-      // Fetch the created ingredient separately
-      const { data, error } = await this.supabase.client
+      // Fetch the created ingredient separately with timeout
+      const fetchPromise = this.supabase.client
         .from('ingredients')
         .select()
         .eq('name_bg', ingredient.name_bg)
@@ -95,6 +104,15 @@ export class IngredientService {
         .order('created_at', { ascending: false })
         .limit(1)
         .single();
+      
+      const fetchTimeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          console.error('[IngredientService] Fetch timed out after 5 seconds');
+          reject(new Error('Fetch operation timed out'));
+        }, 5000);
+      });
+
+      const { data, error } = await Promise.race([fetchPromise, fetchTimeoutPromise]);
 
       console.log('[IngredientService] Fetch result:', { data, error });
 
