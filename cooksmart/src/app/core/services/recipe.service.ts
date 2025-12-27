@@ -79,6 +79,10 @@ export class RecipeService {
 
       if (error) throw error;
 
+      console.log('[RecipeService] RPC response data:', data);
+      console.log('[RecipeService] Data type:', typeof data);
+      console.log('[RecipeService] Is array:', Array.isArray(data));
+
       return data as RecipeWithIngredients;
     } catch (error) {
       console.error('Error fetching recipe:', error);
