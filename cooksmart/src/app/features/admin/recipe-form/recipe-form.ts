@@ -336,11 +336,10 @@ export class RecipeForm implements OnInit {
       console.log('Create ingredient result:', result);
 
       if (result.success && result.data) {
-        console.log('Success! Adding ingredient to lists...');
+        console.log('Success! Reloading ingredients list...');
         
-        // Add to available ingredients
-        this.availableIngredients.update(ingredients => [...ingredients, result.data!]);
-        this.filteredIngredients.update(ingredients => [...ingredients, result.data!]);
+        // Reload the full ingredients list from the database to ensure sync
+        await this.loadIngredients();
         
         // Show success message
         const name = `${result.data.name_bg} / ${result.data.name_en}`;
