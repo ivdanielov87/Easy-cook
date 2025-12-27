@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { AuthService } from './auth.service';
 import { Recipe, RecipeWithIngredients, RecipeCreate, RecipeUpdate, RecipeFilters } from '../models';
 
 @Injectable({
@@ -9,7 +10,10 @@ export class RecipeService {
   recipes = signal<Recipe[]>([]);
   loading = signal<boolean>(false);
 
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private auth: AuthService
+  ) {}
 
   /**
    * Fetch all recipes with optional filters
@@ -125,9 +129,18 @@ export class RecipeService {
       const supabaseUrl = (this.supabase.client as any).supabaseUrl;
       const supabaseKey = (this.supabase.client as any).supabaseKey;
       
-      console.log('[RecipeService] Getting user session...');
+      console.log('[RecipeService] Getting user ID from AuthService...');
+      const currentUser = this.auth.currentUser();
+      
+      if (!currentUser?.id) {
+        throw new Error('User not authenticated');
+      }
+      
+      const userId = currentUser.id;
+      console.log('[RecipeService] User ID:', userId);
+      
+      // Get access token with timeout
       let accessToken = supabaseKey;
-      let userId: string | null = null;
       try {
         const sessionPromise = this.supabase.client.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => 
@@ -136,14 +149,9 @@ export class RecipeService {
         
         const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
         accessToken = session?.access_token || supabaseKey;
-        userId = session?.user?.id || null;
-        console.log('[RecipeService] Got session token and user ID:', userId);
+        console.log('[RecipeService] Got access token');
       } catch (err) {
         console.warn('[RecipeService] Session fetch timed out, using API key');
-      }
-
-      if (!userId) {
-        throw new Error('User not authenticated');
       }
 
       // Insert recipe using direct HTTP POST
