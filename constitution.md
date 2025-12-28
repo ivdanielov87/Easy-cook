@@ -70,42 +70,6 @@
 
 ### 5.1 Database & Backend
 
-#### Profile Creation Trigger
-**CRITICAL:** The database trigger for creating user profiles MUST extract metadata from `auth.users`.
-
-**Mistake Made:**
-```sql
--- WRONG: Missing display_name extraction
-INSERT INTO public.profiles (id, email, role)
-VALUES (NEW.id, NEW.email, 'user');
-```
-
-**Correct Implementation:**
-```sql
--- CORRECT: Extract display_name from user metadata
-INSERT INTO public.profiles (id, email, display_name, role)
-VALUES (
-    NEW.id, 
-    NEW.email, 
-    COALESCE(NEW.raw_user_meta_data->>'display_name', NULL),
-    'user'
-);
-```
-
-**Why:** When users register with `signUp(email, password, displayName)`, Supabase stores `displayName` in `raw_user_meta_data`. The trigger must extract it to populate the profile table.
-
-#### Email Validation
-**CRITICAL:** Supabase validates email domains and rejects fake/test domains.
-
-**Mistake Made:**
-- Using test emails like `user@example.com` during development
-- These fail with `400 Bad Request: email_address_invalid`
-
-**Solution:**
-- Use real email domains (Gmail, Outlook, etc.) for testing
-- Document this requirement in setup instructions
-- For development, consider disabling email confirmation in Supabase settings
-
 #### Email Confirmation Flow
 **CRITICAL:** Supabase requires email confirmation by default. Users cannot login until they confirm.
 
@@ -123,39 +87,6 @@ VALUES (
 **Alternative for Development:**
 - Disable email confirmation in Supabase Dashboard → Authentication → Email Auth
 - Re-enable for production
-
-### 5.2 Authentication & OAuth
-
-#### Google OAuth Implementation
-**BEST PRACTICE:** Always provide OAuth options alongside email/password for better UX.
-
-**Implementation Checklist:**
-1. Add `signInWithGoogle()` method to SupabaseService
-2. Add `signInWithGoogle()` method to AuthService
-3. Add Google sign-in button to both login AND register pages
-4. Use official Google branding (colors, logo)
-5. Add "OR" divider between authentication methods
-6. Configure Google OAuth in Supabase Dashboard
-7. Add redirect URL to Google Cloud Console
-
-**UI/UX:**
-- Place Google button below email/password form
-- Use white background with Google's official colors
-- Add subtle hover effects
-- Ensure button is accessible on mobile (min 44px height)
-
-#### Authentication Guards
-**CRITICAL:** Implement guards for protected content, not just routes.
-
-**Mistake Made:**
-- Recipe detail page was accessible to unauthenticated users
-- Should have required login to view full recipe details
-
-**Solution:**
-- Check authentication in component `ngOnInit()`
-- Show login prompt with redirect buttons for unauthenticated users
-- Don't load sensitive data if user is not authenticated
-- Provide clear call-to-action (Login/Register buttons)
 
 ### 5.3 Frontend Architecture
 
@@ -181,11 +112,6 @@ async signUp(email: string, password: string, displayName: string):
 #### Translation Keys
 **BEST PRACTICE:** Add translation keys for ALL user-facing text, including error messages.
 
-**Mistake Made:**
-- Hardcoded error messages in components
-- Forgot to add translation keys for new features
-
-**Solution:**
 - Add translation keys immediately when implementing features
 - Use consistent naming: `AUTH.ERROR_TYPE`, `COMMON.ACTION`
 - Update both `en.json` AND `bg.json` simultaneously

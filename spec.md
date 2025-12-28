@@ -46,7 +46,6 @@ Home cooks struggle to decide what to prepare with ingredients they already have
 
 #### Authenticated User Features
 - User registration and login (email/password via Supabase Auth)
-- Google OAuth authentication for easy sign-in
 - Email confirmation flow with user messaging
 - Profile management (display name, avatar upload)
 - Profile automatically created on registration via database trigger
@@ -84,7 +83,6 @@ Home cooks struggle to decide what to prepare with ingredients they already have
 ### Recently Completed (Phase 2)
 
 - ✅ Multi-language support (Bulgarian/English with ngx-translate)
-- ✅ Google OAuth authentication
 - ✅ Email confirmation messaging
 - ✅ Profile creation trigger with display_name support
 - ✅ Saved recipes functionality
@@ -102,9 +100,8 @@ Home cooks struggle to decide what to prepare with ingredients they already have
 - **FR-1.3:** ✅ System distinguishes between 'user' and 'admin' roles
 - **FR-1.4:** ✅ Admin routes protected by both Angular guard and database RLS
 - **FR-1.5:** ✅ Profile created automatically on user registration via trigger (includes display_name)
-- **FR-1.6:** ✅ Google OAuth sign-in available on login and register pages
-- **FR-1.7:** ✅ Email confirmation required with proper user messaging
-- **FR-1.8:** ✅ Email not confirmed error handling on login
+- **FR-1.6:** ✅ Email confirmation required with proper user messaging
+- **FR-1.7:** ✅ Email not confirmed error handling on login
 
 ### FR-2: Recipe Discovery
 - **FR-2.1:** ✅ Display recipes in grid layout with thumbnail, title, difficulty, prep time
@@ -245,7 +242,6 @@ Home cooks struggle to decide what to prepare with ingredients they already have
 - [x] Database schema deployed to Supabase Cloud
 - [x] Angular project scaffolded with correct structure
 - [x] Authentication flow working (register, login, logout)
-- [x] Google OAuth authentication implemented
 - [x] Email confirmation flow with user messaging
 - [x] Public recipe browsing functional
 - [ ] Ingredient-based search returns results

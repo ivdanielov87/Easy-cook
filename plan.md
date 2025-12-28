@@ -4,7 +4,7 @@
 **Date:** 2025-12-28  
 **Methodology:** Spec Kit Phase 1 → Incremental Implementation  
 **Estimated Duration:** 10-12 days (single developer)  
-**Updated:** Completed authentication (email + Google OAuth), profile creation, saved recipes, i18n, design system, and responsive layouts
+**Updated:** Completed authentication (email), profile creation, saved recipes, i18n, design system, and responsive layouts
 
 ---
 
@@ -22,7 +22,6 @@
 
 **Phase 2: Authentication & Core Services**
 - Email/password authentication
-- Google OAuth authentication
 - Email confirmation flow with user messaging
 - Profile creation trigger (includes display_name)
 - AuthGuard and AdminGuard
@@ -561,11 +560,9 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 - [x] **2.1.1** Create `src/app/core/services/supabase.service.ts`
   - Initialize Supabase client
   - Expose `auth`, `from()`, `storage` methods
-  - Added `signInWithGoogle()` for OAuth
 - [x] **2.1.2** Create `src/app/core/services/auth.service.ts`
   - `signUp(email, password, displayName)`
   - `signIn(email, password)`
-  - `signInWithGoogle()` for OAuth
   - `signOut()`
   - `currentUser$` signal/observable
   - `isAdmin$` signal (checks profile.role)
@@ -576,7 +573,6 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   - Verify profile created in DB with display_name
   - Login and check session persists on reload
   - Email confirmation flow with user messaging
-  - Google OAuth authentication
 
 **Validation:**
 - User can register and login

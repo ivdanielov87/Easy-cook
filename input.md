@@ -35,11 +35,6 @@ The application has two distinct layout modes to separate public access from adm
     * Email confirmation is REQUIRED by default in Supabase
     * Show success message after registration with email confirmation instructions
     * Handle `email_not_confirmed` error on login with clear user messaging
-* **Google OAuth Authentication:**
-    * Implement Google sign-in on both login and register pages
-    * Use official Google branding (white background, Google colors)
-    * Add "OR" divider between email/password and OAuth options
-    * Configure OAuth in Supabase Dashboard and Google Cloud Console
 * **Authentication Guards:**
     * Implement AuthGuard for protected routes (profile, saved recipes)
     * Implement AdminGuard for admin routes
@@ -146,12 +141,10 @@ The application has two distinct layout modes to separate public access from adm
 2. Check email for confirmation link
 3. Click confirmation link
 4. Login with confirmed account
-5. Verify profile created in Supabase with display_name
-6. Test Google OAuth flow
-7. Test on actual mobile device (not just DevTools)
-8. Verify saved recipes functionality
-9. Test authentication guards (try accessing recipe detail as guest)
-10. Test language switching (BG/EN)
+5. Test on actual mobile device (not just DevTools)
+6. Verify saved recipes functionality
+7. Test authentication guards (try accessing recipe detail as guest)
+8. Test language switching (BG/EN)
 
 ## 8. UI/UX Requirements
 
