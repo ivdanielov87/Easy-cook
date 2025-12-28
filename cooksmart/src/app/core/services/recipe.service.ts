@@ -19,19 +19,25 @@ export class RecipeService {
    * Fetch all recipes with optional filters
    */
   async getRecipes(filters?: RecipeFilters): Promise<Recipe[]> {
+    console.log('[RecipeService] getRecipes() called with filters:', filters);
     try {
       this.loading.set(true);
+      console.log('[RecipeService] Loading set to true');
 
       // Ensure session is valid before making request
+      console.log('[RecipeService] Checking session validity...');
       const sessionValid = await this.supabase.ensureValidSession();
+      console.log('[RecipeService] Session valid:', sessionValid);
       if (!sessionValid) {
         console.warn('[RecipeService] Session invalid, attempting to continue with public access...');
       }
 
+      console.log('[RecipeService] Building query...');
       let query = this.supabase.client
         .from('recipes')
         .select('*')
         .order('created_at', { ascending: false });
+      console.log('[RecipeService] Base query built');
 
       // Apply filters
       if (filters?.difficulty) {
@@ -60,25 +66,38 @@ export class RecipeService {
       }
 
       // Execute query with timeout to prevent hanging
+      console.log('[RecipeService] Executing query...');
       let data, error;
       try {
+        console.log('[RecipeService] Starting Promise.race with 10s timeout');
         const result = await Promise.race([
           query,
           new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Request timeout - connection may be stale')), 10000)
+            setTimeout(() => {
+              console.error('[RecipeService] 10-SECOND TIMEOUT TRIGGERED');
+              reject(new Error('Request timeout - connection may be stale'));
+            }, 10000)
           )
         ]);
+        console.log('[RecipeService] Query completed, result:', result);
         ({ data, error } = result as any);
       } catch (timeoutError: any) {
+        console.error('[RecipeService] Timeout error caught:', timeoutError);
         throw new Error(timeoutError.message || 'Request timeout');
       }
 
-      if (error) throw error;
+      if (error) {
+        console.error('[RecipeService] Query error:', error);
+        throw error;
+      }
 
+      console.log('[RecipeService] Data received, count:', data?.length || 0);
       this.recipes.set(data as Recipe[]);
       return data as Recipe[];
     } catch (error: any) {
-      console.error('[RecipeService] Error fetching recipes:', error);
+      console.error('[RecipeService] EXCEPTION in getRecipes:', error);
+      console.error('[RecipeService] Error message:', error.message);
+      console.error('[RecipeService] Error stack:', error.stack);
       
       // If timeout or connection error, show user-friendly message
       if (error.message?.includes('timeout') || error.message?.includes('stale')) {
@@ -87,6 +106,7 @@ export class RecipeService {
       
       return [];
     } finally {
+      console.log('[RecipeService] Finally block - setting loading to false');
       this.loading.set(false);
     }
   }
