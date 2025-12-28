@@ -24,66 +24,54 @@ export class RecipeService {
       this.loading.set(true);
       console.log('[RecipeService] Loading set to true');
 
-      // Ensure session is valid before making request
-      console.log('[RecipeService] Checking session validity...');
-      const sessionValid = await this.supabase.ensureValidSession();
-      console.log('[RecipeService] Session valid:', sessionValid);
-      if (!sessionValid) {
-        console.warn('[RecipeService] Session invalid, attempting to continue with public access...');
-      }
+      // Build query function for retry logic
+      const buildAndExecuteQuery = async () => {
+        console.log('[RecipeService] Building query...');
+        let query = this.supabase.client
+          .from('recipes')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      console.log('[RecipeService] Building query...');
-      let query = this.supabase.client
-        .from('recipes')
-        .select('*')
-        .order('created_at', { ascending: false });
-      console.log('[RecipeService] Base query built');
-
-      // Apply filters
-      if (filters?.difficulty) {
-        query = query.eq('difficulty', filters.difficulty);
-      }
-
-      if (filters?.prepTime) {
-        switch (filters.prepTime) {
-          case 'less_than_15':
-            query = query.lt('prep_time', 15);
-            break;
-          case '15_to_30':
-            query = query.gte('prep_time', 15).lte('prep_time', 30);
-            break;
-          case '30_to_60':
-            query = query.gte('prep_time', 30).lte('prep_time', 60);
-            break;
-          case 'more_than_60':
-            query = query.gt('prep_time', 60);
-            break;
+        // Apply filters
+        if (filters?.difficulty) {
+          query = query.eq('difficulty', filters.difficulty);
         }
-      }
 
-      if (filters?.search) {
-        query = query.ilike('title', `%${filters.search}%`);
-      }
+        if (filters?.prepTime) {
+          switch (filters.prepTime) {
+            case 'less_than_15':
+              query = query.lt('prep_time', 15);
+              break;
+            case '15_to_30':
+              query = query.gte('prep_time', 15).lte('prep_time', 30);
+              break;
+            case '30_to_60':
+              query = query.gte('prep_time', 30).lte('prep_time', 60);
+              break;
+            case 'more_than_60':
+              query = query.gt('prep_time', 60);
+              break;
+          }
+        }
 
-      // Execute query with timeout to prevent hanging
-      console.log('[RecipeService] Executing query...');
+        if (filters?.search) {
+          query = query.ilike('title', `%${filters.search}%`);
+        }
+
+        return query;
+      };
+
+      // Execute query with retry logic to handle stale connections
+      console.log('[RecipeService] Executing query with retry...');
       let data, error;
+      
       try {
-        console.log('[RecipeService] Starting Promise.race with 10s timeout');
-        const result = await Promise.race([
-          query,
-          new Promise((_, reject) => 
-            setTimeout(() => {
-              console.error('[RecipeService] 10-SECOND TIMEOUT TRIGGERED');
-              reject(new Error('Request timeout - connection may be stale'));
-            }, 10000)
-          )
-        ]);
+        const result = await this.supabase.withRetry(buildAndExecuteQuery, 2, 5000);
         console.log('[RecipeService] Query completed, result:', result);
         ({ data, error } = result as any);
-      } catch (timeoutError: any) {
-        console.error('[RecipeService] Timeout error caught:', timeoutError);
-        throw new Error(timeoutError.message || 'Request timeout');
+      } catch (retryError: any) {
+        console.error('[RecipeService] Query failed after retries:', retryError);
+        throw new Error(retryError.message || 'Request failed after retries');
       }
 
       if (error) {

@@ -508,6 +508,27 @@
     }
   }
   
+  // Error State
+  .error-state {
+    text-align: center;
+    padding: $spacing-2xl 0;
+    
+    .error-icon {
+      font-size: 3rem;
+      margin-bottom: $spacing-md;
+    }
+    
+    .error-message {
+      color: $text-secondary;
+      font-size: 1.125rem;
+      margin-bottom: $spacing-lg;
+    }
+    
+    .btn {
+      margin: 0 auto;
+    }
+  }
+  
   // Empty State
   .empty-state {
     text-align: center;

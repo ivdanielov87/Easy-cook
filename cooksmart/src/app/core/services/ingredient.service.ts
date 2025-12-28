@@ -25,17 +25,30 @@ export class IngredientService {
       const currentLang = this.translateService.getCurrentLanguage();
       const orderBy = currentLang === 'bg' ? 'name_bg' : 'name_en';
       
-      const { data, error } = await this.supabase.client
-        .from('ingredients')
-        .select('*')
-        .order(orderBy, { ascending: true });
+      // Build query function for retry logic
+      const buildAndExecuteQuery = async () => {
+        return this.supabase.client
+          .from('ingredients')
+          .select('*')
+          .order(orderBy, { ascending: true });
+      };
+
+      // Execute query with retry logic to handle stale connections
+      let data, error;
+      try {
+        const result = await this.supabase.withRetry(buildAndExecuteQuery, 2, 5000);
+        ({ data, error } = result as any);
+      } catch (retryError: any) {
+        console.error('[IngredientService] Query failed after retries:', retryError);
+        throw new Error(retryError.message || 'Request failed after retries');
+      }
 
       if (error) throw error;
 
       this.ingredients.set(data as Ingredient[]);
       return data as Ingredient[];
-    } catch (error) {
-      console.error('Error fetching ingredients:', error);
+    } catch (error: any) {
+      console.error('[IngredientService] Error fetching ingredients:', error);
       return [];
     } finally {
       this.loading.set(false);
@@ -47,17 +60,30 @@ export class IngredientService {
    */
   async getIngredientById(id: string): Promise<Ingredient | null> {
     try {
-      const { data, error } = await this.supabase.client
-        .from('ingredients')
-        .select('*')
-        .eq('id', id)
-        .single();
+      // Build query function for retry logic
+      const buildAndExecuteQuery = async () => {
+        return this.supabase.client
+          .from('ingredients')
+          .select('*')
+          .eq('id', id)
+          .single();
+      };
+
+      // Execute query with retry logic
+      let data, error;
+      try {
+        const result = await this.supabase.withRetry(buildAndExecuteQuery, 2, 5000);
+        ({ data, error } = result as any);
+      } catch (retryError: any) {
+        console.error('[IngredientService] GetById failed after retries:', retryError);
+        throw new Error(retryError.message || 'GetById failed after retries');
+      }
 
       if (error) throw error;
 
       return data as Ingredient;
-    } catch (error) {
-      console.error('Error fetching ingredient:', error);
+    } catch (error: any) {
+      console.error('[IngredientService] Error fetching ingredient:', error);
       return null;
     }
   }
@@ -176,17 +202,30 @@ export class IngredientService {
       const currentLang = this.translateService.getCurrentLanguage();
       const orderBy = currentLang === 'bg' ? 'name_bg' : 'name_en';
 
-      const { data, error } = await this.supabase.client
-        .from('ingredients')
-        .select('*')
-        .or(`name_bg.ilike.%${query}%,name_en.ilike.%${query}%`)
-        .order(orderBy, { ascending: true });
+      // Build query function for retry logic
+      const buildAndExecuteQuery = async () => {
+        return this.supabase.client
+          .from('ingredients')
+          .select('*')
+          .or(`name_bg.ilike.%${query}%,name_en.ilike.%${query}%`)
+          .order(orderBy, { ascending: true });
+      };
+
+      // Execute query with retry logic
+      let data, error;
+      try {
+        const result = await this.supabase.withRetry(buildAndExecuteQuery, 2, 5000);
+        ({ data, error } = result as any);
+      } catch (retryError: any) {
+        console.error('[IngredientService] Search failed after retries:', retryError);
+        throw new Error(retryError.message || 'Search failed after retries');
+      }
 
       if (error) throw error;
 
       return data as Ingredient[];
-    } catch (error) {
-      console.error('Error searching ingredients:', error);
+    } catch (error: any) {
+      console.error('[IngredientService] Error searching ingredients:', error);
       return [];
     } finally {
       this.loading.set(false);

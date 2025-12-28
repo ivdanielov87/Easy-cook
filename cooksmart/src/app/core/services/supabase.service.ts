@@ -6,9 +6,17 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class SupabaseService {
-  private supabase: SupabaseClient;
+  private supabase!: SupabaseClient;
 
   constructor() {
+    this.initializeClient();
+  }
+
+  /**
+   * Initialize or reinitialize the Supabase client
+   */
+  private initializeClient(): void {
+    console.log('[SupabaseService] Initializing Supabase client...');
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey,
@@ -17,9 +25,55 @@ export class SupabaseService {
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true
+        },
+        global: {
+          headers: {
+            'X-Client-Info': 'cooksmart-web'
+          }
         }
       }
     );
+    console.log('[SupabaseService] Supabase client initialized');
+  }
+
+  /**
+   * Reinitialize the Supabase client (useful for recovering from stale connections)
+   */
+  reinitializeClient(): void {
+    console.log('[SupabaseService] Reinitializing Supabase client due to stale connection...');
+    this.initializeClient();
+  }
+
+  /**
+   * Test Supabase connection health
+   */
+  async testConnection(): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log('[SupabaseService] Testing connection...');
+      const result = await Promise.race([
+        this.supabase.from('recipes').select('id').limit(1),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Connection test timeout')), 5000)
+        )
+      ]);
+      
+      const { error } = result as any;
+      if (error) {
+        console.error('[SupabaseService] Connection test failed:', error);
+        return { success: false, message: `Database error: ${error.message}` };
+      }
+      
+      console.log('[SupabaseService] Connection test successful');
+      return { success: true, message: 'Connected successfully' };
+    } catch (err: any) {
+      console.error('[SupabaseService] Connection test error:', err);
+      return { 
+        success: false, 
+        message: err.message?.includes('timeout') 
+          ? 'Connection timeout - Supabase may be unreachable or paused'
+          : `Connection error: ${err.message}`
+      };
+    }
   }
 
   /**
@@ -33,16 +87,44 @@ export class SupabaseService {
    * Get the current user
    */
   async getCurrentUser(): Promise<User | null> {
-    const { data: { user } } = await this.supabase.auth.getUser();
-    return user;
+    try {
+      const result = await Promise.race([
+        this.supabase.auth.getUser(),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => {
+            console.error('[SupabaseService] getCurrentUser() TIMEOUT after 5 seconds');
+            reject(new Error('getCurrentUser timeout'));
+          }, 5000)
+        )
+      ]);
+      const { data: { user } } = result;
+      return user;
+    } catch (error) {
+      console.error('[SupabaseService] getCurrentUser() error:', error);
+      return null;
+    }
   }
 
   /**
    * Get the current session
    */
   async getSession(): Promise<Session | null> {
-    const { data: { session } } = await this.supabase.auth.getSession();
-    return session;
+    try {
+      const result = await Promise.race([
+        this.supabase.auth.getSession(),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => {
+            console.error('[SupabaseService] getSession() TIMEOUT after 5 seconds');
+            reject(new Error('getSession timeout'));
+          }, 5000)
+        )
+      ]);
+      const { data: { session } } = result;
+      return session;
+    } catch (error) {
+      console.error('[SupabaseService] getSession() error:', error);
+      return null;
+    }
   }
 
   /**
@@ -50,14 +132,23 @@ export class SupabaseService {
    */
   async refreshSession(): Promise<Session | null> {
     try {
-      const { data: { session }, error } = await this.supabase.auth.refreshSession();
+      const result = await Promise.race([
+        this.supabase.auth.refreshSession(),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => {
+            console.error('[SupabaseService] refreshSession() TIMEOUT after 5 seconds');
+            reject(new Error('refreshSession timeout'));
+          }, 5000)
+        )
+      ]);
+      const { data: { session }, error } = result;
       if (error) {
-        console.error('Error refreshing session:', error);
+        console.error('[SupabaseService] Error refreshing session:', error);
         return null;
       }
       return session;
     } catch (error) {
-      console.error('Exception refreshing session:', error);
+      console.error('[SupabaseService] Exception refreshing session:', error);
       return null;
     }
   }
@@ -72,6 +163,55 @@ export class SupabaseService {
         setTimeout(() => reject(new Error('Request timeout - connection may be stale')), timeoutMs)
       )
     ]);
+  }
+
+  /**
+   * Execute a query with automatic retry on timeout/connection errors
+   */
+  async withRetry<T>(
+    queryFn: () => Promise<T>,
+    maxRetries: number = 2,
+    timeoutMs: number = 5000
+  ): Promise<T> {
+    let lastError: Error | null = null;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[SupabaseService] Query attempt ${attempt + 1}/${maxRetries + 1}`);
+        
+        const result = await Promise.race([
+          queryFn(),
+          new Promise<never>((_, reject) => 
+            setTimeout(() => {
+              console.error(`[SupabaseService] Timeout on attempt ${attempt + 1}`);
+              reject(new Error('Request timeout - connection may be stale'));
+            }, timeoutMs)
+          )
+        ]);
+        
+        console.log(`[SupabaseService] Query succeeded on attempt ${attempt + 1}`);
+        return result;
+      } catch (error: any) {
+        lastError = error;
+        console.error(`[SupabaseService] Query failed on attempt ${attempt + 1}:`, error.message);
+        
+        // If this is not the last attempt, reinitialize client and retry
+        if (attempt < maxRetries) {
+          // Reinitialize the Supabase client to recover from stale connection
+          if (attempt === 0) {
+            console.log('[SupabaseService] First retry - reinitializing client...');
+            this.reinitializeClient();
+          }
+          
+          const delayMs = Math.min(1000 * Math.pow(2, attempt), 5000); // Exponential backoff, max 5s
+          console.log(`[SupabaseService] Retrying in ${delayMs}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+      }
+    }
+    
+    console.error(`[SupabaseService] All retry attempts failed`);
+    throw lastError || new Error('Query failed after all retries');
   }
 
   /**

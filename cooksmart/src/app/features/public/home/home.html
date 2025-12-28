@@ -117,6 +117,14 @@
           <div class="spinner"></div>
           <p>{{ 'COMMON.LOADING' | translate }}</p>
         </div>
+      } @else if (error()) {
+        <div class="error-state">
+          <div class="error-icon">⚠️</div>
+          <p class="error-message">{{ error() }}</p>
+          <button class="btn btn-primary" (click)="loadFeaturedRecipes()">
+            Try Again
+          </button>
+        </div>
       } @else if (featuredRecipes().length === 0) {
         <div class="empty-state">
           <p>{{ 'PANTRY.NO_RECIPES_FOUND' | translate }}</p>
