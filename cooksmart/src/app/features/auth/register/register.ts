@@ -16,11 +16,23 @@ import { fadeIn } from '../../../shared/animations';
 export class Register {
   email = signal<string>('');
   password = signal<string>('');
+  confirmPassword = signal<string>('');
   displayName = signal<string>('');
   loading = signal<boolean>(false);
   error = signal<string>('');
   success = signal<string>('');
   registrationComplete = signal<boolean>(false);
+  showPassword = signal<boolean>(false);
+  showConfirmPassword = signal<boolean>(false);
+  
+  // Password validation states
+  passwordTouched = signal<boolean>(false);
+  hasMinLength = signal<boolean>(false);
+  hasUpperCase = signal<boolean>(false);
+  hasLowerCase = signal<boolean>(false);
+  hasNumber = signal<boolean>(false);
+  passwordsMatch = signal<boolean>(false);
+  passwordStrength = signal<'weak' | 'medium' | 'good' | ''>('');
 
   constructor(
     private authService: AuthService,
@@ -28,13 +40,18 @@ export class Register {
   ) {}
 
   async onSubmit(): Promise<void> {
-    if (!this.email() || !this.password() || !this.displayName()) {
-      this.error.set('AUTH.FILL_ALL_FIELDS');
+    if (!this.email() || !this.password() || !this.confirmPassword() || !this.displayName()) {
+      this.error.set('Please fill in all fields');
       return;
     }
 
-    if (this.password().length < 6) {
-      this.error.set('ERRORS.PASSWORD_TOO_SHORT');
+    if (!this.validatePassword()) {
+      this.error.set('Please meet all password requirements');
+      return;
+    }
+
+    if (this.password() !== this.confirmPassword()) {
+      this.error.set('Passwords do not match');
       return;
     }
 
@@ -65,6 +82,69 @@ export class Register {
 
   onPasswordChange(value: string): void {
     this.password.set(value);
+    this.passwordTouched.set(true);
+    this.validatePasswordStrength(value);
+    this.checkPasswordsMatch();
+  }
+
+  onConfirmPasswordChange(value: string): void {
+    this.confirmPassword.set(value);
+    this.checkPasswordsMatch();
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword.set(!this.showPassword());
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword.set(!this.showConfirmPassword());
+  }
+
+  validatePasswordStrength(password: string): void {
+    // Check minimum length (8 characters)
+    this.hasMinLength.set(password.length >= 8);
+    
+    // Check for uppercase letter
+    this.hasUpperCase.set(/[A-Z]/.test(password));
+    
+    // Check for lowercase letter
+    this.hasLowerCase.set(/[a-z]/.test(password));
+    
+    // Check for number
+    this.hasNumber.set(/[0-9]/.test(password));
+    
+    // Calculate password strength
+    const validations = [
+      this.hasMinLength(),
+      this.hasUpperCase(),
+      this.hasLowerCase(),
+      this.hasNumber()
+    ];
+    
+    const validCount = validations.filter(v => v).length;
+    
+    if (validCount === 4) {
+      this.passwordStrength.set('good');
+    } else if (validCount >= 2) {
+      this.passwordStrength.set('medium');
+    } else if (validCount >= 1) {
+      this.passwordStrength.set('weak');
+    } else {
+      this.passwordStrength.set('');
+    }
+  }
+
+  checkPasswordsMatch(): void {
+    if (this.confirmPassword()) {
+      this.passwordsMatch.set(this.password() === this.confirmPassword());
+    }
+  }
+
+  validatePassword(): boolean {
+    return this.hasMinLength() && 
+           this.hasUpperCase() && 
+           this.hasLowerCase() && 
+           this.hasNumber();
   }
 
   onDisplayNameChange(value: string): void {

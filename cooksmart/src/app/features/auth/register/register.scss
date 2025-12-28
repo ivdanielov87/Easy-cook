@@ -131,6 +131,155 @@
           color: $text-muted;
         }
       }
+      
+      .password-input-wrapper {
+        position: relative;
+        
+        .form-input {
+          padding-right: 3rem;
+          
+          &.error {
+            border-color: #ef4444;
+            
+            &:focus {
+              box-shadow: 0 0 0 3px rgba(#ef4444, 0.1);
+            }
+          }
+          
+          &.success {
+            border-color: $primary-color;
+          }
+        }
+        
+        .password-toggle {
+          position: absolute;
+          right: $spacing-sm;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: $text-secondary;
+          cursor: pointer;
+          padding: $spacing-xs;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: color $transition-fast;
+          
+          &:hover {
+            color: $text-primary;
+          }
+          
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+      
+      .password-strength {
+        margin-top: $spacing-sm;
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        
+        .strength-bar {
+          flex: 1;
+          height: 4px;
+          background: $border-color;
+          border-radius: 2px;
+          overflow: hidden;
+          
+          .strength-fill {
+            height: 100%;
+            transition: all $transition-base;
+            border-radius: 2px;
+            
+            &.strength-weak {
+              width: 33%;
+              background: #ef4444;
+            }
+            
+            &.strength-medium {
+              width: 66%;
+              background: #f59e0b;
+            }
+            
+            &.strength-good {
+              width: 100%;
+              background: $primary-color;
+            }
+          }
+        }
+        
+        .strength-text {
+          font-size: 0.75rem;
+          font-weight: $font-weight-semibold;
+          min-width: 60px;
+          text-align: right;
+          
+          &.strength-weak {
+            color: #ef4444;
+          }
+          
+          &.strength-medium {
+            color: #f59e0b;
+          }
+          
+          &.strength-good {
+            color: $primary-color;
+          }
+        }
+      }
+      
+      .password-requirements {
+        margin-top: $spacing-sm;
+        padding: $spacing-sm;
+        background: rgba($primary-color, 0.05);
+        border-radius: $border-radius-sm;
+        
+        .requirement {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          font-size: 0.8125rem;
+          color: $text-secondary;
+          margin-bottom: $spacing-xs;
+          transition: color $transition-fast;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+          
+          .requirement-icon {
+            font-size: 0.875rem;
+            color: $text-muted;
+            transition: color $transition-fast;
+          }
+          
+          &.met {
+            color: $primary-color;
+            
+            .requirement-icon {
+              color: $primary-color;
+              font-weight: $font-weight-bold;
+            }
+          }
+        }
+      }
+      
+      .field-error {
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+        margin-top: $spacing-xs;
+        font-size: 0.8125rem;
+        color: #ef4444;
+        
+        .error-icon {
+          font-size: 1rem;
+        }
+      }
     }
     
     .btn-block {
