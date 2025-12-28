@@ -251,7 +251,6 @@
     .empty-icon {
       font-size: 4rem;
       margin-bottom: $spacing-md;
-      opacity: 0.5;
     }
     
     h3 {
@@ -263,11 +262,37 @@
     
     p {
       color: $text-secondary;
-      font-size: 1rem;
       margin-bottom: $spacing-lg;
     }
   }
-}
+  
+  .error-state {
+    text-align: center;
+    padding: $spacing-2xl;
+    background: rgba(#ef4444, 0.05);
+    border: 1px solid rgba(#ef4444, 0.2);
+    border-radius: $border-radius;
+    
+    .error-icon {
+      font-size: 4rem;
+      margin-bottom: $spacing-md;
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+      font-weight: $font-weight-semibold;
+      color: #dc2626;
+      margin-bottom: $spacing-sm;
+    }
+    
+    p {
+      color: $text-secondary;
+      margin-bottom: $spacing-lg;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
 
 // Button Styles
 .btn {

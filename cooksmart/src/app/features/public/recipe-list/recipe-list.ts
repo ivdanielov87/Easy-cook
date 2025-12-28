@@ -17,6 +17,7 @@ import { fadeIn, staggerList } from '../../../shared/animations';
 export class RecipeList implements OnInit {
   recipes = signal<Recipe[]>([]);
   loading = signal<boolean>(true);
+  error = signal<string>('');
   
   // Filter signals
   selectedDifficulty = signal<Difficulty | ''>('');
@@ -31,6 +32,7 @@ export class RecipeList implements OnInit {
 
   async loadRecipes(): Promise<void> {
     this.loading.set(true);
+    this.error.set('');
     
     const filters: RecipeFilters = {};
     
@@ -46,9 +48,22 @@ export class RecipeList implements OnInit {
       filters.search = this.searchQuery();
     }
     
-    const recipes = await this.recipeService.getRecipes(filters);
-    this.recipes.set(recipes);
-    this.loading.set(false);
+    try {
+      // Add timeout wrapper at component level
+      const recipesPromise = this.recipeService.getRecipes(filters);
+      const timeoutPromise = new Promise<Recipe[]>((_, reject) => 
+        setTimeout(() => reject(new Error('Loading timeout - please refresh the page')), 15000)
+      );
+      
+      const recipes = await Promise.race([recipesPromise, timeoutPromise]);
+      this.recipes.set(recipes);
+    } catch (err: any) {
+      console.error('[RecipeList] Error loading recipes:', err);
+      this.error.set(err.message || 'Failed to load recipes. Please refresh the page.');
+      this.recipes.set([]);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   onDifficultyChange(value: string): void {

@@ -61,7 +61,16 @@
 
     <!-- Recipes Grid -->
     <div class="recipes-content">
-      @if (loading()) {
+      @if (error()) {
+        <div class="error-state">
+          <div class="error-icon">⚠️</div>
+          <h3>Connection Error</h3>
+          <p>{{ error() }}</p>
+          <button class="btn btn-primary" (click)="loadRecipes()" type="button">
+            Try Again
+          </button>
+        </div>
+      } @else if (loading()) {
         <div class="loading-state">
           <div class="spinner"></div>
           <p>{{ 'COMMON.LOADING' | translate }}</p>
