@@ -1,15 +1,6 @@
 @use '../../../../variables' as *;
 @use '../../../../mixins' as *;
 
-// Enable smooth scrolling for anchor links
-:host {
-  display: block;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
 .home-page {
   // Hero Section
   .hero {
