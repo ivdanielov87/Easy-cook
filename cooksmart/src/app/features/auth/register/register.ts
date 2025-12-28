@@ -41,17 +41,17 @@ export class Register {
 
   async onSubmit(): Promise<void> {
     if (!this.email() || !this.password() || !this.confirmPassword() || !this.displayName()) {
-      this.error.set('Please fill in all fields');
+      this.error.set('ERRORS.FILL_ALL_FIELDS');
       return;
     }
 
     if (!this.validatePassword()) {
-      this.error.set('Please meet all password requirements');
+      this.error.set('ERRORS.MEET_PASSWORD_REQUIREMENTS');
       return;
     }
 
     if (this.password() !== this.confirmPassword()) {
-      this.error.set('Passwords do not match');
+      this.error.set('ERRORS.PASSWORDS_DONT_MATCH');
       return;
     }
 

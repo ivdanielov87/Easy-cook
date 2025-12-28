@@ -32,7 +32,7 @@
             class="form-input"
             [value]="displayName()"
             (input)="onDisplayNameChange($any($event.target).value)"
-            placeholder="Enter your name"
+            [placeholder]="'AUTH.DISPLAY_NAME' | translate"
             required
           />
         </div>
@@ -59,7 +59,7 @@
               class="form-input"
               [value]="password()"
               (input)="onPasswordChange($any($event.target).value)"
-              placeholder="Enter your password"
+              [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
               required
             />
             <button 
@@ -88,35 +88,35 @@
                 <div class="strength-fill" [class]="'strength-' + passwordStrength()"></div>
               </div>
               <span class="strength-text" [class]="'strength-' + passwordStrength()">
-                @if (passwordStrength() === 'weak') { Weak }
-                @if (passwordStrength() === 'medium') { Medium }
-                @if (passwordStrength() === 'good') { Good }
+                @if (passwordStrength() === 'weak') { {{ 'AUTH.PASSWORD_STRENGTH_WEAK' | translate }} }
+                @if (passwordStrength() === 'medium') { {{ 'AUTH.PASSWORD_STRENGTH_MEDIUM' | translate }} }
+                @if (passwordStrength() === 'good') { {{ 'AUTH.PASSWORD_STRENGTH_GOOD' | translate }} }
               </span>
             </div>
             
             <div class="password-requirements">
               <div class="requirement" [class.met]="hasMinLength()">
                 <span class="requirement-icon">{{ hasMinLength() ? '✓' : '○' }}</span>
-                At least 8 characters
+                {{ 'AUTH.PASSWORD_REQUIREMENT_MIN_LENGTH' | translate }}
               </div>
               <div class="requirement" [class.met]="hasUpperCase()">
                 <span class="requirement-icon">{{ hasUpperCase() ? '✓' : '○' }}</span>
-                Contains uppercase letter
+                {{ 'AUTH.PASSWORD_REQUIREMENT_UPPERCASE' | translate }}
               </div>
               <div class="requirement" [class.met]="hasLowerCase()">
                 <span class="requirement-icon">{{ hasLowerCase() ? '✓' : '○' }}</span>
-                Contains lowercase letter
+                {{ 'AUTH.PASSWORD_REQUIREMENT_LOWERCASE' | translate }}
               </div>
               <div class="requirement" [class.met]="hasNumber()">
                 <span class="requirement-icon">{{ hasNumber() ? '✓' : '○' }}</span>
-                Contains number
+                {{ 'AUTH.PASSWORD_REQUIREMENT_NUMBER' | translate }}
               </div>
             </div>
           }
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <label for="confirmPassword" class="form-label">{{ 'AUTH.CONFIRM_PASSWORD' | translate }}</label>
           <div class="password-input-wrapper">
             <input
               [type]="showConfirmPassword() ? 'text' : 'password'"
@@ -126,7 +126,7 @@
               [class.success]="confirmPassword() && passwordsMatch()"
               [value]="confirmPassword()"
               (input)="onConfirmPasswordChange($any($event.target).value)"
-              placeholder="Re-enter your password"
+              [placeholder]="'AUTH.CONFIRM_PASSWORD_PLACEHOLDER' | translate"
               required
             />
             <button 
@@ -151,7 +151,7 @@
           @if (confirmPassword() && !passwordsMatch()) {
             <div class="field-error">
               <span class="error-icon">⚠</span>
-              Passwords do not match
+              {{ 'AUTH.PASSWORDS_DO_NOT_MATCH' | translate }}
             </div>
           }
         </div>

@@ -54,6 +54,10 @@ export class RecipeDetail implements OnInit {
       this.recipe.set(recipe);
       // Initialize checkbox states for all ingredients
       this.checkedIngredients.set(new Array(recipe.ingredients?.length || 0).fill(false));
+      
+      // Check if recipe is already saved
+      const saved = await this.recipeService.isRecipeSaved(recipe.id);
+      this.isSaved.set(saved);
     } else {
       this.router.navigate(['/recipes']);
     }

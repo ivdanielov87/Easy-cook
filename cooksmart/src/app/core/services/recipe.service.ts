@@ -579,4 +579,34 @@ export class RecipeService {
       this.loading.set(false);
     }
   }
+
+  /**
+   * Check if a recipe is saved by the current user
+   */
+  async isRecipeSaved(recipeId: string): Promise<boolean> {
+    try {
+      const currentUser = this.auth.currentUser();
+      
+      if (!currentUser) {
+        return false;
+      }
+
+      const { data, error } = await this.supabase.client
+        .from('saved_recipes')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .eq('recipe_id', recipeId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        console.error('Error checking if recipe is saved:', error);
+        return false;
+      }
+
+      return !!data;
+    } catch (error) {
+      console.error('Error checking if recipe is saved:', error);
+      return false;
+    }
+  }
 }
