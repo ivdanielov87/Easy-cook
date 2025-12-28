@@ -11,7 +11,14 @@ export class SupabaseService {
   constructor() {
     this.supabase = createClient(
       environment.supabaseUrl,
-      environment.supabaseKey
+      environment.supabaseKey,
+      {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true
+        }
+      }
     );
   }
 
@@ -36,6 +43,35 @@ export class SupabaseService {
   async getSession(): Promise<Session | null> {
     const { data: { session } } = await this.supabase.auth.getSession();
     return session;
+  }
+
+  /**
+   * Refresh the current session
+   */
+  async refreshSession(): Promise<Session | null> {
+    try {
+      const { data: { session }, error } = await this.supabase.auth.refreshSession();
+      if (error) {
+        console.error('Error refreshing session:', error);
+        return null;
+      }
+      return session;
+    } catch (error) {
+      console.error('Exception refreshing session:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Execute a query with timeout to prevent hanging on stale connections
+   */
+  async withTimeout<T>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout - connection may be stale')), timeoutMs)
+      )
+    ]);
   }
 
   /**
@@ -87,6 +123,35 @@ export class SupabaseService {
    */
   onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     return this.supabase.auth.onAuthStateChange(callback);
+  }
+
+  /**
+   * Check if session is valid and refresh if needed
+   */
+  async ensureValidSession(): Promise<boolean> {
+    try {
+      const session = await this.getSession();
+      
+      if (!session) {
+        return false;
+      }
+
+      // Check if session is about to expire (within 60 seconds)
+      const expiresAt = session.expires_at ? session.expires_at * 1000 : 0;
+      const now = Date.now();
+      const timeUntilExpiry = expiresAt - now;
+
+      if (timeUntilExpiry < 60000) {
+        console.log('[SupabaseService] Session expiring soon, refreshing...');
+        const refreshedSession = await this.refreshSession();
+        return refreshedSession !== null;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[SupabaseService] Error checking session validity:', error);
+      return false;
+    }
   }
 
   /**

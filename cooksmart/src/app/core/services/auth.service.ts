@@ -15,11 +15,14 @@ export class AuthService {
   isAdmin = signal<boolean>(false);
   loading = signal<boolean>(true);
 
+  private sessionCheckInterval: any;
+
   constructor(
     private supabase: SupabaseService,
     private router: Router
   ) {
     this.initializeAuth();
+    this.startSessionMonitoring();
   }
 
   /**
@@ -207,5 +210,30 @@ export class AuthService {
    */
   isUserAuthenticated(): boolean {
     return this.isAuthenticated();
+  }
+
+  /**
+   * Start monitoring session and refresh when needed
+   */
+  private startSessionMonitoring(): void {
+    // Check session every 5 minutes
+    this.sessionCheckInterval = setInterval(async () => {
+      if (this.isAuthenticated()) {
+        const sessionValid = await this.supabase.ensureValidSession();
+        if (!sessionValid) {
+          console.warn('[AuthService] Session expired, signing out...');
+          await this.signOut();
+        }
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+  }
+
+  /**
+   * Stop session monitoring (cleanup)
+   */
+  ngOnDestroy(): void {
+    if (this.sessionCheckInterval) {
+      clearInterval(this.sessionCheckInterval);
+    }
   }
 }

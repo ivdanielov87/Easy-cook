@@ -21,6 +21,13 @@ export class RecipeService {
   async getRecipes(filters?: RecipeFilters): Promise<Recipe[]> {
     try {
       this.loading.set(true);
+
+      // Ensure session is valid before making request
+      const sessionValid = await this.supabase.ensureValidSession();
+      if (!sessionValid) {
+        console.warn('[RecipeService] Session invalid, attempting to continue with public access...');
+      }
+
       let query = this.supabase.client
         .from('recipes')
         .select('*')
@@ -52,14 +59,32 @@ export class RecipeService {
         query = query.ilike('title', `%${filters.search}%`);
       }
 
-      const { data, error } = await query;
+      // Execute query with timeout to prevent hanging
+      let data, error;
+      try {
+        const result = await Promise.race([
+          query,
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Request timeout - connection may be stale')), 10000)
+          )
+        ]);
+        ({ data, error } = result as any);
+      } catch (timeoutError: any) {
+        throw new Error(timeoutError.message || 'Request timeout');
+      }
 
       if (error) throw error;
 
       this.recipes.set(data as Recipe[]);
       return data as Recipe[];
-    } catch (error) {
-      console.error('Error fetching recipes:', error);
+    } catch (error: any) {
+      console.error('[RecipeService] Error fetching recipes:', error);
+      
+      // If timeout or connection error, show user-friendly message
+      if (error.message?.includes('timeout') || error.message?.includes('stale')) {
+        console.error('[RecipeService] Connection timeout - please refresh the page');
+      }
+      
       return [];
     } finally {
       this.loading.set(false);
