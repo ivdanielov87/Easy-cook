@@ -1,10 +1,51 @@
 # Implementation Plan: CookSmart Recipe & Pantry Assistant
 
-**Version:** 1.2  
-**Date:** 2025-12-26  
+**Version:** 1.3  
+**Date:** 2025-12-28  
 **Methodology:** Spec Kit Phase 1 → Incremental Implementation  
 **Estimated Duration:** 10-12 days (single developer)  
-**Updated:** Added i18n (BG/EN), design system, and mobile-first responsive design
+**Updated:** Completed authentication (email + Google OAuth), profile creation, saved recipes, i18n, design system, and responsive layouts
+
+---
+
+## Current Status (as of 2025-12-28)
+
+### ✅ Completed Features
+
+**Phase 1: Foundation**
+- Database schema deployed with RLS policies
+- Angular project scaffolded with standalone components
+- i18n support (Bulgarian/English) with ngx-translate
+- Modern design system with animations
+- Mobile-first responsive layouts
+- Core models and interfaces
+
+**Phase 2: Authentication & Core Services**
+- Email/password authentication
+- Google OAuth authentication
+- Email confirmation flow with user messaging
+- Profile creation trigger (includes display_name)
+- AuthGuard and AdminGuard
+- Session persistence
+- Main and Admin layouts with language switcher
+
+**Phase 3: Public Features**
+- Recipe list with filters (difficulty, prep time)
+- Recipe detail page with authentication guard
+- Recipe card component with animations
+- Save/unsave recipes functionality
+- Profile page with saved recipes grid
+- Profile editing (display name, avatar)
+
+### 🚧 In Progress
+- Smart pantry search (ingredient-based)
+
+### 📋 Remaining Tasks
+- Admin dashboard
+- Admin recipe CRUD operations
+- Image upload functionality
+- Error handling and loading states
+- Final testing and documentation
 
 ---
 
@@ -27,15 +68,15 @@ This plan breaks down the CookSmart application into discrete, testable mileston
 **Goal:** Supabase database fully configured with tables, RLS policies, and triggers
 
 #### Tasks
-- [ ] **1.1.1** Execute `db_schema.sql` in Supabase SQL Editor
-- [ ] **1.1.2** Verify all tables created: `profiles`, `recipes`, `ingredients`, `recipe_ingredients`, `saved_recipes`
-- [ ] **1.1.3** Verify trigger creates profile on user registration
-- [ ] **1.1.4** Test RLS policies:
+- [x] **1.1.1** Execute `db_schema.sql` in Supabase SQL Editor
+- [x] **1.1.2** Verify all tables created: `profiles`, `recipes`, `ingredients`, `recipe_ingredients`, `saved_recipes`
+- [x] **1.1.3** Verify trigger creates profile on user registration (updated with display_name support)
+- [x] **1.1.4** Test RLS policies:
   - Guest can read recipes (no auth)
   - User cannot insert recipe (should fail)
   - Manually promote test user to admin role
   - Admin can insert/update/delete recipes
-- [ ] **1.1.5** Create Supabase Storage bucket `recipes` with public read access
+- [x] **1.1.5** Create Supabase Storage bucket `recipes` with public read access
 
 **Validation:**
 ```sql
@@ -55,11 +96,11 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 **Goal:** Angular project with correct folder structure and routing skeleton
 
 #### Tasks
-- [ ] **1.2.1** Create new Angular project with standalone components
+- [x] **1.2.1** Create new Angular project with standalone components
   ```bash
   ng new cooksmart --standalone --routing --style=scss --strict
   ```
-- [ ] **1.2.2** Create folder structure:
+- [x] **1.2.2** Create folder structure:
   ```
   src/app/
   ├── core/
@@ -84,7 +125,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
       ├── pipes/
       └── directives/
   ```
-- [ ] **1.2.3** Create `_variables.scss` with color/font system and responsive breakpoints:
+- [x] **1.2.3** Create `_variables.scss` with color/font system and responsive breakpoints:
   ```scss
   // Responsive Breakpoints
   $breakpoint-mobile: 768px;
@@ -92,7 +133,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   
   // Colors, fonts, etc. (to be expanded in Milestone 1.5)
   ```
-- [ ] **1.2.3b** Create `_mixins.scss` with mobile-first media query helpers:
+- [x] **1.2.3b** Create `_mixins.scss` with mobile-first media query helpers:
   ```scss
   // Mobile-First Media Query Mixins
   @mixin tablet {
@@ -118,8 +159,8 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   //   }
   // }
   ```
-- [ ] **1.2.4** Configure `angular.json` to include global styles
-- [ ] **1.2.5** Create environment files with Supabase placeholders
+- [x] **1.2.4** Configure `angular.json` to include global styles
+- [x] **1.2.5** Create environment files with Supabase placeholders
   ```typescript
   export const environment = {
     production: false,
@@ -127,7 +168,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     supabaseKey: 'YOUR_SUPABASE_ANON_KEY'
   };
   ```
-- [ ] **1.2.6** Install dependencies:
+- [x] **1.2.6** Install dependencies:
   ```bash
   npm install @supabase/supabase-js
   npm install @angular/material (optional)
@@ -145,18 +186,18 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 **Goal:** Configure ngx-translate for Bulgarian/English language switching
 
 #### Tasks
-- [ ] **1.4.1** Configure `@ngx-translate/core` in `app.config.ts`:
+- [x] **1.4.1** Configure `@ngx-translate/core` in `app.config.ts`:
   - Import `TranslateModule`, `TranslateLoader`, `TranslateHttpLoader`
   - Set default language to 'bg' (Bulgarian)
   - Set fallback language to 'en' (English)
   - Configure loader to read from `assets/i18n/{lang}.json`
-- [ ] **1.4.2** Create translation directory structure:
+- [x] **1.4.2** Create translation directory structure:
   ```
   src/assets/i18n/
   ├── bg.json
   └── en.json
   ```
-- [ ] **1.4.3** Create initial Bulgarian translation file (`bg.json`):
+- [x] **1.4.3** Create initial Bulgarian translation file (`bg.json`):
   ```json
   {
     "COMMON": {
@@ -203,7 +244,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     }
   }
   ```
-- [ ] **1.4.4** Create initial English translation file (`en.json`):
+- [x] **1.4.4** Create initial English translation file (`en.json`):
   ```json
   {
     "COMMON": {
@@ -250,12 +291,12 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     }
   }
   ```
-- [ ] **1.4.5** Create `TranslateService` wrapper in `src/app/core/services/translate.service.ts`:
+- [x] **1.4.5** Create `TranslateService` wrapper in `src/app/core/services/translate.service.ts`:
   - Method to switch language: `setLanguage(lang: 'bg' | 'en')`
   - Signal for current language: `currentLang$`
   - Store selected language in localStorage
   - Load saved language preference on app init
-- [ ] **1.4.6** Test language switching:
+- [x] **1.4.6** Test language switching:
   - Verify JSON files load correctly
   - Verify language persists after page reload
   - Verify all keys resolve properly
@@ -274,12 +315,12 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 **Goal:** Establish modern design system with Angular animations
 
 #### Tasks
-- [ ] **1.5.1** Import `BrowserAnimationsModule` in `app.config.ts`:
+- [x] **1.5.1** Import `BrowserAnimationsModule` in `app.config.ts`:
   ```typescript
   import { provideAnimations } from '@angular/platform-browser/animations';
   // Add to providers array
   ```
-- [ ] **1.5.2** Enhance `_variables.scss` with modern design tokens:
+- [x] **1.5.2** Enhance `_variables.scss` with modern design tokens:
   ```scss
   // Responsive Breakpoints (Mobile-First)
   $breakpoint-mobile: 768px;   // < 768px = Mobile (base styles)
@@ -337,11 +378,11 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   // Container Max Width
   $container-max-width: 1200px;
   ```
-- [ ] **1.5.3** Create reusable animation definitions in `src/app/shared/animations/`:
+- [x] **1.5.3** Create reusable animation definitions in `src/app/shared/animations/`:
   - `fade.animation.ts` - Fade in/out for route transitions
   - `slide.animation.ts` - Slide in from bottom for lists
   - `scale.animation.ts` - Scale up for modals/dialogs
-- [ ] **1.5.4** Create `fade.animation.ts`:
+- [x] **1.5.4** Create `fade.animation.ts`:
   ```typescript
   import { trigger, transition, style, animate } from '@angular/animations';
   
@@ -362,7 +403,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     ])
   ]);
   ```
-- [ ] **1.5.5** Create `slide.animation.ts`:
+- [x] **1.5.5** Create `slide.animation.ts`:
   ```typescript
   import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
   
@@ -384,7 +425,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     ])
   ]);
   ```
-- [ ] **1.5.6** Create global styles in `src/styles.scss` with mobile-first approach:
+- [x] **1.5.6** Create global styles in `src/styles.scss` with mobile-first approach:
   ```scss
   @import 'variables';
   @import 'mixins';
@@ -449,7 +490,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     }
   }
   ```
-- [ ] **1.5.7** Add Google Fonts (Inter) to `index.html`:
+- [x] **1.5.7** Add Google Fonts (Inter) to `index.html`:
   ```html
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -472,7 +513,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 **Goal:** TypeScript interfaces for all domain entities
 
 #### Tasks
-- [ ] **1.6.1** Create `src/app/core/models/profile.model.ts`
+- [x] **1.6.1** Create `src/app/core/models/profile.model.ts`
   ```typescript
   export interface Profile {
     id: string;
@@ -482,7 +523,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     role: 'user' | 'admin';
   }
   ```
-- [ ] **1.6.2** Create `src/app/core/models/recipe.model.ts`
+- [x] **1.6.2** Create `src/app/core/models/recipe.model.ts`
   ```typescript
   export type Difficulty = 'Easy' | 'Medium' | 'Hard';
   
@@ -500,9 +541,9 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     steps?: string[]; // JSON array
   }
   ```
-- [ ] **1.6.3** Create `src/app/core/models/ingredient.model.ts`
-- [ ] **1.6.4** Create `src/app/core/models/recipe-ingredient.model.ts`
-- [ ] **1.6.5** Create barrel export `src/app/core/models/index.ts`
+- [x] **1.6.3** Create `src/app/core/models/ingredient.model.ts`
+- [x] **1.6.4** Create `src/app/core/models/recipe-ingredient.model.ts`
+- [x] **1.6.5** Create barrel export `src/app/core/models/index.ts`
 
 **Validation:** No TypeScript errors, models importable
 
@@ -512,26 +553,30 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 
 ## Phase 2: Authentication & Core Services
 
-### Milestone 2.1: Supabase Service & Auth
+### Milestone 2.1: Supabase Service & Auth ✅
 **Duration:** 1 day  
 **Goal:** Working authentication with session management
 
 #### Tasks
-- [ ] **2.1.1** Create `src/app/core/services/supabase.service.ts`
+- [x] **2.1.1** Create `src/app/core/services/supabase.service.ts`
   - Initialize Supabase client
   - Expose `auth`, `from()`, `storage` methods
-- [ ] **2.1.2** Create `src/app/core/services/auth.service.ts`
-  - `signUp(email, password)`
+  - Added `signInWithGoogle()` for OAuth
+- [x] **2.1.2** Create `src/app/core/services/auth.service.ts`
+  - `signUp(email, password, displayName)`
   - `signIn(email, password)`
+  - `signInWithGoogle()` for OAuth
   - `signOut()`
   - `currentUser$` signal/observable
   - `isAdmin$` signal (checks profile.role)
-- [ ] **2.1.3** Create `AuthGuard` (redirects to login if not authenticated)
-- [ ] **2.1.4** Create `AdminGuard` (checks `isAdmin$`, redirects to home)
-- [ ] **2.1.5** Test auth flow:
+- [x] **2.1.3** Create `AuthGuard` (redirects to login if not authenticated)
+- [x] **2.1.4** Create `AdminGuard` (checks `isAdmin$`, redirects to home)
+- [x] **2.1.5** Test auth flow:
   - Register new user
-  - Verify profile created in DB
+  - Verify profile created in DB with display_name
   - Login and check session persists on reload
+  - Email confirmation flow with user messaging
+  - Google OAuth authentication
 
 **Validation:**
 - User can register and login
@@ -542,18 +587,18 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 
 ---
 
-### Milestone 2.2: Layout Components
+### Milestone 2.2: Layout Components ✅
 **Duration:** 1.5 days  
 **Goal:** Main and Admin layouts with navigation and language switcher
 
 #### Tasks
-- [ ] **2.2.1** Create `LanguageSwitcherComponent` (shared):
+- [x] **2.2.1** Create `LanguageSwitcherComponent` (shared):
   - Dropdown with BG/EN flags/labels
   - Calls `TranslateService.setLanguage()`
   - Shows current language with visual indicator
   - Styled with premium hover effects
   - Responsive: Compact on mobile, full labels on desktop
-- [ ] **2.2.2** Create `MainLayoutComponent` with responsive navbar:
+- [x] **2.2.2** Create `MainLayoutComponent` with responsive navbar:
   - **Mobile (< 768px):**
     - Logo on left, hamburger menu icon on right
     - Language switcher and user menu in collapsed menu
@@ -563,11 +608,11 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
     - All navigation labels use `translate` pipe
   - Router outlet with fade animation
   - Footer with translated content (stacked on mobile, horizontal on desktop)
-- [ ] **2.2.3** Create `AdminLayoutComponent` with:
+- [x] **2.2.3** Create `AdminLayoutComponent` with:
   - Sidebar (Dashboard, Manage Recipes, Logout) - all translated
   - Language switcher in top bar
   - Router outlet for admin content
-- [ ] **2.2.4** Style both layouts with mobile-first SCSS:
+- [x] **2.2.4** Style both layouts with mobile-first SCSS:
   - **Mobile base styles:** Compact spacing, stacked elements, hamburger menu
   - **Tablet (@include tablet):** 2-column grids where applicable
   - **Desktop (@include desktop):** Max-width container, horizontal menus, 3-4 column grids
@@ -575,7 +620,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   - Use subtle shadows ($shadow-md)
   - Rounded corners ($border-radius)
   - Smooth transitions on hover states and menu animations
-- [ ] **2.2.5** Configure routes with animations:
+- [x] **2.2.5** Configure routes with animations:
   ```typescript
   {
     path: '',
@@ -617,16 +662,16 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 
 ## Phase 3: Public Features
 
-### Milestone 3.1: Recipe List & Detail Pages
+### Milestone 3.1: Recipe List & Detail Pages ✅
 **Duration:** 2.5 days  
 **Goal:** Users can browse and view recipes with modern UI and animations
 
 #### Tasks
-- [ ] **3.1.1** Create `RecipeService` with methods:
+- [x] **3.1.1** Create `RecipeService` with methods:
   - `getRecipes(filters?: { difficulty?, prepTime? })`
   - `getRecipeBySlug(slug: string)`
   - `searchByIngredients(ingredientIds: string[])`
-- [ ] **3.1.2** Create `RecipeListComponent` with responsive grid:
+- [x] **3.1.2** Create `RecipeListComponent` with responsive grid:
   - **Mobile:** 1 card per row (100% width)
   - **Tablet:** 2 cards per row (CSS Grid: `grid-template-columns: repeat(2, 1fr)`)
   - **Desktop:** 3-4 cards per row (CSS Grid: `repeat(auto-fill, minmax(280px, 1fr))`)
@@ -635,7 +680,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   - Use Angular Signals for state
   - Apply `staggerList` animation to recipe grid
   - Add loading skeleton with fade animation
-- [ ] **3.1.3** Create `RecipeCardComponent` (shared) with responsive design:
+- [x] **3.1.3** Create `RecipeCardComponent` (shared) with responsive design:
   - Display thumbnail, title, difficulty chip, prep time
   - Premium card styling (shadow, rounded corners, hover lift effect)
   - **Mobile:** Full-width card, larger touch targets
@@ -643,7 +688,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   - Click navigates to detail page
   - Apply `fadeIn` animation on load
   - All labels translated (difficulty, time units)
-- [ ] **3.1.4** Create `RecipeDetailComponent` with responsive layout:
+- [x] **3.1.4** Create `RecipeDetailComponent` with responsive layout:
   - Hero image with subtle overlay (full-width on mobile, contained on desktop)
   - **Mobile:** Stacked layout (image → metadata → ingredients → steps)
   - **Desktop:** 2-column layout (ingredients sidebar, steps main column)
@@ -652,7 +697,7 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
   - Steps list with numbered badges
   - "Save to Favorites" button with icon (if authenticated) - translated
   - Apply `fadeIn` animation to sections
-- [ ] **3.1.5** Style all components with modern design system:
+- [x] **3.1.5** Style all components with modern design system:
   - Ample whitespace between sections
   - Subtle shadows on cards
   - Smooth transitions on interactive elements
@@ -710,25 +755,26 @@ INSERT INTO recipes (title, slug) VALUES ('Test', 'test');
 
 ---
 
-### Milestone 3.3: User Profile & Favorites
+### Milestone 3.3: User Profile & Favorites ✅
 **Duration:** 1 day  
 **Goal:** Users can manage profile and save recipes
 
 #### Tasks
-- [ ] **3.3.1** Create `ProfileService`:
+- [x] **3.3.1** Create `ProfileService`:
   - `updateProfile(displayName, avatarFile?)`
   - `uploadAvatar(file)` (to Supabase Storage)
-- [ ] **3.3.2** Create `SavedRecipesService`:
+- [x] **3.3.2** Create `SavedRecipesService`:
   - `saveRecipe(recipeId)`
   - `unsaveRecipe(recipeId)`
   - `getSavedRecipes()`
   - `isRecipeSaved(recipeId)` signal
-- [ ] **3.3.3** Create `ProfileComponent`:
+- [x] **3.3.3** Create `ProfileComponent`:
   - Form to edit display name
   - Avatar upload with preview
   - "My Saved Recipes" section (grid)
-- [ ] **3.3.4** Add save/unsave button to `RecipeDetailComponent`
-- [ ] **3.3.5** Test RLS: User can only CRUD their own saved_recipes
+- [x] **3.3.4** Add save/unsave button to `RecipeDetailComponent`
+- [x] **3.3.5** Test RLS: User can only CRUD their own saved_recipes
+- [x] **3.3.6** Display saved recipes grid in profile page
 
 **Validation:**
 - User can update profile
