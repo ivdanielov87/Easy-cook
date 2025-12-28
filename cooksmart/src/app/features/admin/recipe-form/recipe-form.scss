@@ -248,6 +248,16 @@
       gap: $spacing-sm;
       align-items: start;
       margin-bottom: $spacing-md;
+      padding: $spacing-md;
+      background: rgba($primary-color, 0.02);
+      border-radius: $border-radius-sm;
+      border: 1px solid transparent;
+      transition: all $transition-fast;
+      
+      &:hover {
+        background: rgba($primary-color, 0.04);
+        border-color: rgba($primary-color, 0.1);
+      }
       
       .step-number {
         display: flex;
@@ -261,6 +271,39 @@
         font-weight: $font-weight-semibold;
         font-size: 0.875rem;
         flex-shrink: 0;
+        margin-top: $spacing-xs;
+      }
+      
+      .form-textarea {
+        min-height: 80px;
+        resize: vertical;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        padding: $spacing-sm $spacing-md;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-sm;
+        background: $surface;
+        transition: all $transition-fast;
+        
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+          background: white;
+        }
+        
+        &::placeholder {
+          color: $text-muted;
+          font-style: italic;
+        }
+        
+        &:hover:not(:focus) {
+          border-color: rgba($primary-color, 0.3);
+        }
+      }
+      
+      .btn-icon {
+        margin-top: $spacing-xs;
       }
     }
     
