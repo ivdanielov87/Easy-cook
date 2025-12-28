@@ -301,6 +301,178 @@ export class RegisterComponent {
 - Creates missing profiles
 - Reports final status
 
+### 5.7 Code Quality & Safety
+
+#### Null Safety
+**CRITICAL:** Always check for null/undefined before accessing properties or methods.
+
+**Mistake Made:**
+- Accessing properties without null checks
+- Assuming data always exists from API responses
+- Not handling empty states
+
+**Solution:**
+```typescript
+// ❌ WRONG: No null check
+const userName = user.display_name.toUpperCase();
+
+// ✅ CORRECT: Safe navigation and fallback
+const userName = user?.display_name?.toUpperCase() ?? 'Guest';
+
+// ✅ CORRECT: Explicit null check
+if (user && user.display_name) {
+  const userName = user.display_name.toUpperCase();
+}
+
+// ✅ CORRECT: In templates
+@if (recipe) {
+  <h1>{{ recipe.title }}</h1>
+}
+
+// ✅ CORRECT: With optional chaining
+<p>{{ recipe?.description ?? 'No description available' }}</p>
+```
+
+**Best Practices:**
+- Use optional chaining (`?.`) for property access
+- Use nullish coalescing (`??`) for default values
+- Use `@if` blocks in templates for conditional rendering
+- Always handle loading and empty states
+- Check array length before accessing elements
+
+#### Clean Up Default Angular Files
+**CRITICAL:** Remove default Angular scaffolding content before starting development.
+
+**Mistake Made:**
+- Left default `app.component.html` content from `ng new`
+- Forgot to clean up example code and comments
+- Default content interfered with actual application
+
+**Solution - After `ng new`, immediately clean up:**
+
+**`app.component.html`:**
+```html
+<!-- ❌ WRONG: Leave Angular default content -->
+<div class="content" role="main">
+  <span>Welcome to {{ title }}!</span>
+  <!-- ... Angular default content ... -->
+</div>
+
+<!-- ✅ CORRECT: Clean slate -->
+<router-outlet></router-outlet>
+```
+
+**`app.component.ts`:**
+```typescript
+// ❌ WRONG: Leave default title
+export class AppComponent {
+  title = 'cooksmart';
+}
+
+// ✅ CORRECT: Remove unused properties
+export class AppComponent {
+  // Clean component, logic in services
+}
+```
+
+**Files to Clean/Remove:**
+1. Clear `app.component.html` (leave only `<router-outlet>`)
+2. Remove unused properties from `app.component.ts`
+3. Clean up `app.component.scss` (remove default styles)
+4. Delete `app.component.spec.ts` if not using tests in MVP
+5. Remove default favicon and replace with project icon
+6. Update `index.html` title and meta tags
+
+### 5.8 Routing & Navigation
+
+#### Verify Button Navigation
+**CRITICAL:** Always verify that buttons and links navigate to the correct routes.
+
+**Mistake Made:**
+- Created buttons without implementing routes
+- Buttons clicked but nothing happened
+- Forgot to create corresponding components
+
+**Solution - Navigation Verification Checklist:**
+
+**1. Check if route exists:**
+```typescript
+// In app.routes.ts
+export const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent }, // ✅ Route exists
+];
+```
+
+**2. Verify component exists:**
+```bash
+# Check if component file exists
+ls src/app/features/auth/register/
+# Should show: register.ts, register.html, register.scss
+```
+
+**3. Test navigation:**
+```html
+<!-- In template -->
+<button routerLink="/register">Register</button>
+
+<!-- Or programmatic -->
+<button (click)="goToRegister()">Register</button>
+```
+
+```typescript
+// In component
+goToRegister() {
+  this.router.navigate(['/register']);
+}
+```
+
+**4. Check browser console for routing errors:**
+- `Error: Cannot match any routes. URL Segment: 'register'` → Route not defined
+- Component not found → Create the component
+
+**Complete Flow When Adding Navigation:**
+1. ✅ Create component: `ng generate component features/auth/register`
+2. ✅ Add route to `app.routes.ts`
+3. ✅ Implement component logic and template
+4. ✅ Add navigation button/link
+5. ✅ Test navigation works
+6. ✅ Verify route guard if needed
+7. ✅ Test back button behavior
+
+#### Route Organization
+**BEST PRACTICE:** Organize routes by feature and access level.
+
+**Pattern:**
+```typescript
+export const routes: Routes = [
+  // Public routes (no auth required)
+  { path: '', component: HomeComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  
+  // Protected routes (auth required)
+  { 
+    path: 'profile', 
+    component: ProfileComponent, 
+    canActivate: [AuthGuard] 
+  },
+  
+  // Admin routes (admin role required)
+  {
+    path: 'admin',
+    canActivate: [AdminGuard],
+    children: [
+      { path: 'dashboard', component: AdminDashboardComponent },
+      { path: 'recipes', component: AdminRecipeListComponent },
+    ]
+  },
+  
+  // Wildcard route (404)
+  { path: '**', redirectTo: '' }
+];
+```
+
 ---
 
 ## 6. Common Pitfalls to Avoid
@@ -316,6 +488,11 @@ export class RegisterComponent {
 8. Skip email confirmation messaging
 9. Implement authentication without OAuth options
 10. Forget to check authentication in component logic (not just routes)
+11. Access properties without null/undefined checks
+12. Leave default Angular scaffolding content in production code
+13. Create navigation buttons without implementing routes first
+14. Assume data always exists from API responses
+15. Forget to test that buttons actually navigate correctly
 
 ### Do:
 1. Use real email addresses for testing authentication
@@ -328,3 +505,8 @@ export class RegisterComponent {
 8. Provide clear email confirmation instructions
 9. Offer multiple authentication methods (email + OAuth)
 10. Implement authentication guards at component level
+11. Use optional chaining (`?.`) and nullish coalescing (`??`)
+12. Clean up default Angular files immediately after `ng new`
+13. Create routes and components before adding navigation
+14. Handle loading, empty, and error states for all data
+15. Verify navigation works by clicking every button/link
