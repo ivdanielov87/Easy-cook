@@ -219,8 +219,8 @@ export class AuthService {
     // Check session every 5 minutes
     this.sessionCheckInterval = setInterval(async () => {
       if (this.isAuthenticated()) {
-        const sessionValid = await this.supabase.ensureValidSession();
-        if (!sessionValid) {
+        const session = await this.supabase.getSession();
+        if (!session) {
           console.warn('[AuthService] Session expired, signing out...');
           await this.signOut();
         }

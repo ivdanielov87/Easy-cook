@@ -24,55 +24,40 @@ export class RecipeService {
       this.loading.set(true);
       console.log('[RecipeService] Loading set to true');
 
-      // Build query function for retry logic
-      const buildAndExecuteQuery = async () => {
-        console.log('[RecipeService] Building query...');
-        let query = this.supabase.client
-          .from('recipes')
-          .select('*')
-          .order('created_at', { ascending: false });
+      console.log('[RecipeService] Building query...');
+      let query = this.supabase.client
+        .from('recipes')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-        // Apply filters
-        if (filters?.difficulty) {
-          query = query.eq('difficulty', filters.difficulty);
-        }
-
-        if (filters?.prepTime) {
-          switch (filters.prepTime) {
-            case 'less_than_15':
-              query = query.lt('prep_time', 15);
-              break;
-            case '15_to_30':
-              query = query.gte('prep_time', 15).lte('prep_time', 30);
-              break;
-            case '30_to_60':
-              query = query.gte('prep_time', 30).lte('prep_time', 60);
-              break;
-            case 'more_than_60':
-              query = query.gt('prep_time', 60);
-              break;
-          }
-        }
-
-        if (filters?.search) {
-          query = query.ilike('title', `%${filters.search}%`);
-        }
-
-        return query;
-      };
-
-      // Execute query with retry logic to handle stale connections
-      console.log('[RecipeService] Executing query with retry...');
-      let data, error;
-      
-      try {
-        const result = await this.supabase.withRetry(buildAndExecuteQuery, 2, 5000);
-        console.log('[RecipeService] Query completed, result:', result);
-        ({ data, error } = result as any);
-      } catch (retryError: any) {
-        console.error('[RecipeService] Query failed after retries:', retryError);
-        throw new Error(retryError.message || 'Request failed after retries');
+      // Apply filters
+      if (filters?.difficulty) {
+        query = query.eq('difficulty', filters.difficulty);
       }
+
+      if (filters?.prepTime) {
+        switch (filters.prepTime) {
+          case 'less_than_15':
+            query = query.lt('prep_time', 15);
+            break;
+          case '15_to_30':
+            query = query.gte('prep_time', 15).lte('prep_time', 30);
+            break;
+          case '30_to_60':
+            query = query.gte('prep_time', 30).lte('prep_time', 60);
+            break;
+          case 'more_than_60':
+            query = query.gt('prep_time', 60);
+            break;
+        }
+      }
+
+      if (filters?.search) {
+        query = query.ilike('title', `%${filters.search}%`);
+      }
+
+      console.log('[RecipeService] Executing query...');
+      const { data, error } = await query;
 
       if (error) {
         console.error('[RecipeService] Query error:', error);
