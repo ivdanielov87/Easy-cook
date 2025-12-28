@@ -72,10 +72,11 @@
   "AUTH": {
     "EMAIL": "Имейл",
     "PASSWORD": "Парола",
+    "CONFIRM_PASSWORD": "Потвърдете паролата",
     "DISPLAY_NAME": "Име за показване",
     "LOGIN_TITLE": "Вход в системата",
     "LOGIN_SUBTITLE": "Влезте в профила си",
-    "REGISTER_TITLE": "Регистрация",
+    "REGISTER_TITLE": "Създайте вашия акаунт",
     "REGISTER_SUBTITLE": "Създайте нов акаунт",
     "FORGOT_PASSWORD": "Забравена парола",
     "REMEMBER_ME": "Запомни ме",
@@ -85,6 +86,7 @@
     "SIGN_IN": "Влез",
     "EMAIL_PLACEHOLDER": "Въведете имейл",
     "PASSWORD_PLACEHOLDER": "Въведете парола",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Въведете паролата отново",
     "FILL_ALL_FIELDS": "Моля, попълнете всички полета",
     "LOGIN_ERROR": "Грешка при вход. Проверете данните си.",
     "LOGIN_HERE": "Влезте тук",
@@ -96,7 +98,17 @@
     "CHECK_EMAIL_CONFIRMATION": "Моля, проверете имейла си, за да потвърдите акаунта. Кликнете върху линка за потвърждение в имейла, за да активирате акаунта си.",
     "CHECK_SPAM_FOLDER": "Ако не виждате имейла, моля проверете папката за спам.",
     "GO_TO_LOGIN": "Към вход",
-    "EMAIL_NOT_CONFIRMED": "Моля, потвърдете имейл адреса си преди да влезете. Проверете входящата си поща за имейл за потвърждение."
+    "EMAIL_NOT_CONFIRMED": "Моля, потвърдете имейл адреса си преди да влезете. Проверете входящата си поща за имейл за потвърждение.",
+    "PASSWORD_STRENGTH_WEAK": "Слаба",
+    "PASSWORD_STRENGTH_MEDIUM": "Средна",
+    "PASSWORD_STRENGTH_GOOD": "Добра",
+    "PASSWORD_REQUIREMENT_MIN_LENGTH": "Поне 8 символа",
+    "PASSWORD_REQUIREMENT_UPPERCASE": "Съдържа главна буква",
+    "PASSWORD_REQUIREMENT_LOWERCASE": "Съдържа малка буква",
+    "PASSWORD_REQUIREMENT_NUMBER": "Съдържа цифра",
+    "PASSWORDS_DO_NOT_MATCH": "Паролите не съвпадат",
+    "PASSWORD_REQUIREMENTS_NOT_MET": "Моля, изпълнете всички изисквания за парола",
+    "REGISTRATION_FAILED_MESSAGE": "Регистрацията не успя. Моля, опитайте отново."
   },
   "ADMIN": {
     "DASHBOARD": "Табло",
@@ -172,14 +184,20 @@
   "ERRORS": {
     "REQUIRED_FIELD": "Това поле е задължително",
     "INVALID_EMAIL": "Невалиден имейл адрес",
-    "PASSWORD_TOO_SHORT": "Паролата трябва да е поне 6 символа",
+    "PASSWORD_TOO_SHORT": "Паролата трябва да е поне 8 символа",
+    "PASSWORD_MIN_LENGTH": "Паролата трябва да е поне 8 символа",
+    "PASSWORD_MISSING_UPPERCASE": "Паролата трябва да съдържа поне една главна буква",
+    "PASSWORD_MISSING_LOWERCASE": "Паролата трябва да съдържа поне една малка буква",
+    "PASSWORD_MISSING_NUMBER": "Паролата трябва да съдържа поне една цифра",
     "PASSWORDS_DONT_MATCH": "Паролите не съвпадат",
     "LOGIN_FAILED": "Грешен имейл или парола",
     "REGISTRATION_FAILED": "Регистрацията не успя",
     "NETWORK_ERROR": "Грешка в мрежата. Моля, опитайте отново.",
     "UPLOAD_FAILED": "Качването не успя",
     "FILE_TOO_LARGE": "Файлът е твърде голям (макс. 5MB)",
-    "INVALID_FILE_TYPE": "Невалиден тип файл"
+    "INVALID_FILE_TYPE": "Невалиден тип файл",
+    "FILL_ALL_FIELDS": "Моля, попълнете всички полета",
+    "MEET_PASSWORD_REQUIREMENTS": "Моля, изпълнете всички изисквания за парола"
   },
   "FOOTER": {
     "COPYRIGHT": "© 2025 CookSmart. Всички права запазени.",
