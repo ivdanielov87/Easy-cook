@@ -150,6 +150,23 @@ export class AuthService {
   }
 
   /**
+   * Sign in with Google OAuth
+   */
+  async signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { error } = await this.supabase.signInWithGoogle();
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'An unexpected error occurred' };
+    }
+  }
+
+  /**
    * Update user profile
    */
   async updateProfile(updates: { display_name?: string; avatar_url?: string }): Promise<{ success: boolean; error?: string }> {

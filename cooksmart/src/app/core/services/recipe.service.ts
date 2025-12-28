@@ -133,10 +133,6 @@ export class RecipeService {
 
       if (error) throw error;
 
-      console.log('[RecipeService] RPC response data:', data);
-      console.log('[RecipeService] Data type:', typeof data);
-      console.log('[RecipeService] Is array:', Array.isArray(data));
-
       // The RPC function returns {recipe: {...}, ingredients: [...]}
       // We need to combine them into the RecipeWithIngredients format
       if (data && typeof data === 'object' && 'recipe' in data && 'ingredients' in data) {
@@ -144,7 +140,6 @@ export class RecipeService {
           ...data.recipe,
           ingredients: data.ingredients
         };
-        console.log('[RecipeService] Mapped result:', result);
         return result as RecipeWithIngredients;
       }
 
@@ -469,9 +464,18 @@ export class RecipeService {
    */
   async saveRecipe(recipeId: string): Promise<{ success: boolean; error?: string }> {
     try {
+      const currentUser = this.auth.currentUser();
+      
+      if (!currentUser?.id) {
+        throw new Error('User not authenticated');
+      }
+
       const { error } = await this.supabase.client
         .from('saved_recipes')
-        .insert({ recipe_id: recipeId });
+        .insert({ 
+          recipe_id: recipeId,
+          user_id: currentUser.id
+        });
 
       if (error) throw error;
 
@@ -487,10 +491,17 @@ export class RecipeService {
    */
   async unsaveRecipe(recipeId: string): Promise<{ success: boolean; error?: string }> {
     try {
+      const currentUser = this.auth.currentUser();
+      
+      if (!currentUser?.id) {
+        throw new Error('User not authenticated');
+      }
+
       const { error } = await this.supabase.client
         .from('saved_recipes')
         .delete()
-        .eq('recipe_id', recipeId);
+        .eq('recipe_id', recipeId)
+        .eq('user_id', currentUser.id);
 
       if (error) throw error;
 

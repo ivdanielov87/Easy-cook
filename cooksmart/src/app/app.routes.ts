@@ -7,6 +7,7 @@ import { RecipeDetail } from './features/public/recipe-detail/recipe-detail';
 import { Pantry } from './features/public/pantry/pantry';
 import { Profile } from './features/profile/profile';
 import { Login } from './features/auth/login/login';
+import { Register } from './features/auth/register/register';
 import { Dashboard } from './features/admin/dashboard/dashboard';
 import { RecipeManagement } from './features/admin/recipe-management/recipe-management';
 import { RecipeForm } from './features/admin/recipe-form/recipe-form';
@@ -16,6 +17,10 @@ export const routes: Routes = [
   {
     path: 'login',
     component: Login
+  },
+  {
+    path: 'register',
+    component: Register
   },
   {
     path: '',

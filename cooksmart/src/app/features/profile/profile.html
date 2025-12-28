@@ -90,6 +90,49 @@
           </div>
         </div>
       </div>
+
+      <!-- Saved Recipes Card -->
+      <div class="profile-card saved-recipes-card">
+        <div class="card-header">
+          <h2 class="card-title">{{ 'PROFILE.SAVED_RECIPES' | translate }}</h2>
+        </div>
+
+        <div class="card-body">
+          @if (loadingSavedRecipes()) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>{{ 'COMMON.LOADING' | translate }}</p>
+            </div>
+          } @else if (savedRecipes().length === 0) {
+            <div class="empty-state">
+              <p>{{ 'PROFILE.NO_SAVED_RECIPES' | translate }}</p>
+            </div>
+          } @else {
+            <div class="saved-recipes-grid">
+              @for (recipe of savedRecipes(); track recipe.id) {
+                <a [routerLink]="['/recipes', recipe.slug]" class="saved-recipe-card">
+                  <div class="recipe-image">
+                    @if (recipe.image_url) {
+                      <img [src]="recipe.image_url" [alt]="recipe.title" />
+                    } @else {
+                      <div class="recipe-image-placeholder">
+                        <span class="placeholder-icon">🍳</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="recipe-info">
+                    <h3 class="recipe-title">{{ recipe.title }}</h3>
+                    <div class="recipe-meta">
+                      <span class="meta-item">⏱️ {{ recipe.prep_time }} {{ 'RECIPE.MINUTES' | translate }}</span>
+                      <span class="meta-item">🍽️ {{ recipe.servings }}</span>
+                    </div>
+                  </div>
+                </a>
+              }
+            </div>
+          }
+        </div>
+      </div>
     </div>
   </div>
 </div>

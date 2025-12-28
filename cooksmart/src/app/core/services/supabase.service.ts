@@ -71,6 +71,18 @@ export class SupabaseService {
   }
 
   /**
+   * Sign in with Google OAuth
+   */
+  async signInWithGoogle() {
+    return await this.supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`
+      }
+    });
+  }
+
+  /**
    * Listen to auth state changes
    */
   onAuthStateChange(callback: (event: string, session: Session | null) => void) {

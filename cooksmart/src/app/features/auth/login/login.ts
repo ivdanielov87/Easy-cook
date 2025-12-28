@@ -34,8 +34,18 @@ export class Login {
     this.error.set('');
 
     try {
-      await this.authService.signIn(this.email(), this.password());
-      this.router.navigate(['/']);
+      const result = await this.authService.signIn(this.email(), this.password());
+      
+      if (result.success) {
+        this.router.navigate(['/']);
+      } else {
+        // Check for email confirmation error
+        if (result.error?.includes('email_not_confirmed') || result.error?.includes('Email not confirmed')) {
+          this.error.set('AUTH.EMAIL_NOT_CONFIRMED');
+        } else {
+          this.error.set(result.error || 'AUTH.LOGIN_ERROR');
+        }
+      }
     } catch (err: any) {
       this.error.set(err.message || 'AUTH.LOGIN_ERROR');
     } finally {
@@ -49,5 +59,21 @@ export class Login {
 
   onPasswordChange(value: string): void {
     this.password.set(value);
+  }
+
+  async signInWithGoogle(): Promise<void> {
+    this.loading.set(true);
+    this.error.set('');
+
+    try {
+      const result = await this.authService.signInWithGoogle();
+      if (!result.success && result.error) {
+        this.error.set(result.error);
+      }
+    } catch (err: any) {
+      this.error.set(err.message || 'AUTH.LOGIN_ERROR');
+    } finally {
+      this.loading.set(false);
+    }
   }
 }

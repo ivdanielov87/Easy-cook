@@ -1,5 +1,21 @@
 <div class="recipe-detail-page">
-  @if (loading()) {
+  @if (!authService.isAuthenticated()) {
+    <div class="login-required-state">
+      <div class="login-prompt">
+        <div class="prompt-icon">🔒</div>
+        <h2 class="prompt-title">{{ 'RECIPE.LOGIN_REQUIRED_TITLE' | translate }}</h2>
+        <p class="prompt-message">{{ 'RECIPE.LOGIN_REQUIRED_MESSAGE' | translate }}</p>
+        <div class="prompt-actions">
+          <a routerLink="/login" class="btn btn-primary">
+            {{ 'COMMON.LOGIN' | translate }}
+          </a>
+          <a routerLink="/register" class="btn btn-secondary">
+            {{ 'COMMON.REGISTER' | translate }}
+          </a>
+        </div>
+      </div>
+    </div>
+  } @else if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
       <p>{{ 'COMMON.LOADING' | translate }}</p>

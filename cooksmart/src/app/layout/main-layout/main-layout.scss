@@ -400,6 +400,9 @@
   cursor: pointer;
   
   &.btn-primary {
+    display: flex;
+    align-items: center;
+    height: 40px;
     background: $primary-color;
     color: white;
     

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -11,7 +11,7 @@ import { fadeIn } from '../../../shared/animations';
 
 @Component({
   selector: 'app-recipe-detail',
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterLink],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.scss',
   animations: [fadeIn]
@@ -32,6 +32,12 @@ export class RecipeDetail implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    // Check if user is authenticated
+    if (!this.authService.isAuthenticated()) {
+      this.loading.set(false);
+      return;
+    }
+
     const slug = this.route.snapshot.paramMap.get('slug');
     if (slug) {
       await this.loadRecipe(slug);

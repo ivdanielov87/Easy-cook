@@ -65,7 +65,9 @@
     "SERVINGS_COUNT": "{{count}} servings",
     "NO_STEPS": "No steps added",
     "BASIC_INFO": "Basic Information",
-    "SELECTED_INGREDIENTS": "Selected Ingredients"
+    "SELECTED_INGREDIENTS": "Selected Ingredients",
+    "LOGIN_REQUIRED_TITLE": "Login Required",
+    "LOGIN_REQUIRED_MESSAGE": "You need to be logged in to view recipe details. Please login or create an account to continue."
   },
   "AUTH": {
     "EMAIL": "Email",
@@ -87,7 +89,14 @@
     "LOGIN_ERROR": "Login error. Please check your credentials.",
     "LOGIN_HERE": "Login here",
     "REGISTER_HERE": "Register here",
-    "LOGOUT_CONFIRM": "Are you sure you want to logout?"
+    "LOGOUT_CONFIRM": "Are you sure you want to logout?",
+    "OR": "or",
+    "SIGN_IN_WITH_GOOGLE": "Sign in with Google",
+    "REGISTRATION_SUCCESS": "Registration Successful!",
+    "CHECK_EMAIL_CONFIRMATION": "Please check your email to confirm your account. Click the confirmation link in the email to activate your account.",
+    "CHECK_SPAM_FOLDER": "If you don't see the email, please check your spam folder.",
+    "GO_TO_LOGIN": "Go to Login",
+    "EMAIL_NOT_CONFIRMED": "Please confirm your email address before logging in. Check your inbox for the confirmation email."
   },
   "ADMIN": {
     "DASHBOARD": "Dashboard",

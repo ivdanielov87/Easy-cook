@@ -1,15 +1,17 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
+import { RecipeService } from '../../core/services/recipe.service';
+import { Recipe } from '../../core/models';
 import { fadeIn } from '../../shared/animations';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterLink],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   animations: [fadeIn]
@@ -20,9 +22,12 @@ export class Profile implements OnInit {
   saving = signal<boolean>(false);
   error = signal<string>('');
   success = signal<string>('');
+  savedRecipes = signal<Recipe[]>([]);
+  loadingSavedRecipes = signal<boolean>(false);
 
   constructor(
     public authService: AuthService,
+    private recipeService: RecipeService,
     private router: Router
   ) {}
 
@@ -41,6 +46,20 @@ export class Profile implements OnInit {
     
     if (user) {
       this.email.set(user.email || '');
+    }
+
+    this.loadSavedRecipes();
+  }
+
+  async loadSavedRecipes(): Promise<void> {
+    this.loadingSavedRecipes.set(true);
+    try {
+      const recipes = await this.recipeService.getSavedRecipes();
+      this.savedRecipes.set(recipes);
+    } catch (error) {
+      console.error('Error loading saved recipes:', error);
+    } finally {
+      this.loadingSavedRecipes.set(false);
     }
   }
 

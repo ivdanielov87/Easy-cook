@@ -170,8 +170,13 @@ COMMENT ON TABLE saved_recipes IS 'User favorites/bookmarked recipes';
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.profiles (id, email, role)
-    VALUES (NEW.id, NEW.email, 'user');
+    INSERT INTO public.profiles (id, email, display_name, role)
+    VALUES (
+        NEW.id, 
+        NEW.email, 
+        COALESCE(NEW.raw_user_meta_data->>'display_name', NULL),
+        'user'
+    );
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

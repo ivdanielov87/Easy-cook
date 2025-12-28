@@ -2,6 +2,89 @@
 @use '../../../../mixins' as *;
 
 .recipe-detail-page {
+  // Login Required State
+  .login-required-state {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-2xl $spacing-md;
+    
+    .login-prompt {
+      max-width: 500px;
+      text-align: center;
+      background: $surface;
+      padding: $spacing-2xl;
+      border-radius: $border-radius-lg;
+      box-shadow: $shadow-lg;
+      
+      .prompt-icon {
+        font-size: 4rem;
+        margin-bottom: $spacing-lg;
+      }
+      
+      .prompt-title {
+        font-size: 1.75rem;
+        font-weight: $font-weight-bold;
+        color: $text-primary;
+        margin-bottom: $spacing-md;
+      }
+      
+      .prompt-message {
+        font-size: 1rem;
+        color: $text-secondary;
+        line-height: 1.6;
+        margin-bottom: $spacing-xl;
+      }
+      
+      .prompt-actions {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+        
+        @include tablet {
+          flex-direction: row;
+          justify-content: center;
+          gap: $spacing-md;
+        }
+        
+        .btn {
+          padding: $spacing-md $spacing-xl;
+          border-radius: $border-radius-sm;
+          font-weight: $font-weight-semibold;
+          text-decoration: none;
+          text-align: center;
+          transition: all $transition-fast;
+          
+          &.btn-primary {
+            background: $primary-color;
+            color: white;
+            border: none;
+            
+            &:hover {
+              background: $primary-dark;
+              transform: translateY(-2px);
+              box-shadow: $shadow-md;
+            }
+          }
+          
+          &.btn-secondary {
+            background: transparent;
+            color: $primary-color;
+            border: 2px solid $primary-color;
+            
+            &:hover {
+              background: $primary-color;
+              color: white;
+              transform: translateY(-2px);
+              box-shadow: $shadow-md;
+            }
+          }
+        }
+      }
+    }
+  }
+
   // Loading State
   .loading-state {
     text-align: center;

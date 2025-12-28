@@ -93,6 +93,27 @@
       margin-top: $spacing-xl;
     }
   }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: $spacing-xl 0;
+    
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid $border-color;
+    }
+    
+    span {
+      padding: 0 $spacing-md;
+      color: $text-secondary;
+      font-size: 0.875rem;
+      font-weight: $font-weight-medium;
+    }
+  }
   
   .auth-footer {
     text-align: center;
@@ -141,6 +162,29 @@
       background: $primary-dark;
       transform: translateY(-2px);
       box-shadow: $shadow-md;
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  &.btn-google {
+    background: white;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    
+    .google-icon {
+      flex-shrink: 0;
+    }
+    
+    &:hover:not(:disabled) {
+      background: #f8f9fa;
+      border-color: #d2d3d4;
+      transform: translateY(-1px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     &:disabled {
