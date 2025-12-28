@@ -1,6 +1,15 @@
 @use '../../../../variables' as *;
 @use '../../../../mixins' as *;
 
+// Enable smooth scrolling for anchor links
+:host {
+  display: block;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 .home-page {
   // Hero Section
   .hero {
@@ -191,7 +200,7 @@
   // How It Works Section
   .how-it-works {
     padding: $spacing-2xl 0;
-    background: $surface;
+    // background: $surface;
     
     @include desktop {
       padding: 4rem 0;
