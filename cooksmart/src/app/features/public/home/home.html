@@ -13,7 +13,7 @@
           <a routerLink="/recipes" class="btn btn-hero-primary">
             {{ 'HOME.BROWSE_RECIPES' | translate }}
           </a>
-          <a routerLink="/pantry" class="btn btn-hero-secondary">
+          <a href="#how-it-works" class="btn btn-hero-secondary">
             {{ 'HOME.HOW_IT_WORKS' | translate }}
           </a>
         </div>
@@ -39,6 +39,69 @@
         <div class="hero-badge">
           <span class="badge-dot"></span>
           <span class="badge-text">{{ 'HOME.MENU_READY' | translate }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="how-it-works" [@fadeIn]>
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-subtitle">Get from meal planning stress to delicious dinners in just three simple steps</p>
+      
+      <div class="steps-grid">
+        <!-- Step 1 -->
+        <div class="step-card" [@fadeIn]>
+          <div class="step-badge">01</div>
+          <div class="step-image">
+            <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=400&h=300&fit=crop" alt="Choose Your Menu" />
+          </div>
+          <div class="step-content">
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3h18v18H3z"/>
+                <path d="M9 9h6v6H9z"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Choose Your Menu</h3>
+            <p class="step-description">Browse free weekly options or premium collections</p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card" [@fadeIn]>
+          <div class="step-badge">02</div>
+          <div class="step-image">
+            <img src="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=400&h=300&fit=crop" alt="Get Your Shopping List" />
+          </div>
+          <div class="step-content">
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 2L7 6H3l4 4-1 7h12l-1-7 4-4h-4l-2-4z"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Get Your Shopping List</h3>
+            <p class="step-description">Automated, organized grocery lists generated</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card" [@fadeIn]>
+          <div class="step-badge">03</div>
+          <div class="step-image">
+            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=300&fit=crop" alt="Cook & Enjoy" />
+          </div>
+          <div class="step-content">
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Cook & Enjoy</h3>
+            <p class="step-description">Step-by-step recipes with cooking support</p>
+          </div>
         </div>
       </div>
     </div>

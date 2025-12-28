@@ -188,6 +188,142 @@
     }
   }
   
+  // How It Works Section
+  .how-it-works {
+    padding: $spacing-2xl 0;
+    background: $surface;
+    
+    @include desktop {
+      padding: 4rem 0;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: $font-weight-bold;
+      color: $text-primary;
+      margin-bottom: $spacing-sm;
+      
+      @include tablet {
+        font-size: 2.5rem;
+      }
+    }
+    
+    .section-subtitle {
+      text-align: center;
+      font-size: 1rem;
+      color: $text-secondary;
+      margin-bottom: $spacing-2xl;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      
+      @include tablet {
+        font-size: 1.125rem;
+      }
+    }
+    
+    .steps-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: $spacing-xl;
+      max-width: $container-max-width;
+      margin: 0 auto;
+      
+      @include tablet {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      @include desktop {
+        grid-template-columns: repeat(3, 1fr);
+        gap: $spacing-lg;
+      }
+    }
+    
+    .step-card {
+      position: relative;
+      background: white;
+      border-radius: $border-radius;
+      overflow: hidden;
+      box-shadow: $shadow-sm;
+      transition: all $transition-base;
+      
+      &:hover {
+        box-shadow: $shadow-lg;
+        transform: translateY(-4px);
+      }
+      
+      .step-badge {
+        position: absolute;
+        top: $spacing-md;
+        left: $spacing-md;
+        width: 48px;
+        height: 48px;
+        background: $primary-color;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+        font-weight: $font-weight-bold;
+        z-index: 2;
+        box-shadow: $shadow-md;
+      }
+      
+      .step-image {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform $transition-base;
+        }
+      }
+      
+      &:hover .step-image img {
+        transform: scale(1.05);
+      }
+      
+      .step-content {
+        padding: $spacing-lg;
+        
+        .step-icon {
+          width: 48px;
+          height: 48px;
+          background: rgba($primary-color, 0.1);
+          color: $primary-color;
+          border-radius: $border-radius-sm;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: $spacing-md;
+          
+          svg {
+            width: 24px;
+            height: 24px;
+          }
+        }
+        
+        .step-title {
+          font-size: 1.25rem;
+          font-weight: $font-weight-semibold;
+          color: $text-primary;
+          margin-bottom: $spacing-sm;
+        }
+        
+        .step-description {
+          font-size: 0.9375rem;
+          color: $text-secondary;
+          line-height: 1.6;
+        }
+      }
+    }
+  }
+
   // Featured Recipes Section
   .featured-recipes {
     padding: $spacing-2xl 0;
