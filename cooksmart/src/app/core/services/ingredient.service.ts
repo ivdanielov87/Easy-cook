@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { SupabaseHttpService } from './supabase-http.service';
 import { Ingredient, IngredientCreate } from '../models';
 import { TranslateService } from './translate.service';
 
@@ -12,6 +13,7 @@ export class IngredientService {
 
   constructor(
     private supabase: SupabaseService,
+    private supabaseHttp: SupabaseHttpService,
     private translateService: TranslateService
   ) {}
 
@@ -25,10 +27,12 @@ export class IngredientService {
       const currentLang = this.translateService.getCurrentLanguage();
       const orderBy = currentLang === 'bg' ? 'name_bg' : 'name_en';
       
-      const { data, error } = await this.supabase.client
-        .from('ingredients')
-        .select('*')
-        .order(orderBy, { ascending: true });
+      const params: Record<string, string> = {
+        'select': '*',
+        'order': `${orderBy}.asc`
+      };
+      
+      const { data, error } = await this.supabaseHttp.get<Ingredient[]>('ingredients', params);
 
       if (error) throw error;
 
@@ -47,15 +51,16 @@ export class IngredientService {
    */
   async getIngredientById(id: string): Promise<Ingredient | null> {
     try {
-      const { data, error } = await this.supabase.client
-        .from('ingredients')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const params: Record<string, string> = {
+        'select': '*',
+        'id': `eq.${id}`
+      };
+      
+      const { data, error } = await this.supabaseHttp.get<Ingredient[]>('ingredients', params);
 
       if (error) throw error;
 
-      return data as Ingredient;
+      return data && data.length > 0 ? data[0] : null;
     } catch (error: any) {
       console.error('Error fetching ingredient:', error);
       return null;
@@ -176,11 +181,13 @@ export class IngredientService {
       const currentLang = this.translateService.getCurrentLanguage();
       const orderBy = currentLang === 'bg' ? 'name_bg' : 'name_en';
 
-      const { data, error } = await this.supabase.client
-        .from('ingredients')
-        .select('*')
-        .or(`name_bg.ilike.%${query}%,name_en.ilike.%${query}%`)
-        .order(orderBy, { ascending: true });
+      const params: Record<string, string> = {
+        'select': '*',
+        'or': `(name_bg.ilike.*${query}*,name_en.ilike.*${query}*)`,
+        'order': `${orderBy}.asc`
+      };
+
+      const { data, error } = await this.supabaseHttp.get<Ingredient[]>('ingredients', params);
 
       if (error) throw error;
 

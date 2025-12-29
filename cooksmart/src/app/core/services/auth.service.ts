@@ -1,6 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from './supabase.service';
+import { SupabaseHttpService } from './supabase-http.service';
 import { Profile } from '../models';
 import { Session, User } from '@supabase/supabase-js';
 
@@ -16,6 +17,7 @@ export class AuthService {
   loading = signal<boolean>(true);
 
   private sessionCheckInterval: any;
+  private supabaseHttp = inject(SupabaseHttpService);
 
   constructor(
     private supabase: SupabaseService,
@@ -83,16 +85,18 @@ export class AuthService {
    */
   private async fetchUserProfile(userId: string): Promise<Profile | null> {
     try {
-      const { data, error } = await this.supabase.client
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      const params: Record<string, string> = {
+        'select': '*',
+        'id': `eq.${userId}`
+      };
+      
+      const { data, error } = await this.supabaseHttp.get<any[]>('profiles', params);
 
       if (error) throw error;
-      return data as Profile;
+
+      return data && data.length > 0 ? data[0] as Profile : null;
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('Error fetching user profile:', error);
       return null;
     }
   }
@@ -180,10 +184,11 @@ export class AuthService {
         return { success: false, error: 'No user logged in' };
       }
 
-      const { error } = await this.supabase.client
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
+      const params: Record<string, string> = {
+        'id': `eq.${user.id}`
+      };
+
+      const { error } = await this.supabaseHttp.patch('profiles', updates, params);
 
       if (error) throw error;
 
@@ -237,19 +242,16 @@ export class AuthService {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
-          console.log('[AuthService] Tab became visible, waking up connection...');
-          try {
-            // Wake up the database connection with a simple query
-            await this.supabase.client.from('recipes').select('id').limit(1);
-            console.log('[AuthService] Database connection restored');
-            
-            // Refresh session if authenticated
-            if (this.isAuthenticated()) {
+          console.log('[AuthService] Tab became visible');
+          
+          // Refresh session if authenticated
+          if (this.isAuthenticated()) {
+            try {
               await this.supabase.refreshSession();
               console.log('[AuthService] Session refreshed successfully');
+            } catch (error) {
+              console.error('[AuthService] Error refreshing session:', error);
             }
-          } catch (error) {
-            console.error('[AuthService] Error on visibility change:', error);
           }
         }
       });
