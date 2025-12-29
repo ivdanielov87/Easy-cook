@@ -31,7 +31,6 @@ export class RecipeList implements OnInit {
   }
 
   async loadRecipes(): Promise<void> {
-    console.log('[RecipeList] loadRecipes() called');
     this.loading.set(true);
     this.error.set('');
     
@@ -49,35 +48,13 @@ export class RecipeList implements OnInit {
       filters.search = this.searchQuery();
     }
     
-    console.log('[RecipeList] Filters:', filters);
-    
     try {
-      console.log('[RecipeList] Starting recipe fetch with timeout...');
-      
-      // Create timeout that will definitely trigger
-      let timeoutId: any;
-      const timeoutPromise = new Promise<Recipe[]>((_, reject) => {
-        timeoutId = setTimeout(() => {
-          console.error('[RecipeList] TIMEOUT TRIGGERED after 15 seconds');
-          reject(new Error('Loading timeout - please refresh the page'));
-        }, 15000);
-      });
-      
-      const recipesPromise = this.recipeService.getRecipes(filters).then(recipes => {
-        console.log('[RecipeList] Recipes received:', recipes.length);
-        clearTimeout(timeoutId);
-        return recipes;
-      });
-      
-      const recipes = await Promise.race([recipesPromise, timeoutPromise]);
-      console.log('[RecipeList] Setting recipes:', recipes.length);
+      const recipes = await this.recipeService.getRecipes(filters);
       this.recipes.set(recipes);
     } catch (err: any) {
-      console.error('[RecipeList] Error loading recipes:', err);
-      this.error.set(err.message || 'Failed to load recipes. Please refresh the page.');
+      this.error.set(err.message || 'Failed to load recipes');
       this.recipes.set([]);
     } finally {
-      console.log('[RecipeList] Setting loading to false');
       this.loading.set(false);
     }
   }
