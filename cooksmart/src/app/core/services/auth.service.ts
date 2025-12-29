@@ -237,20 +237,21 @@ export class AuthService {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
-          console.log('[AuthService] Tab became visible, waking up connection...');
-          try {
-            // Wake up the database connection with a simple query
-            await this.supabase.client.from('recipes').select('id').limit(1);
-            console.log('[AuthService] Database connection restored');
-            
-            // Refresh session if authenticated
-            if (this.isAuthenticated()) {
+          console.log('[AuthService] Tab became visible, restoring connection...');
+          
+          // Refresh session if authenticated
+          if (this.isAuthenticated()) {
+            try {
               await this.supabase.refreshSession();
               console.log('[AuthService] Session refreshed successfully');
+            } catch (error) {
+              console.error('[AuthService] Error refreshing session:', error);
             }
-          } catch (error) {
-            console.error('[AuthService] Error on visibility change:', error);
           }
+          
+          // Notify all components to reload their data
+          console.log('[AuthService] Notifying components to reload data...');
+          this.supabase.notifyConnectionRestored();
         }
       });
     }
