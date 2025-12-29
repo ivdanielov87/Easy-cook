@@ -26,6 +26,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(),
+    // Note: provideAnimations() is deprecated in Angular 20.2+ but still fully supported.
+    // Will be replaced with animate.enter/animate.leave pattern in Angular 23.
     provideAnimations(),
     importProvidersFrom(
       TranslateModule.forRoot({
