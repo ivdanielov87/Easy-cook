@@ -16,6 +16,7 @@ export class AuthService {
   loading = signal<boolean>(true);
 
   private sessionCheckInterval: any;
+  private tabHiddenTime: number = 0;
 
   constructor(
     private supabase: SupabaseService,
@@ -236,22 +237,36 @@ export class AuthService {
   private setupVisibilityListener(): void {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', async () => {
-        if (document.visibilityState === 'visible') {
-          console.log('[AuthService] Tab became visible, restoring connection...');
+        if (document.visibilityState === 'hidden') {
+          // Track when tab was hidden
+          this.tabHiddenTime = Date.now();
+        } else if (document.visibilityState === 'visible') {
+          // Calculate how long the tab was hidden
+          const hiddenDuration = Date.now() - this.tabHiddenTime;
+          const hiddenSeconds = hiddenDuration / 1000;
           
-          // Refresh session if authenticated
-          if (this.isAuthenticated()) {
-            try {
-              await this.supabase.refreshSession();
-              console.log('[AuthService] Session refreshed successfully');
-            } catch (error) {
-              console.error('[AuthService] Error refreshing session:', error);
+          console.log(`[AuthService] Tab became visible after ${hiddenSeconds.toFixed(1)}s`);
+          
+          // Only restore connection if tab was hidden for more than 30 seconds
+          if (hiddenSeconds > 30) {
+            console.log('[AuthService] Tab was hidden for >30s, restoring connection...');
+            
+            // Refresh session if authenticated
+            if (this.isAuthenticated()) {
+              try {
+                await this.supabase.refreshSession();
+                console.log('[AuthService] Session refreshed successfully');
+              } catch (error) {
+                console.error('[AuthService] Error refreshing session:', error);
+              }
             }
+            
+            // Notify all components to reload their data
+            console.log('[AuthService] Notifying components to reload data...');
+            this.supabase.notifyConnectionRestored();
+          } else {
+            console.log('[AuthService] Tab was hidden for <30s, no reload needed');
           }
-          
-          // Notify all components to reload their data
-          console.log('[AuthService] Notifying components to reload data...');
-          this.supabase.notifyConnectionRestored();
         }
       });
     }
