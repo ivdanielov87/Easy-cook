@@ -51,7 +51,6 @@ export class SupabaseService {
   async refreshSession(): Promise<Session | null> {
     const { data: { session }, error } = await this.supabase.auth.refreshSession();
     if (error) {
-      console.error('Error refreshing session:', error);
       return null;
     }
     return session;

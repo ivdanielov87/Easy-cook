@@ -201,15 +201,10 @@ export class RecipeService {
       
       const userId = currentUser.id;
       
-      // Get access token with timeout
+      // Get access token
       let accessToken = supabaseKey;
       try {
-        const sessionPromise = this.supabase.client.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session timeout')), 2000)
-        );
-        
-        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        const { data: { session } } = await this.supabase.client.auth.getSession();
         accessToken = session?.access_token || supabaseKey;
       } catch (err) {
         // Use API key as fallback
@@ -290,15 +285,10 @@ export class RecipeService {
       const supabaseUrl = (this.supabase.client as any).supabaseUrl;
       const supabaseKey = (this.supabase.client as any).supabaseKey;
       
-      // Get access token with timeout
+      // Get access token
       let accessToken = supabaseKey;
       try {
-        const sessionPromise = this.supabase.client.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session timeout')), 2000)
-        );
-        
-        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        const { data: { session } } = await this.supabase.client.auth.getSession();
         accessToken = session?.access_token || supabaseKey;
       } catch (err) {
         // Use API key as fallback

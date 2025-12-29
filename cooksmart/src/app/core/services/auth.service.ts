@@ -221,7 +221,7 @@ export class AuthService {
    * Start monitoring session and refresh when needed
    */
   private startSessionMonitoring(): void {
-    // Check session every 5 minutes
+    // Check session every 20 minutes
     this.sessionCheckInterval = setInterval(async () => {
       if (this.isAuthenticated()) {
         const session = await this.supabase.getSession();
@@ -230,7 +230,7 @@ export class AuthService {
           await this.signOut();
         }
       }
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 20 * 60 * 1000); // 20 minutes
   }
 
   /**
