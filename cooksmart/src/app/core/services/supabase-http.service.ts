@@ -27,11 +27,10 @@ export class SupabaseHttpService {
         const parsed = JSON.parse(authData);
         if (parsed?.access_token) {
           authToken = parsed.access_token;
-          console.log('[SupabaseHttp] Using user access token for authenticated request');
         }
       }
     } catch (error) {
-      console.warn('[SupabaseHttp] Could not get user token, using anon key');
+      // Silently fall back to anon key
     }
     
     return new HttpHeaders({
@@ -47,8 +46,6 @@ export class SupabaseHttpService {
    */
   async get<T>(table: string, params?: Record<string, string>): Promise<{ data: T | null; error: any }> {
     try {
-      console.log(`[SupabaseHttp] GET /${table}`, params);
-      
       let url = `${this.baseUrl}/${table}`;
       if (params) {
         const queryString = new URLSearchParams(params).toString();
@@ -60,10 +57,8 @@ export class SupabaseHttpService {
         this.http.get<T>(url, { headers })
       );
       
-      console.log(`[SupabaseHttp] GET /${table} success`);
       return { data, error: null };
     } catch (error: any) {
-      console.error(`[SupabaseHttp] GET /${table} error:`, error);
       return { data: null, error };
     }
   }
@@ -73,17 +68,13 @@ export class SupabaseHttpService {
    */
   async post<T>(table: string, body: any): Promise<{ data: T | null; error: any }> {
     try {
-      console.log(`[SupabaseHttp] POST /${table}`, body);
-      
       const headers = await this.getHeaders();
       const data = await firstValueFrom(
         this.http.post<T>(`${this.baseUrl}/${table}`, body, { headers })
       );
       
-      console.log(`[SupabaseHttp] POST /${table} success`);
       return { data, error: null };
     } catch (error: any) {
-      console.error(`[SupabaseHttp] POST /${table} error:`, error);
       return { data: null, error };
     }
   }
@@ -93,8 +84,6 @@ export class SupabaseHttpService {
    */
   async patch<T>(table: string, body: any, params?: Record<string, string>): Promise<{ data: T | null; error: any }> {
     try {
-      console.log(`[SupabaseHttp] PATCH /${table}`, body, params);
-      
       let url = `${this.baseUrl}/${table}`;
       if (params) {
         const queryString = new URLSearchParams(params).toString();
@@ -106,10 +95,8 @@ export class SupabaseHttpService {
         this.http.patch<T>(url, body, { headers })
       );
       
-      console.log(`[SupabaseHttp] PATCH /${table} success`);
       return { data, error: null };
     } catch (error: any) {
-      console.error(`[SupabaseHttp] PATCH /${table} error:`, error);
       return { data: null, error };
     }
   }
@@ -119,8 +106,6 @@ export class SupabaseHttpService {
    */
   async delete<T>(table: string, params: Record<string, string>): Promise<{ data: T | null; error: any }> {
     try {
-      console.log(`[SupabaseHttp] DELETE /${table}`, params);
-      
       const queryString = new URLSearchParams(params).toString();
       const url = `${this.baseUrl}/${table}?${queryString}`;
       
@@ -129,10 +114,8 @@ export class SupabaseHttpService {
         this.http.delete<T>(url, { headers })
       );
       
-      console.log(`[SupabaseHttp] DELETE /${table} success`);
       return { data, error: null };
     } catch (error: any) {
-      console.error(`[SupabaseHttp] DELETE /${table} error:`, error);
       return { data: null, error };
     }
   }

@@ -21,12 +21,9 @@ export class RecipeService {
    * Fetch all recipes with optional filters
    */
   async getRecipes(filters?: RecipeFilters): Promise<Recipe[]> {
-    console.log('[RecipeService] getRecipes() called with filters:', filters);
     try {
       this.loading.set(true);
-      console.log('[RecipeService] Loading set to true');
 
-      console.log('[RecipeService] Building HTTP query params...');
       const params: Record<string, string> = {
         'select': '*',
         'order': 'created_at.desc'
@@ -60,24 +57,17 @@ export class RecipeService {
         params['title'] = `ilike.*${filters.search}*`;
       }
 
-      console.log('[RecipeService] Executing HTTP GET request...');
       const { data, error } = await this.supabaseHttp.get<Recipe[]>('recipes', params);
 
       if (error) {
-        console.error('[RecipeService] Query error:', error);
         throw error;
       }
 
-      console.log('[RecipeService] Data received, count:', data?.length || 0);
       this.recipes.set(data as Recipe[]);
       return data as Recipe[];
     } catch (error: any) {
-      console.error('[RecipeService] EXCEPTION in getRecipes:', error);
-      console.error('[RecipeService] Error message:', error.message);
-      
       return [];
     } finally {
-      console.log('[RecipeService] Finally block - setting loading to false');
       this.loading.set(false);
     }
   }
@@ -129,7 +119,6 @@ export class RecipeService {
         ingredients: mappedIngredients
       } as RecipeWithIngredients;
     } catch (error) {
-      console.error('Error fetching recipe by ID:', error);
       return null;
     } finally {
       this.loading.set(false);
@@ -180,7 +169,6 @@ export class RecipeService {
         ingredients: mappedIngredients
       } as RecipeWithIngredients;
     } catch (error) {
-      console.error('Error fetching recipe by slug:', error);
       return null;
     } finally {
       this.loading.set(false);
@@ -199,15 +187,12 @@ export class RecipeService {
    */
   async createRecipe(recipe: RecipeCreate): Promise<{ success: boolean; data?: Recipe; error?: string }> {
     try {
-      console.log('[RecipeService] Starting recipe creation...');
-      console.log('[RecipeService] Recipe data:', recipe);
       this.loading.set(true);
 
       // Get Supabase credentials and user session
       const supabaseUrl = (this.supabase.client as any).supabaseUrl;
       const supabaseKey = (this.supabase.client as any).supabaseKey;
       
-      console.log('[RecipeService] Getting user ID from AuthService...');
       const currentUser = this.auth.currentUser();
       
       if (!currentUser?.id) {
@@ -215,7 +200,6 @@ export class RecipeService {
       }
       
       const userId = currentUser.id;
-      console.log('[RecipeService] User ID:', userId);
       
       // Get access token with timeout
       let accessToken = supabaseKey;
@@ -227,13 +211,11 @@ export class RecipeService {
         
         const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
         accessToken = session?.access_token || supabaseKey;
-        console.log('[RecipeService] Got access token');
       } catch (err) {
-        console.warn('[RecipeService] Session fetch timed out, using API key');
+        // Use API key as fallback
       }
 
       // Insert recipe using direct HTTP POST
-      console.log('[RecipeService] Inserting recipe via HTTP POST...');
       const recipeResponse = await fetch(`${supabaseUrl}/rest/v1/recipes`, {
         method: 'POST',
         headers: {
@@ -255,22 +237,16 @@ export class RecipeService {
         })
       });
 
-      console.log('[RecipeService] Recipe HTTP response status:', recipeResponse.status);
-
       if (!recipeResponse.ok) {
         const errorText = await recipeResponse.text();
-        console.error('[RecipeService] Recipe HTTP error:', errorText);
         throw new Error(`HTTP ${recipeResponse.status}: ${errorText}`);
       }
 
       const recipeDataArray = await recipeResponse.json();
       const recipeData = Array.isArray(recipeDataArray) ? recipeDataArray[0] : recipeDataArray;
-      
-      console.log('[RecipeService] Recipe created successfully with ID:', recipeData.id);
 
       // Insert recipe ingredients
       if (recipe.ingredients && recipe.ingredients.length > 0) {
-        console.log('[RecipeService] Inserting', recipe.ingredients.length, 'ingredients...');
         const ingredientsToInsert = recipe.ingredients.map((ing: RecipeIngredientInput) => ({
           recipe_id: recipeData.id,
           ingredient_id: ing.ingredient_id,
@@ -278,9 +254,6 @@ export class RecipeService {
           unit: ing.unit
         }));
 
-        console.log('[RecipeService] Ingredients to insert:', ingredientsToInsert);
-
-        // Insert recipe_ingredients using direct HTTP POST
         const ingredientsResponse = await fetch(`${supabaseUrl}/rest/v1/recipe_ingredients`, {
           method: 'POST',
           headers: {
@@ -292,24 +265,16 @@ export class RecipeService {
           body: JSON.stringify(ingredientsToInsert)
         });
 
-        console.log('[RecipeService] Ingredients HTTP response status:', ingredientsResponse.status);
-
         if (!ingredientsResponse.ok) {
           const errorText = await ingredientsResponse.text();
-          console.error('[RecipeService] Ingredients HTTP error:', errorText);
           throw new Error(`HTTP ${ingredientsResponse.status}: ${errorText}`);
         }
-
-        console.log('[RecipeService] All ingredients inserted successfully');
       }
 
-      console.log('[RecipeService] Recipe creation complete!');
       return { success: true, data: recipeData as Recipe };
     } catch (error: any) {
-      console.error('[RecipeService] Exception during recipe creation:', error);
       return { success: false, error: error.message };
     } finally {
-      console.log('[RecipeService] Setting loading to false');
       this.loading.set(false);
     }
   }
@@ -319,9 +284,6 @@ export class RecipeService {
    */
   async updateRecipe(id: string, updates: RecipeUpdate): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log('[RecipeService] Starting recipe update...');
-      console.log('[RecipeService] Recipe ID:', id);
-      console.log('[RecipeService] Update data:', updates);
       this.loading.set(true);
 
       // Get Supabase credentials
@@ -338,13 +300,11 @@ export class RecipeService {
         
         const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
         accessToken = session?.access_token || supabaseKey;
-        console.log('[RecipeService] Got access token');
       } catch (err) {
-        console.warn('[RecipeService] Session fetch timed out, using API key');
+        // Use API key as fallback
       }
 
       // Update recipe using direct HTTP PATCH
-      console.log('[RecipeService] Updating recipe via HTTP PATCH...');
       const recipeResponse = await fetch(`${supabaseUrl}/rest/v1/recipes?id=eq.${id}`, {
         method: 'PATCH',
         headers: {
@@ -364,18 +324,13 @@ export class RecipeService {
         })
       });
 
-      console.log('[RecipeService] Recipe update HTTP response status:', recipeResponse.status);
-
       if (!recipeResponse.ok) {
         const errorText = await recipeResponse.text();
-        console.error('[RecipeService] Recipe update HTTP error:', errorText);
         throw new Error(`HTTP ${recipeResponse.status}: ${errorText}`);
       }
 
       // If ingredients are provided, update them
       if (updates.ingredients) {
-        console.log('[RecipeService] Updating ingredients...');
-        
         // Delete existing ingredients
         const deleteResponse = await fetch(`${supabaseUrl}/rest/v1/recipe_ingredients?recipe_id=eq.${id}`, {
           method: 'DELETE',
@@ -387,7 +342,6 @@ export class RecipeService {
 
         if (!deleteResponse.ok) {
           const errorText = await deleteResponse.text();
-          console.error('[RecipeService] Delete ingredients HTTP error:', errorText);
           throw new Error(`Failed to delete ingredients: ${errorText}`);
         }
 
@@ -413,16 +367,13 @@ export class RecipeService {
 
           if (!insertResponse.ok) {
             const errorText = await insertResponse.text();
-            console.error('[RecipeService] Insert ingredients HTTP error:', errorText);
             throw new Error(`Failed to insert ingredients: ${errorText}`);
           }
         }
       }
 
-      console.log('[RecipeService] Recipe updated successfully');
       return { success: true };
     } catch (error: any) {
-      console.error('[RecipeService] Error updating recipe:', error);
       return { success: false, error: error.message };
     } finally {
       this.loading.set(false);

@@ -25,7 +25,6 @@ export class AuthService {
   ) {
     this.initializeAuth();
     this.startSessionMonitoring();
-    this.setupVisibilityListener();
   }
 
   /**
@@ -235,37 +234,11 @@ export class AuthService {
   }
 
   /**
-   * Setup visibility change listener to refresh session when tab becomes visible
-   * This prevents stale connections caused by browser throttling in background tabs
-   */
-  private setupVisibilityListener(): void {
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', async () => {
-        if (document.visibilityState === 'visible') {
-          console.log('[AuthService] Tab became visible');
-          
-          // Refresh session if authenticated
-          if (this.isAuthenticated()) {
-            try {
-              await this.supabase.refreshSession();
-              console.log('[AuthService] Session refreshed successfully');
-            } catch (error) {
-              console.error('[AuthService] Error refreshing session:', error);
-            }
-          }
-        }
-      });
-    }
-  }
-
-  /**
    * Stop session monitoring (cleanup)
    */
   ngOnDestroy(): void {
     if (this.sessionCheckInterval) {
       clearInterval(this.sessionCheckInterval);
     }
-    // Note: visibilitychange listener cleanup would require storing the handler reference
-    // For a root service, this is typically not needed as it lives for the app lifetime
   }
 }
