@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, User, Session } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseService {
   private readonly supabase: SupabaseClient;
+  
+  // Observable to notify components when connection is restored
+  private connectionRestoredSubject = new Subject<void>();
+  connectionRestored$ = this.connectionRestoredSubject.asObservable();
 
   constructor() {
     this.supabase = createClient(
@@ -17,9 +22,21 @@ export class SupabaseService {
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true
+        },
+        global: {
+          headers: {
+            'X-Client-Info': 'cooksmart-web'
+          }
         }
       }
     );
+  }
+  
+  /**
+   * Notify subscribers that connection has been restored
+   */
+  notifyConnectionRestored(): void {
+    this.connectionRestoredSubject.next();
   }
 
   /**

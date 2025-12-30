@@ -1,8 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 import { RecipeService } from '../../../core/services/recipe.service';
+import { SupabaseService } from '../../../core/services/supabase.service';
 import { Recipe } from '../../../core/models';
 import { fadeIn, staggerList } from '../../../shared/animations';
 
@@ -13,15 +15,30 @@ import { fadeIn, staggerList } from '../../../shared/animations';
   styleUrl: './home.scss',
   animations: [fadeIn, staggerList]
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   featuredRecipes = signal<Recipe[]>([]);
   loading = signal<boolean>(true);
   error = signal<string>('');
+  
+  private connectionSubscription?: Subscription;
 
-  constructor(private recipeService: RecipeService) {}
+  constructor(
+    private recipeService: RecipeService,
+    private supabaseService: SupabaseService
+  ) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadFeaturedRecipes();
+    
+    // Subscribe to connection restoration events
+    this.connectionSubscription = this.supabaseService.connectionRestored$.subscribe(() => {
+      console.log('[Home] Connection restored, reloading recipes...');
+      this.loadFeaturedRecipes();
+    });
+  }
+  
+  ngOnDestroy(): void {
+    this.connectionSubscription?.unsubscribe();
   }
 
   async loadFeaturedRecipes(): Promise<void> {
