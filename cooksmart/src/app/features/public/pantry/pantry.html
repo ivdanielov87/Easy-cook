@@ -1,0 +1,148 @@
+<div class="pantry-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header" [@fadeIn]>
+      <h1 class="page-title">{{ 'COMMON.MY_PANTRY' | translate }}</h1>
+      <p class="page-subtitle">{{ 'PANTRY.WHAT_CAN_I_COOK' | translate }}</p>
+    </div>
+
+    <div class="pantry-content">
+      <!-- Ingredient Selection Section -->
+      <div class="selection-section" [@fadeIn]>
+        <div class="section-header">
+          <h2 class="section-title">{{ 'PANTRY.SELECT_INGREDIENTS' | translate }}</h2>
+          @if (selectedIngredients().length > 0) {
+            <div class="selected-count">
+              {{ selectedIngredients().length }} {{ 'PANTRY.SELECTED' | translate }}
+            </div>
+          }
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+          <input 
+            type="text" 
+            class="search-input" 
+            [placeholder]="'PANTRY.SEARCH_INGREDIENTS' | translate"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchChange($event)"
+          />
+        </div>
+
+        <!-- Ingredients Grid -->
+        @if (loadingIngredients()) {
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>{{ 'COMMON.LOADING' | translate }}</p>
+          </div>
+        } @else {
+          <div class="ingredients-grid">
+            @for (ingredient of filteredIngredients; track ingredient.id) {
+              <button 
+                class="ingredient-chip"
+                [class.selected]="isSelected(ingredient.id)"
+                (click)="toggleIngredient(ingredient.id)"
+                type="button"
+              >
+                <span class="chip-icon">{{ isSelected(ingredient.id) ? '✓' : '+' }}</span>
+                <span class="chip-name">{{ getIngredientName(ingredient) }}</span>
+              </button>
+            }
+          </div>
+
+          @if (filteredIngredients.length === 0) {
+            <div class="empty-state">
+              <p>{{ 'PANTRY.NO_INGREDIENTS_FOUND' | translate }}</p>
+            </div>
+          }
+        }
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button 
+            class="btn btn-primary btn-lg"
+            [disabled]="selectedIngredients().length === 0 || loadingRecipes()"
+            (click)="findRecipes()"
+            type="button"
+          >
+            @if (loadingRecipes()) {
+              <span class="btn-spinner"></span>
+            }
+            {{ 'PANTRY.FIND_RECIPES' | translate }}
+          </button>
+          
+          @if (selectedIngredients().length > 0) {
+            <button 
+              class="btn btn-outline"
+              (click)="clearSelection()"
+              type="button"
+            >
+              {{ 'PANTRY.CLEAR_SELECTION' | translate }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      @if (hasSearched()) {
+        <div class="results-section" [@fadeIn]>
+          <h2 class="section-title">{{ 'PANTRY.MATCHING_RECIPES' | translate }}</h2>
+          
+          @if (loadingRecipes()) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>{{ 'COMMON.LOADING' | translate }}</p>
+            </div>
+          } @else if (matchingRecipes().length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">🔍</div>
+              <h3>{{ 'PANTRY.NO_RECIPES_FOUND' | translate }}</h3>
+              <p>{{ 'PANTRY.TRY_DIFFERENT_INGREDIENTS' | translate }}</p>
+            </div>
+          } @else {
+            <div class="results-info">
+              <p>{{ 'PANTRY.FOUND_RECIPES' | translate: {count: matchingRecipes().length} }}</p>
+            </div>
+            
+            <div class="recipe-grid" [@staggerList]>
+              @for (recipe of matchingRecipes(); track recipe.id) {
+                <div class="recipe-card" [@fadeIn]>
+                  <a [routerLink]="['/recipes', recipe.slug]" class="recipe-card-link">
+                    <div class="recipe-image">
+                      @if (recipe.image_url) {
+                        <img [src]="recipe.image_url" [alt]="recipe.title" />
+                      } @else {
+                        <div class="recipe-image-placeholder">
+                          <span class="placeholder-icon">🍳</span>
+                        </div>
+                      }
+                      <div class="recipe-difficulty">
+                        <span class="difficulty-badge" [class]="'difficulty-' + recipe.difficulty.toLowerCase()">
+                          {{ 'RECIPE.' + recipe.difficulty.toUpperCase() | translate }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="recipe-content">
+                      <h3 class="recipe-title">{{ recipe.title }}</h3>
+                      <p class="recipe-description">{{ recipe.description }}</p>
+                      <div class="recipe-meta">
+                        <span class="meta-item">
+                          <span class="meta-icon">⏱️</span>
+                          {{ recipe.prep_time }} {{ 'RECIPE.MINUTES' | translate }}
+                        </span>
+                        <span class="meta-item">
+                          <span class="meta-icon">🍽️</span>
+                          {{ recipe.servings }} {{ 'RECIPE.SERVINGS' | translate }}
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

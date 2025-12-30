@@ -1,8 +1,8 @@
 # Technical Specification: CookSmart Recipe & Pantry Assistant
 
-**Version:** 1.0  
-**Date:** 2025-12-25  
-**Status:** Phase 1 - Requirements Definition
+**Version:** 1.1  
+**Date:** 2025-12-28  
+**Status:** Phase 2 - Active Development
 
 ---
 
@@ -46,9 +46,13 @@ Home cooks struggle to decide what to prepare with ingredients they already have
 
 #### Authenticated User Features
 - User registration and login (email/password via Supabase Auth)
+- Email confirmation flow with user messaging
 - Profile management (display name, avatar upload)
+- Profile automatically created on registration via database trigger
 - Save/unsave recipes (favorites)
+- View saved recipes in profile page
 - Personal pantry ingredient list
+- Authentication guard for recipe detail pages
 
 #### Admin Features
 - Protected admin panel (`/admin` routes)
@@ -72,28 +76,40 @@ Home cooks struggle to decide what to prepare with ingredients they already have
 - Grocery list generation
 - Nutritional information
 - Recipe recommendations via ML
-- Multi-language support
 - Mobile native apps
 - Third-party recipe imports
 - Video instructions
+
+### Recently Completed (Phase 2)
+
+- ✅ Multi-language support (Bulgarian/English with ngx-translate)
+- ✅ Email confirmation messaging
+- ✅ Profile creation trigger with display_name support
+- ✅ Saved recipes functionality
+- ✅ Authentication guard for recipe details
+- ✅ Modern design system with animations
+- ✅ Mobile-first responsive design
 
 ---
 
 ## 4. Functional Requirements
 
 ### FR-1: Authentication & Authorization
-- **FR-1.1:** Users can register with email/password
-- **FR-1.2:** Users can log in and maintain session
-- **FR-1.3:** System distinguishes between 'user' and 'admin' roles
-- **FR-1.4:** Admin routes protected by both Angular guard and database RLS
-- **FR-1.5:** Profile created automatically on user registration via trigger
+- **FR-1.1:** ✅ Users can register with email/password
+- **FR-1.2:** ✅ Users can log in and maintain session
+- **FR-1.3:** ✅ System distinguishes between 'user' and 'admin' roles
+- **FR-1.4:** ✅ Admin routes protected by both Angular guard and database RLS
+- **FR-1.5:** ✅ Profile created automatically on user registration via trigger (includes display_name)
+- **FR-1.6:** ✅ Email confirmation required with proper user messaging
+- **FR-1.7:** ✅ Email not confirmed error handling on login
 
 ### FR-2: Recipe Discovery
-- **FR-2.1:** Display recipes in grid layout with thumbnail, title, difficulty, prep time
-- **FR-2.2:** Filter recipes by difficulty (Easy/Medium/Hard)
-- **FR-2.3:** Filter recipes by prep time ranges (< 15min, 15-30min, 30-60min, > 60min)
-- **FR-2.4:** Search recipes by title/description (text search)
-- **FR-2.5:** Recipe detail page shows full ingredients list, instructions, metadata
+- **FR-2.1:** ✅ Display recipes in grid layout with thumbnail, title, difficulty, prep time
+- **FR-2.2:** ✅ Filter recipes by difficulty (Easy/Medium/Hard)
+- **FR-2.3:** ✅ Filter recipes by prep time ranges (< 15min, 15-30min, 30-60min, > 60min)
+- **FR-2.4:** ✅ Search recipes by title/description (text search)
+- **FR-2.5:** ✅ Recipe detail page shows full ingredients list, instructions, metadata
+- **FR-2.6:** ✅ Recipe detail page requires authentication (login prompt for guests)
 
 ### FR-3: Smart Pantry Search
 - **FR-3.1:** User inputs multiple ingredients (comma-separated or multi-select)
@@ -102,10 +118,11 @@ Home cooks struggle to decide what to prepare with ingredients they already have
 - **FR-3.4:** Display match percentage or ingredient overlap indicator
 
 ### FR-4: User Profile & Favorites
-- **FR-4.1:** User can update display name and avatar
-- **FR-4.2:** User can save recipes to favorites
-- **FR-4.3:** User can view all saved recipes in dedicated page
-- **FR-4.4:** User can remove recipes from favorites
+- **FR-4.1:** ✅ User can update display name and avatar
+- **FR-4.2:** ✅ User can save recipes to favorites
+- **FR-4.3:** ✅ User can view all saved recipes in profile page
+- **FR-4.4:** ✅ User can remove recipes from favorites
+- **FR-4.5:** ✅ Saved recipes displayed in grid layout on profile page
 
 ### FR-5: Admin Recipe Management
 - **FR-5.1:** Admin can create new recipe with title, description, difficulty, prep time, servings
@@ -222,15 +239,21 @@ Home cooks struggle to decide what to prepare with ingredients they already have
 ## 8. Success Criteria
 
 ### Phase 1 Completion Criteria
-- [ ] Database schema deployed to Supabase Cloud
-- [ ] Angular project scaffolded with correct structure
-- [ ] Authentication flow working (register, login, logout)
-- [ ] Public recipe browsing functional
+- [x] Database schema deployed to Supabase Cloud
+- [x] Angular project scaffolded with correct structure
+- [x] Authentication flow working (register, login, logout)
+- [x] Email confirmation flow with user messaging
+- [x] Public recipe browsing functional
 - [ ] Ingredient-based search returns results
 - [ ] Admin can CRUD recipes with image upload
-- [ ] RLS policies enforced (verified via direct API calls)
-- [ ] Application compiles without errors
-- [ ] All routes protected by appropriate guards
+- [x] RLS policies enforced (verified via direct API calls)
+- [x] Application compiles without errors
+- [x] All routes protected by appropriate guards
+- [x] Profile creation trigger with display_name support
+- [x] Saved recipes functionality implemented
+- [x] Multi-language support (BG/EN) implemented
+- [x] Modern design system with animations
+- [x] Mobile-first responsive layouts
 
 ### User Acceptance
 - Guest can find recipe by 3 ingredients in < 2 minutes

@@ -1,0 +1,93 @@
+<div class="admin-layout" [class.sidebar-collapsed]="!sidebarOpen()">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🥗</span>
+        @if (sidebarOpen()) {
+          <span class="logo-text">CookSmart Admin</span>
+        }
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <span class="nav-icon">📊</span>
+        @if (sidebarOpen()) {
+          <span class="nav-text">{{ 'NAV.DASHBOARD' | translate }}</span>
+        }
+      </a>
+      <a routerLink="/admin/recipes" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📝</span>
+        @if (sidebarOpen()) {
+          <span class="nav-text">{{ 'NAV.MANAGE_RECIPES' | translate }}</span>
+        }
+      </a>
+      <a routerLink="/" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        @if (sidebarOpen()) {
+          <span class="nav-text">{{ 'COMMON.HOME' | translate }}</span>
+        }
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="nav-item" (click)="logout()" type="button">
+        <span class="nav-icon">🚪</span>
+        @if (sidebarOpen()) {
+          <span class="nav-text">{{ 'COMMON.LOGOUT' | translate }}</span>
+        }
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button class="btn-toggle-sidebar" (click)="toggleSidebar()" type="button">
+        <span class="toggle-icon">{{ sidebarOpen() ? '◀' : '▶' }}</span>
+      </button>
+
+      <div class="topbar-actions">
+        <!-- Language Switcher -->
+        <div class="dropdown" [class.open]="languageMenuOpen()">
+          <button class="btn-icon" (click)="toggleLanguageMenu()" type="button">
+            <!-- <span class="lang-flag">{{ translateService.currentLang() === 'bg' ? '🇧🇬' : '🇬🇧' }}</span> -->
+            <span class="lang-code">{{ translateService.currentLang().toUpperCase() }}</span>
+          </button>
+          @if (languageMenuOpen()) {
+            <div class="dropdown-menu">
+              <button class="dropdown-item" (click)="switchLanguage('bg')" type="button">
+                <span class="lang-flag">🇧🇬</span> Български
+              </button>
+              <button class="dropdown-item" (click)="switchLanguage('en')" type="button">
+                <span class="lang-flag">🇬🇧</span> English
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info">
+          <div class="user-avatar">
+            @if (authService.currentProfile()?.avatar_url) {
+              <img [src]="authService.currentProfile()?.avatar_url" alt="Avatar" />
+            } @else {
+              <span class="avatar-placeholder">{{ authService.currentProfile()?.display_name?.charAt(0) || 'A' }}</span>
+            }
+          </div>
+          <div class="user-details">
+            <div class="user-name">{{ authService.currentProfile()?.display_name || authService.currentUser()?.email }}</div>
+            <div class="user-role">{{ 'NAV.ADMIN' | translate }}</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content" [@routeFadeIn]>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

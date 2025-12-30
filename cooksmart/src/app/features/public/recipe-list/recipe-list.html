@@ -1,0 +1,127 @@
+<div class="recipe-list-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header" [@fadeIn]>
+      <h1 class="page-title">{{ 'RECIPE.ALL_RECIPES' | translate }}</h1>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section" [@fadeIn]>
+      <div class="filters-grid">
+        <!-- Search -->
+        <div class="filter-item filter-search">
+          <input 
+            type="text" 
+            class="search-input" 
+            [placeholder]="'COMMON.SEARCH' | translate"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchChange($event)"
+          />
+        </div>
+
+        <!-- Difficulty Filter -->
+        <div class="filter-item">
+          <select 
+            class="filter-select"
+            [ngModel]="selectedDifficulty()"
+            (ngModelChange)="onDifficultyChange($event)"
+          >
+            <option value="">{{ 'FILTERS.ALL' | translate }} - {{ 'FILTERS.DIFFICULTY' | translate }}</option>
+            <option value="Easy">{{ 'RECIPE.EASY' | translate }}</option>
+            <option value="Medium">{{ 'RECIPE.MEDIUM' | translate }}</option>
+            <option value="Hard">{{ 'RECIPE.HARD' | translate }}</option>
+          </select>
+        </div>
+
+        <!-- Prep Time Filter -->
+        <div class="filter-item">
+          <select 
+            class="filter-select"
+            [ngModel]="selectedPrepTime()"
+            (ngModelChange)="onPrepTimeChange($event)"
+          >
+            <option value="">{{ 'FILTERS.ALL' | translate }} - {{ 'FILTERS.PREP_TIME' | translate }}</option>
+            <option value="less_than_15">{{ 'FILTERS.LESS_THAN_15' | translate }}</option>
+            <option value="15_to_30">{{ 'FILTERS.15_TO_30' | translate }}</option>
+            <option value="30_to_60">{{ 'FILTERS.30_TO_60' | translate }}</option>
+            <option value="more_than_60">{{ 'FILTERS.MORE_THAN_60' | translate }}</option>
+          </select>
+        </div>
+
+        <!-- Clear Filters Button -->
+        @if (selectedDifficulty() || selectedPrepTime() || searchQuery()) {
+          <div class="filter-item">
+            <button class="btn btn-clear" (click)="clearFilters()" type="button">
+              {{ 'FILTERS.CLEAR_FILTERS' | translate }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Recipes Grid -->
+    <div class="recipes-content">
+      @if (error()) {
+        <div class="error-state">
+          <div class="error-icon">⚠️</div>
+          <h3>Connection Error</h3>
+          <p>{{ error() }}</p>
+          <button class="btn btn-primary" (click)="loadRecipes()" type="button">
+            Try Again
+          </button>
+        </div>
+      } @else if (loading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>{{ 'COMMON.LOADING' | translate }}</p>
+        </div>
+      } @else if (recipes().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>{{ 'PANTRY.NO_RECIPES_FOUND' | translate }}</h3>
+          <p>{{ 'FILTERS.CLEAR_FILTERS' | translate }}</p>
+          <button class="btn btn-primary" (click)="clearFilters()" type="button">
+            {{ 'FILTERS.CLEAR_FILTERS' | translate }}
+          </button>
+        </div>
+      } @else {
+        <div class="recipe-grid" [@staggerList]>
+          @for (recipe of recipes(); track recipe.id) {
+            <div class="recipe-card" [@fadeIn]>
+              <a [routerLink]="['/recipes', recipe.slug]" class="recipe-card-link">
+                <div class="recipe-image">
+                  @if (recipe.image_url) {
+                    <img [src]="recipe.image_url" [alt]="recipe.title" />
+                  } @else {
+                    <div class="recipe-image-placeholder">
+                      <span class="placeholder-icon">🍳</span>
+                    </div>
+                  }
+                  <div class="recipe-difficulty">
+                    <span class="difficulty-badge" [class]="'difficulty-' + recipe.difficulty.toLowerCase()">
+                      {{ 'RECIPE.' + recipe.difficulty.toUpperCase() | translate }}
+                    </span>
+                  </div>
+                </div>
+                <div class="recipe-content">
+                  <h3 class="recipe-title">{{ recipe.title }}</h3>
+                  <p class="recipe-description">{{ recipe.description }}</p>
+                  <div class="recipe-meta">
+                    <span class="meta-item">
+                      <span class="meta-icon">⏱️</span>
+                      {{ recipe.prep_time }} {{ 'RECIPE.MINUTES' | translate }}
+                    </span>
+                    <span class="meta-item">
+                      <span class="meta-icon">🍽️</span>
+                      {{ recipe.servings }} {{ 'RECIPE.SERVINGS' | translate }}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
