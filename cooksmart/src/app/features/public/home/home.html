@@ -47,15 +47,15 @@
   <!-- How It Works Section -->
   <section id="how-it-works" class="how-it-works" [@fadeIn]>
     <div class="container">
-      <h2 class="section-title">How It Works</h2>
-      <p class="section-subtitle">Get from meal planning stress to delicious dinners in just three simple steps</p>
+      <h2 class="section-title">{{ 'HOME.HOW_IT_WORKS_TITLE' | translate }}</h2>
+      <p class="section-subtitle">{{ 'HOME.HOW_IT_WORKS_SUBTITLE' | translate }}</p>
       
       <div class="steps-grid">
         <!-- Step 1 -->
         <div class="step-card" [@fadeIn]>
           <div class="step-badge">01</div>
           <div class="step-image">
-            <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=400&h=300&fit=crop" alt="Choose Your Menu" />
+            <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=400&h=300&fit=crop" [alt]="'HOME.STEP_1_TITLE' | translate" />
           </div>
           <div class="step-content">
             <div class="step-icon">
@@ -64,8 +64,8 @@
                 <path d="M9 9h6v6H9z"/>
               </svg>
             </div>
-            <h3 class="step-title">Choose Your Menu</h3>
-            <p class="step-description">Browse free weekly options or premium collections</p>
+            <h3 class="step-title">{{ 'HOME.STEP_1_TITLE' | translate }}</h3>
+            <p class="step-description">{{ 'HOME.STEP_1_DESC' | translate }}</p>
           </div>
         </div>
 
@@ -73,7 +73,7 @@
         <div class="step-card" [@fadeIn]>
           <div class="step-badge">02</div>
           <div class="step-image">
-            <img src="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=400&h=300&fit=crop" alt="Get Your Shopping List" />
+            <img src="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=400&h=300&fit=crop" [alt]="'HOME.STEP_2_TITLE' | translate" />
           </div>
           <div class="step-content">
             <div class="step-icon">
@@ -81,8 +81,8 @@
                 <path d="M9 2L7 6H3l4 4-1 7h12l-1-7 4-4h-4l-2-4z"/>
               </svg>
             </div>
-            <h3 class="step-title">Get Your Shopping List</h3>
-            <p class="step-description">Automated, organized grocery lists generated</p>
+            <h3 class="step-title">{{ 'HOME.STEP_2_TITLE' | translate }}</h3>
+            <p class="step-description">{{ 'HOME.STEP_2_DESC' | translate }}</p>
           </div>
         </div>
 
@@ -90,7 +90,7 @@
         <div class="step-card" [@fadeIn]>
           <div class="step-badge">03</div>
           <div class="step-image">
-            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=300&fit=crop" alt="Cook & Enjoy" />
+            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=300&fit=crop" [alt]="'HOME.STEP_3_TITLE' | translate" />
           </div>
           <div class="step-content">
             <div class="step-icon">
@@ -99,8 +99,8 @@
                 <path d="M12 6v6l4 2"/>
               </svg>
             </div>
-            <h3 class="step-title">Cook & Enjoy</h3>
-            <p class="step-description">Step-by-step recipes with cooking support</p>
+            <h3 class="step-title">{{ 'HOME.STEP_3_TITLE' | translate }}</h3>
+            <p class="step-description">{{ 'HOME.STEP_3_DESC' | translate }}</p>
           </div>
         </div>
       </div>

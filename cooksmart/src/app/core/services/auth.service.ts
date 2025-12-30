@@ -1,6 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from './supabase.service';
+import { SupabaseHttpService } from './supabase-http.service';
 import { Profile } from '../models';
 import { Session, User } from '@supabase/supabase-js';
 
@@ -16,7 +17,7 @@ export class AuthService {
   loading = signal<boolean>(true);
 
   private sessionCheckInterval: any;
-  private tabHiddenTime: number = 0;
+  private supabaseHttp = inject(SupabaseHttpService);
 
   constructor(
     private supabase: SupabaseService,
@@ -24,7 +25,6 @@ export class AuthService {
   ) {
     this.initializeAuth();
     this.startSessionMonitoring();
-    this.setupVisibilityListener();
   }
 
   /**
@@ -84,16 +84,18 @@ export class AuthService {
    */
   private async fetchUserProfile(userId: string): Promise<Profile | null> {
     try {
-      const { data, error } = await this.supabase.client
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      const params: Record<string, string> = {
+        'select': '*',
+        'id': `eq.${userId}`
+      };
+      
+      const { data, error } = await this.supabaseHttp.get<any[]>('profiles', params);
 
       if (error) throw error;
-      return data as Profile;
+
+      return data && data.length > 0 ? data[0] as Profile : null;
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('Error fetching user profile:', error);
       return null;
     }
   }
@@ -181,10 +183,11 @@ export class AuthService {
         return { success: false, error: 'No user logged in' };
       }
 
-      const { error } = await this.supabase.client
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
+      const params: Record<string, string> = {
+        'id': `eq.${user.id}`
+      };
+
+      const { error } = await this.supabaseHttp.patch('profiles', updates, params);
 
       if (error) throw error;
 
@@ -218,7 +221,7 @@ export class AuthService {
    * Start monitoring session and refresh when needed
    */
   private startSessionMonitoring(): void {
-    // Check session every 5 minutes
+    // Check session every 20 minutes
     this.sessionCheckInterval = setInterval(async () => {
       if (this.isAuthenticated()) {
         const session = await this.supabase.getSession();
@@ -227,49 +230,7 @@ export class AuthService {
           await this.signOut();
         }
       }
-    }, 5 * 60 * 1000); // 5 minutes
-  }
-
-  /**
-   * Setup visibility change listener to refresh session when tab becomes visible
-   * This prevents stale connections caused by browser throttling in background tabs
-   */
-  private setupVisibilityListener(): void {
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', async () => {
-        if (document.visibilityState === 'hidden') {
-          // Track when tab was hidden
-          this.tabHiddenTime = Date.now();
-        } else if (document.visibilityState === 'visible') {
-          // Calculate how long the tab was hidden
-          const hiddenDuration = Date.now() - this.tabHiddenTime;
-          const hiddenSeconds = hiddenDuration / 1000;
-          
-          console.log(`[AuthService] Tab became visible after ${hiddenSeconds.toFixed(1)}s`);
-          
-          // Only restore connection if tab was hidden for more than 30 seconds
-          if (hiddenSeconds > 30) {
-            console.log('[AuthService] Tab was hidden for >30s, restoring connection...');
-            
-            // Refresh session if authenticated
-            if (this.isAuthenticated()) {
-              try {
-                await this.supabase.refreshSession();
-                console.log('[AuthService] Session refreshed successfully');
-              } catch (error) {
-                console.error('[AuthService] Error refreshing session:', error);
-              }
-            }
-            
-            // Notify all components to reload their data
-            console.log('[AuthService] Notifying components to reload data...');
-            this.supabase.notifyConnectionRestored();
-          } else {
-            console.log('[AuthService] Tab was hidden for <30s, no reload needed');
-          }
-        }
-      });
-    }
+    }, 20 * 60 * 1000); // 20 minutes
   }
 
   /**
@@ -279,7 +240,5 @@ export class AuthService {
     if (this.sessionCheckInterval) {
       clearInterval(this.sessionCheckInterval);
     }
-    // Note: visibilitychange listener cleanup would require storing the handler reference
-    // For a root service, this is typically not needed as it lives for the app lifetime
   }
 }

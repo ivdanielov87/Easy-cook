@@ -198,6 +198,14 @@
     "FEATURE_1": "3 free menus weekly",
     "FEATURE_2": "Automated shopping lists",
     "FEATURE_3": "No credit card required",
-    "MENU_READY": "Menu for tonight ready!"
+    "MENU_READY": "Menu for tonight ready!",
+    "HOW_IT_WORKS_TITLE": "How It Works",
+    "HOW_IT_WORKS_SUBTITLE": "Get from meal planning stress to delicious dinners in just three simple steps",
+    "STEP_1_TITLE": "Choose Your Menu",
+    "STEP_1_DESC": "Browse free weekly options or premium collections",
+    "STEP_2_TITLE": "Get Your Shopping List",
+    "STEP_2_DESC": "Automated, organized grocery lists generated",
+    "STEP_3_TITLE": "Cook & Enjoy",
+    "STEP_3_DESC": "Step-by-step recipes with cooking support"
   }
 }

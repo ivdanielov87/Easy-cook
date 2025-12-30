@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -24,13 +24,14 @@ export function HttpLoaderFactory(http: HttpClient) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(),
+    // Note: provideAnimations() is deprecated in Angular 20.2+ but still fully supported.
+    // Will be replaced with animate.enter/animate.leave pattern in Angular 23.
     provideAnimations(),
     importProvidersFrom(
       TranslateModule.forRoot({
-        defaultLanguage: 'bg',
+        fallbackLang: 'bg',
         loader: {
           provide: TranslateLoader,
           useFactory: HttpLoaderFactory,

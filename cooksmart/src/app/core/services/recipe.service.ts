@@ -1,7 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { SupabaseHttpService } from './supabase-http.service';
 import { AuthService } from './auth.service';
-import { Recipe, RecipeWithIngredients, RecipeCreate, RecipeUpdate, RecipeFilters } from '../models';
+import { Recipe, RecipeWithIngredients, RecipeIngredient, RecipeFilters, RecipeCreate, RecipeUpdate, RecipeIngredientInput } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class RecipeService {
 
   constructor(
     private supabase: SupabaseService,
+    private supabaseHttp: SupabaseHttpService,
     private auth: AuthService
   ) {}
 
@@ -19,67 +21,53 @@ export class RecipeService {
    * Fetch all recipes with optional filters
    */
   async getRecipes(filters?: RecipeFilters): Promise<Recipe[]> {
-    console.log('[RecipeService] getRecipes() called with filters:', filters);
     try {
       this.loading.set(true);
-      console.log('[RecipeService] Loading set to true');
 
-      console.log('[RecipeService] Building query...');
-      let query = this.supabase.client
-        .from('recipes')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const params: Record<string, string> = {
+        'select': '*',
+        'order': 'created_at.desc'
+      };
 
       // Apply filters
       if (filters?.difficulty) {
-        query = query.eq('difficulty', filters.difficulty);
+        params['difficulty'] = `eq.${filters.difficulty}`;
       }
 
       if (filters?.prepTime) {
         switch (filters.prepTime) {
           case 'less_than_15':
-            query = query.lt('prep_time', 15);
+            params['prep_time'] = 'lt.15';
             break;
           case '15_to_30':
-            query = query.gte('prep_time', 15).lte('prep_time', 30);
+            params['prep_time'] = 'gte.15';
+            params['prep_time'] = 'lte.30';
             break;
           case '30_to_60':
-            query = query.gte('prep_time', 30).lte('prep_time', 60);
+            params['prep_time'] = 'gte.30';
+            params['prep_time'] = 'lte.60';
             break;
           case 'more_than_60':
-            query = query.gt('prep_time', 60);
+            params['prep_time'] = 'gt.60';
             break;
         }
       }
 
       if (filters?.search) {
-        query = query.ilike('title', `%${filters.search}%`);
+        params['title'] = `ilike.*${filters.search}*`;
       }
 
-      console.log('[RecipeService] Executing query...');
-      const { data, error } = await query;
+      const { data, error } = await this.supabaseHttp.get<Recipe[]>('recipes', params);
 
       if (error) {
-        console.error('[RecipeService] Query error:', error);
         throw error;
       }
 
-      console.log('[RecipeService] Data received, count:', data?.length || 0);
       this.recipes.set(data as Recipe[]);
       return data as Recipe[];
     } catch (error: any) {
-      console.error('[RecipeService] EXCEPTION in getRecipes:', error);
-      console.error('[RecipeService] Error message:', error.message);
-      console.error('[RecipeService] Error stack:', error.stack);
-      
-      // If timeout or connection error, show user-friendly message
-      if (error.message?.includes('timeout') || error.message?.includes('stale')) {
-        console.error('[RecipeService] Connection timeout - please refresh the page');
-      }
-      
       return [];
     } finally {
-      console.log('[RecipeService] Finally block - setting loading to false');
       this.loading.set(false);
     }
   }
@@ -131,7 +119,6 @@ export class RecipeService {
         ingredients: mappedIngredients
       } as RecipeWithIngredients;
     } catch (error) {
-      console.error('Error fetching recipe by ID:', error);
       return null;
     } finally {
       this.loading.set(false);
@@ -145,25 +132,43 @@ export class RecipeService {
     try {
       this.loading.set(true);
 
-      // Use the get_recipe_with_ingredients RPC function
-      const { data, error } = await this.supabase.client
-        .rpc('get_recipe_with_ingredients', { recipe_slug: slug });
+      // First get the recipe by slug
+      const recipeParams: Record<string, string> = {
+        'select': '*',
+        'slug': `eq.${slug}`
+      };
+      
+      const { data: recipeData, error: recipeError } = await this.supabaseHttp.get<Recipe[]>('recipes', recipeParams);
 
-      if (error) throw error;
+      if (recipeError) throw recipeError;
+      if (!recipeData || recipeData.length === 0) return null;
 
-      // The RPC function returns {recipe: {...}, ingredients: [...]}
-      // We need to combine them into the RecipeWithIngredients format
-      if (data && typeof data === 'object' && 'recipe' in data && 'ingredients' in data) {
-        const result = {
-          ...data.recipe,
-          ingredients: data.ingredients
-        };
-        return result as RecipeWithIngredients;
-      }
+      const recipe = recipeData[0];
 
-      return data as RecipeWithIngredients;
+      // Then get the recipe ingredients with ingredient details
+      const ingredientsParams: Record<string, string> = {
+        'select': 'quantity,unit,ingredient_id,ingredients(id,name_bg,name_en)',
+        'recipe_id': `eq.${recipe.id}`
+      };
+      
+      const { data: ingredientsData, error: ingredientsError } = await this.supabaseHttp.get<any[]>('recipe_ingredients', ingredientsParams);
+
+      if (ingredientsError) throw ingredientsError;
+
+      // Map ingredients to the expected format
+      const mappedIngredients = (ingredientsData || []).map((ing: any) => ({
+        id: ing.ingredients?.id || ing.ingredient_id,
+        name_bg: ing.ingredients?.name_bg || '',
+        name_en: ing.ingredients?.name_en || '',
+        quantity: ing.quantity,
+        unit: ing.unit
+      }));
+
+      return {
+        ...recipe,
+        ingredients: mappedIngredients
+      } as RecipeWithIngredients;
     } catch (error) {
-      console.error('Error fetching recipe by slug:', error);
       return null;
     } finally {
       this.loading.set(false);
@@ -174,28 +179,7 @@ export class RecipeService {
    * Get recipe by slug
    */
   async getRecipeBySlug(slug: string): Promise<RecipeWithIngredients | null> {
-    try {
-      this.loading.set(true);
-
-      const { data, error } = await this.supabase.client
-        .from('recipes')
-        .select('*')
-        .eq('slug', slug)
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        return await this.getRecipeBySlugWithIngredients(data.slug);
-      }
-
-      return null;
-    } catch (error) {
-      console.error('Error fetching recipe by slug:', error);
-      return null;
-    } finally {
-      this.loading.set(false);
-    }
+    return await this.getRecipeBySlugWithIngredients(slug);
   }
 
   /**
@@ -203,15 +187,12 @@ export class RecipeService {
    */
   async createRecipe(recipe: RecipeCreate): Promise<{ success: boolean; data?: Recipe; error?: string }> {
     try {
-      console.log('[RecipeService] Starting recipe creation...');
-      console.log('[RecipeService] Recipe data:', recipe);
       this.loading.set(true);
 
       // Get Supabase credentials and user session
       const supabaseUrl = (this.supabase.client as any).supabaseUrl;
       const supabaseKey = (this.supabase.client as any).supabaseKey;
       
-      console.log('[RecipeService] Getting user ID from AuthService...');
       const currentUser = this.auth.currentUser();
       
       if (!currentUser?.id) {
@@ -219,25 +200,17 @@ export class RecipeService {
       }
       
       const userId = currentUser.id;
-      console.log('[RecipeService] User ID:', userId);
       
-      // Get access token with timeout
+      // Get access token
       let accessToken = supabaseKey;
       try {
-        const sessionPromise = this.supabase.client.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session timeout')), 2000)
-        );
-        
-        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        const { data: { session } } = await this.supabase.client.auth.getSession();
         accessToken = session?.access_token || supabaseKey;
-        console.log('[RecipeService] Got access token');
       } catch (err) {
-        console.warn('[RecipeService] Session fetch timed out, using API key');
+        // Use API key as fallback
       }
 
       // Insert recipe using direct HTTP POST
-      console.log('[RecipeService] Inserting recipe via HTTP POST...');
       const recipeResponse = await fetch(`${supabaseUrl}/rest/v1/recipes`, {
         method: 'POST',
         headers: {
@@ -259,32 +232,23 @@ export class RecipeService {
         })
       });
 
-      console.log('[RecipeService] Recipe HTTP response status:', recipeResponse.status);
-
       if (!recipeResponse.ok) {
         const errorText = await recipeResponse.text();
-        console.error('[RecipeService] Recipe HTTP error:', errorText);
         throw new Error(`HTTP ${recipeResponse.status}: ${errorText}`);
       }
 
       const recipeDataArray = await recipeResponse.json();
       const recipeData = Array.isArray(recipeDataArray) ? recipeDataArray[0] : recipeDataArray;
-      
-      console.log('[RecipeService] Recipe created successfully with ID:', recipeData.id);
 
       // Insert recipe ingredients
       if (recipe.ingredients && recipe.ingredients.length > 0) {
-        console.log('[RecipeService] Inserting', recipe.ingredients.length, 'ingredients...');
-        const ingredientsToInsert = recipe.ingredients.map(ing => ({
+        const ingredientsToInsert = recipe.ingredients.map((ing: RecipeIngredientInput) => ({
           recipe_id: recipeData.id,
           ingredient_id: ing.ingredient_id,
           quantity: ing.quantity,
           unit: ing.unit
         }));
 
-        console.log('[RecipeService] Ingredients to insert:', ingredientsToInsert);
-
-        // Insert recipe_ingredients using direct HTTP POST
         const ingredientsResponse = await fetch(`${supabaseUrl}/rest/v1/recipe_ingredients`, {
           method: 'POST',
           headers: {
@@ -296,24 +260,16 @@ export class RecipeService {
           body: JSON.stringify(ingredientsToInsert)
         });
 
-        console.log('[RecipeService] Ingredients HTTP response status:', ingredientsResponse.status);
-
         if (!ingredientsResponse.ok) {
           const errorText = await ingredientsResponse.text();
-          console.error('[RecipeService] Ingredients HTTP error:', errorText);
           throw new Error(`HTTP ${ingredientsResponse.status}: ${errorText}`);
         }
-
-        console.log('[RecipeService] All ingredients inserted successfully');
       }
 
-      console.log('[RecipeService] Recipe creation complete!');
       return { success: true, data: recipeData as Recipe };
     } catch (error: any) {
-      console.error('[RecipeService] Exception during recipe creation:', error);
       return { success: false, error: error.message };
     } finally {
-      console.log('[RecipeService] Setting loading to false');
       this.loading.set(false);
     }
   }
@@ -323,32 +279,22 @@ export class RecipeService {
    */
   async updateRecipe(id: string, updates: RecipeUpdate): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log('[RecipeService] Starting recipe update...');
-      console.log('[RecipeService] Recipe ID:', id);
-      console.log('[RecipeService] Update data:', updates);
       this.loading.set(true);
 
       // Get Supabase credentials
       const supabaseUrl = (this.supabase.client as any).supabaseUrl;
       const supabaseKey = (this.supabase.client as any).supabaseKey;
       
-      // Get access token with timeout
+      // Get access token
       let accessToken = supabaseKey;
       try {
-        const sessionPromise = this.supabase.client.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session timeout')), 2000)
-        );
-        
-        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        const { data: { session } } = await this.supabase.client.auth.getSession();
         accessToken = session?.access_token || supabaseKey;
-        console.log('[RecipeService] Got access token');
       } catch (err) {
-        console.warn('[RecipeService] Session fetch timed out, using API key');
+        // Use API key as fallback
       }
 
       // Update recipe using direct HTTP PATCH
-      console.log('[RecipeService] Updating recipe via HTTP PATCH...');
       const recipeResponse = await fetch(`${supabaseUrl}/rest/v1/recipes?id=eq.${id}`, {
         method: 'PATCH',
         headers: {
@@ -368,18 +314,13 @@ export class RecipeService {
         })
       });
 
-      console.log('[RecipeService] Recipe update HTTP response status:', recipeResponse.status);
-
       if (!recipeResponse.ok) {
         const errorText = await recipeResponse.text();
-        console.error('[RecipeService] Recipe update HTTP error:', errorText);
         throw new Error(`HTTP ${recipeResponse.status}: ${errorText}`);
       }
 
       // If ingredients are provided, update them
       if (updates.ingredients) {
-        console.log('[RecipeService] Updating ingredients...');
-        
         // Delete existing ingredients
         const deleteResponse = await fetch(`${supabaseUrl}/rest/v1/recipe_ingredients?recipe_id=eq.${id}`, {
           method: 'DELETE',
@@ -391,13 +332,12 @@ export class RecipeService {
 
         if (!deleteResponse.ok) {
           const errorText = await deleteResponse.text();
-          console.error('[RecipeService] Delete ingredients HTTP error:', errorText);
           throw new Error(`Failed to delete ingredients: ${errorText}`);
         }
 
         // Insert new ingredients
         if (updates.ingredients.length > 0) {
-          const ingredientsToInsert = updates.ingredients.map(ing => ({
+          const ingredientsToInsert = updates.ingredients.map((ing: RecipeIngredientInput) => ({
             recipe_id: id,
             ingredient_id: ing.ingredient_id,
             quantity: ing.quantity,
@@ -417,16 +357,13 @@ export class RecipeService {
 
           if (!insertResponse.ok) {
             const errorText = await insertResponse.text();
-            console.error('[RecipeService] Insert ingredients HTTP error:', errorText);
             throw new Error(`Failed to insert ingredients: ${errorText}`);
           }
         }
       }
 
-      console.log('[RecipeService] Recipe updated successfully');
       return { success: true };
     } catch (error: any) {
-      console.error('[RecipeService] Error updating recipe:', error);
       return { success: false, error: error.message };
     } finally {
       this.loading.set(false);
@@ -488,12 +425,10 @@ export class RecipeService {
         throw new Error('User not authenticated');
       }
 
-      const { error } = await this.supabase.client
-        .from('saved_recipes')
-        .insert({ 
-          recipe_id: recipeId,
-          user_id: currentUser.id
-        });
+      const { error } = await this.supabaseHttp.post('saved_recipes', { 
+        recipe_id: recipeId,
+        user_id: currentUser.id
+      });
 
       if (error) throw error;
 
@@ -515,11 +450,12 @@ export class RecipeService {
         throw new Error('User not authenticated');
       }
 
-      const { error } = await this.supabase.client
-        .from('saved_recipes')
-        .delete()
-        .eq('recipe_id', recipeId)
-        .eq('user_id', currentUser.id);
+      const params: Record<string, string> = {
+        'recipe_id': `eq.${recipeId}`,
+        'user_id': `eq.${currentUser.id}`
+      };
+
+      const { error } = await this.supabaseHttp.delete('saved_recipes', params);
 
       if (error) throw error;
 
@@ -537,14 +473,16 @@ export class RecipeService {
     try {
       this.loading.set(true);
 
-      const { data, error } = await this.supabase.client
-        .from('saved_recipes')
-        .select('recipe_id, recipes(*)')
-        .order('saved_at', { ascending: false });
+      const params: Record<string, string> = {
+        'select': 'recipe_id,recipes(*)',
+        'order': 'saved_at.desc'
+      };
+
+      const { data, error } = await this.supabaseHttp.get<any[]>('saved_recipes', params);
 
       if (error) throw error;
 
-      return data.map((item: any) => item.recipes) as Recipe[];
+      return data ? data.map((item: any) => item.recipes) as Recipe[] : [];
     } catch (error) {
       console.error('Error fetching saved recipes:', error);
       return [];
@@ -564,19 +502,20 @@ export class RecipeService {
         return false;
       }
 
-      const { data, error } = await this.supabase.client
-        .from('saved_recipes')
-        .select('id')
-        .eq('user_id', currentUser.id)
-        .eq('recipe_id', recipeId)
-        .single();
+      const params: Record<string, string> = {
+        'select': 'id',
+        'user_id': `eq.${currentUser.id}`,
+        'recipe_id': `eq.${recipeId}`
+      };
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      const { data, error } = await this.supabaseHttp.get<any[]>('saved_recipes', params);
+
+      if (error) {
         console.error('Error checking if recipe is saved:', error);
         return false;
       }
 
-      return !!data;
+      return !!(data && data.length > 0);
     } catch (error) {
       console.error('Error checking if recipe is saved:', error);
       return false;
