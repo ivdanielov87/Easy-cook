@@ -29,30 +29,37 @@
           />
         </div>
 
-        <!-- Ingredients Grid -->
+        <!-- Ingredients Grid by Category -->
         @if (loadingIngredients()) {
           <div class="loading-state">
             <div class="spinner"></div>
             <p>{{ 'COMMON.LOADING' | translate }}</p>
           </div>
         } @else {
-          <div class="ingredients-grid">
-            @for (ingredient of filteredIngredients; track ingredient.id) {
-              <button 
-                class="ingredient-chip"
-                [class.selected]="isSelected(ingredient.id)"
-                (click)="toggleIngredient(ingredient.id)"
-                type="button"
-              >
-                <span class="chip-icon">{{ isSelected(ingredient.id) ? '✓' : '+' }}</span>
-                <span class="chip-name">{{ getIngredientName(ingredient) }}</span>
-              </button>
-            }
-          </div>
-
           @if (filteredIngredients.length === 0) {
             <div class="empty-state">
               <p>{{ 'PANTRY.NO_INGREDIENTS_FOUND' | translate }}</p>
+            </div>
+          } @else {
+            <div class="ingredients-by-category">
+              @for (category of getCategoryKeys(); track category) {
+                <div class="category-section">
+                  <h3 class="category-title">{{ getCategoryName(category) }}</h3>
+                  <div class="ingredients-grid">
+                    @for (ingredient of ingredientsByCategory.get(category); track ingredient.id) {
+                      <button 
+                        class="ingredient-chip"
+                        [class.selected]="isSelected(ingredient.id)"
+                        (click)="toggleIngredient(ingredient.id)"
+                        type="button"
+                      >
+                        <span class="chip-icon">{{ isSelected(ingredient.id) ? '✓' : '+' }}</span>
+                        <span class="chip-name">{{ getIngredientName(ingredient) }}</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
             </div>
           }
         }

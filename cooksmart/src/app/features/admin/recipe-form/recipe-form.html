@@ -153,6 +153,19 @@
                 />
               </div>
             </div>
+            <div class="form-group ingridient-category">
+              <label class="form-label">{{ 'ADMIN.INGREDIENT_CATEGORY' | translate }} *</label>
+              <select
+                class="form-input"
+                [value]="newIngredientCategory()"
+                (change)="newIngredientCategory.set($any($event.target).value)"
+              >
+                <option value="">{{ 'ADMIN.SELECT_CATEGORY' | translate }}</option>
+                @for (category of getIngredientCategories(); track category) {
+                  <option [value]="category">{{ getCategoryLabel(category) }}</option>
+                }
+              </select>
+            </div>
             
             @if (ingredientError()) {
               <div class="ingredient-error-message">

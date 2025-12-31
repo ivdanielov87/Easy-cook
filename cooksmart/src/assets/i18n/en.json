@@ -119,7 +119,9 @@
     "CREATE_NEW_INGREDIENT": "Create New Ingredient",
     "INGREDIENT_NAME_BG": "Bulgarian Name",
     "INGREDIENT_NAME_EN": "English Name",
-    "INGREDIENT_REQUIRED_FIELDS": "Both Bulgarian and English names are required",
+    "INGREDIENT_CATEGORY": "Category",
+    "SELECT_CATEGORY": "Select a category",
+    "INGREDIENT_REQUIRED_FIELDS": "All fields are required (Bulgarian name, English name, and category)",
     "INGREDIENT_ALREADY_EXISTS": "Ingredient already exists: {{name}}",
     "INGREDIENT_CREATED_SUCCESS": "Ingredient created successfully: {{name}}"
   },

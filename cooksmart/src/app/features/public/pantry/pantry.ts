@@ -2,10 +2,10 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IngredientService } from '../../../core/services/ingredient.service';
 import { RecipeService } from '../../../core/services/recipe.service';
-import { Ingredient, Recipe } from '../../../core/models';
+import { Ingredient, Recipe, IngredientCategory, INGREDIENT_CATEGORY_LABELS } from '../../../core/models';
 import { fadeIn, staggerList } from '../../../shared/animations';
 
 @Component({
@@ -28,7 +28,8 @@ export class Pantry implements OnInit {
 
   constructor(
     private ingredientService: IngredientService,
-    private recipeService: RecipeService
+    private recipeService: RecipeService,
+    private translateService: TranslateService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -51,6 +52,29 @@ export class Pantry implements OnInit {
       ing.name_bg.toLowerCase().includes(query) ||
       ing.name_en.toLowerCase().includes(query)
     );
+  }
+
+  get ingredientsByCategory(): Map<IngredientCategory, Ingredient[]> {
+    const filtered = this.filteredIngredients;
+    const grouped = new Map<IngredientCategory, Ingredient[]>();
+    
+    filtered.forEach(ingredient => {
+      const category = ingredient.category || IngredientCategory.OTHER;
+      if (!grouped.has(category)) {
+        grouped.set(category, []);
+      }
+      grouped.get(category)!.push(ingredient);
+    });
+    
+    // Sort categories by order in enum
+    const sortedMap = new Map<IngredientCategory, Ingredient[]>();
+    Object.values(IngredientCategory).forEach(category => {
+      if (grouped.has(category)) {
+        sortedMap.set(category, grouped.get(category)!);
+      }
+    });
+    
+    return sortedMap;
   }
 
   toggleIngredient(ingredientId: string): void {
@@ -94,5 +118,14 @@ export class Pantry implements OnInit {
 
   getIngredientName(ingredient: Ingredient): string {
     return this.ingredientService.getIngredientName(ingredient);
+  }
+
+  getCategoryName(category: IngredientCategory): string {
+    const currentLang = this.translateService.currentLang || 'en';
+    return INGREDIENT_CATEGORY_LABELS[category][currentLang as 'en' | 'bg'];
+  }
+
+  getCategoryKeys(): IngredientCategory[] {
+    return Array.from(this.ingredientsByCategory.keys());
   }
 }

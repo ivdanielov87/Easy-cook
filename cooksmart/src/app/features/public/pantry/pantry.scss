@@ -99,11 +99,28 @@
       }
     }
     
+    .ingredients-by-category {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xl;
+      margin-bottom: $spacing-lg;
+      
+      .category-section {
+        .category-title {
+          font-size: 1.125rem;
+          font-weight: $font-weight-semibold;
+          color: $text-primary;
+          margin-bottom: $spacing-md;
+          padding-bottom: $spacing-xs;
+          border-bottom: 2px solid $border-color;
+        }
+      }
+    }
+    
     .ingredients-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: $spacing-sm;
-      margin-bottom: $spacing-lg;
       
       @include tablet {
         grid-template-columns: repeat(3, 1fr);

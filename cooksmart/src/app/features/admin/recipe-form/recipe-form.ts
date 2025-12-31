@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { IngredientService } from '../../../core/services/ingredient.service';
-import { Recipe, Ingredient, RecipeIngredient } from '../../../core/models';
+import { Recipe, Ingredient, RecipeIngredient, IngredientCategory, INGREDIENT_CATEGORY_LABELS } from '../../../core/models';
 import { fadeIn } from '../../../shared/animations';
 
 @Component({
@@ -39,6 +39,7 @@ export class RecipeForm implements OnInit {
   showNewIngredientForm = signal<boolean>(false);
   newIngredientNameBg = signal<string>('');
   newIngredientNameEn = signal<string>('');
+  newIngredientCategory = signal<string>('');
   creatingIngredient = signal<boolean>(false);
   ingredientError = signal<string>('');
   ingredientSuccess = signal<string>('');
@@ -310,12 +311,13 @@ export class RecipeForm implements OnInit {
 
     const nameBg = this.newIngredientNameBg().trim();
     const nameEn = this.newIngredientNameEn().trim();
+    const category = this.newIngredientCategory().trim();
     
     console.log('=== Starting ingredient creation ===');
-    console.log('Creating ingredient:', { nameBg, nameEn });
+    console.log('Creating ingredient:', { nameBg, nameEn, category });
     console.log('Current creatingIngredient state:', this.creatingIngredient());
     
-    if (!nameBg || !nameEn) {
+    if (!nameBg || !nameEn || !category) {
       this.ingredientError.set(this.translate.instant('ADMIN.INGREDIENT_REQUIRED_FIELDS'));
       return;
     }
@@ -341,7 +343,8 @@ export class RecipeForm implements OnInit {
       console.log('Calling ingredientService.createIngredient...');
       const result = await this.ingredientService.createIngredient({
         name_bg: nameBg,
-        name_en: nameEn
+        name_en: nameEn,
+        category: category as IngredientCategory
       });
 
       console.log('Create ingredient result:', result);
@@ -361,6 +364,7 @@ export class RecipeForm implements OnInit {
         setTimeout(() => {
           this.newIngredientNameBg.set('');
           this.newIngredientNameEn.set('');
+          this.newIngredientCategory.set('');
           this.showNewIngredientForm.set(false);
           this.ingredientError.set('');
           this.ingredientSuccess.set('');
@@ -397,10 +401,20 @@ export class RecipeForm implements OnInit {
     // Always reset form state when toggling
     this.newIngredientNameBg.set('');
     this.newIngredientNameEn.set('');
+    this.newIngredientCategory.set('');
     this.creatingIngredient.set(false);
     this.ingredientError.set('');
     this.error.set('');
     
     this.showNewIngredientForm.set(willShow);
+  }
+
+  getIngredientCategories(): IngredientCategory[] {
+    return Object.values(IngredientCategory);
+  }
+
+  getCategoryLabel(category: IngredientCategory): string {
+    const currentLang = this.translate.currentLang || 'en';
+    return INGREDIENT_CATEGORY_LABELS[category][currentLang as 'en' | 'bg'];
   }
 }
