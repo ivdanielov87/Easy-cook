@@ -376,7 +376,7 @@
         
         .ingredient-content {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: $spacing-md;
           flex: 1;
           cursor: pointer;

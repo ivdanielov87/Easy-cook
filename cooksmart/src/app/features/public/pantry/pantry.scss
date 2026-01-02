@@ -3,67 +3,67 @@
 
 .pantry-page {
   padding: $spacing-xl 0;
-  
+
   // Page Header
   .page-header {
     text-align: center;
     margin-bottom: $spacing-2xl;
-    
+
     .page-title {
       font-size: 2rem;
       font-weight: $font-weight-bold;
       color: $text-primary;
       margin-bottom: $spacing-sm;
-      
+
       @include tablet {
         font-size: 2.5rem;
       }
     }
-    
+
     .page-subtitle {
       font-size: 1.125rem;
       color: $text-secondary;
-      
+
       @include tablet {
         font-size: 1.25rem;
       }
     }
   }
-  
+
   // Pantry Content
   .pantry-content {
     display: flex;
     flex-direction: column;
     gap: $spacing-2xl;
   }
-  
+
   // Selection Section
   .selection-section {
     background: $surface;
     padding: $spacing-lg;
     border-radius: $border-radius;
     box-shadow: $shadow-sm;
-    
+
     @include tablet {
       padding: $spacing-xl;
     }
-    
+
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: $spacing-lg;
-      
+
       .section-title {
         font-size: 1.5rem;
         font-weight: $font-weight-bold;
         color: $text-primary;
-        
+
         @include tablet {
           font-size: 1.75rem;
         }
       }
-      
+
       .selected-count {
         padding: $spacing-xs $spacing-md;
         background: $primary-color;
@@ -73,10 +73,10 @@
         font-size: 0.875rem;
       }
     }
-    
+
     .search-bar {
       margin-bottom: $spacing-lg;
-      
+
       .search-input {
         width: 100%;
         padding: $spacing-sm $spacing-md;
@@ -86,25 +86,25 @@
         color: $text-primary;
         background: $surface;
         transition: all $transition-fast;
-        
+
         &:focus {
           outline: none;
           border-color: $primary-color;
           box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
         }
-        
+
         &::placeholder {
           color: $text-muted;
         }
       }
     }
-    
+
     .ingredients-by-category {
       display: flex;
       flex-direction: column;
       gap: $spacing-xl;
       margin-bottom: $spacing-lg;
-      
+
       .category-section {
         .category-title {
           font-size: 1.125rem;
@@ -116,20 +116,20 @@
         }
       }
     }
-    
+
     .ingredients-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: $spacing-sm;
-      
+
       @include tablet {
         grid-template-columns: repeat(3, 1fr);
       }
-      
+
       @include desktop {
         grid-template-columns: repeat(4, 1fr);
       }
-      
+
       .ingredient-chip {
         display: flex;
         align-items: center;
@@ -143,7 +143,7 @@
         cursor: pointer;
         transition: all $transition-fast;
         text-align: left;
-        
+
         .chip-icon {
           flex-shrink: 0;
           width: 20px;
@@ -156,26 +156,30 @@
           font-size: 0.875rem;
           transition: all $transition-fast;
         }
-        
+
         .chip-name {
           flex: 1;
           overflow: hidden;
           text-overflow: ellipsis;
-          white-space: nowrap;
+          white-space: normal;
+
+          @include desktop {
+            white-space: nowrap;
+          }
         }
-        
+
         &:hover {
           border-color: $primary-color;
           background: white;
           transform: translateY(-2px);
           box-shadow: $shadow-sm;
         }
-        
+
         &.selected {
           background: $primary-color;
           border-color: $primary-color;
           color: white;
-          
+
           .chip-icon {
             background: white;
             color: $primary-color;
@@ -183,19 +187,19 @@
         }
       }
     }
-    
+
     .action-buttons {
       display: flex;
       flex-direction: column;
       gap: $spacing-sm;
-      
+
       @include tablet {
         flex-direction: row;
         justify-content: center;
       }
     }
   }
-  
+
   // Results Section
   .results-section {
     .section-title {
@@ -203,66 +207,66 @@
       font-weight: $font-weight-bold;
       color: $text-primary;
       margin-bottom: $spacing-md;
-      
+
       @include tablet {
         font-size: 1.75rem;
       }
     }
-    
+
     .results-info {
       margin-bottom: $spacing-lg;
       padding: $spacing-md;
       background: $background-gray;
       border-radius: $border-radius-sm;
       text-align: center;
-      
+
       p {
         color: $text-secondary;
         font-weight: $font-weight-medium;
       }
     }
   }
-  
+
   // Recipe Grid (reuse from other pages)
   .recipe-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: $spacing-lg;
-    
+
     @include tablet {
       grid-template-columns: repeat(2, 1fr);
     }
-    
+
     @include desktop {
       grid-template-columns: repeat(3, 1fr);
     }
   }
-  
+
   .recipe-card {
     background: $surface;
     border-radius: $border-radius;
     box-shadow: $shadow-sm;
     overflow: hidden;
     transition: all $transition-base;
-    
+
     &:hover {
       box-shadow: $shadow-lg;
       transform: translateY(-4px);
     }
-    
+
     .recipe-card-link {
       display: block;
       text-decoration: none;
       color: inherit;
     }
-    
+
     .recipe-image {
       position: relative;
       width: 100%;
       padding-top: 66.67%;
       overflow: hidden;
       background: $background-gray;
-      
+
       img {
         position: absolute;
         top: 0;
@@ -271,7 +275,7 @@
         height: 100%;
         object-fit: cover;
       }
-      
+
       .recipe-image-placeholder {
         position: absolute;
         top: 0;
@@ -282,18 +286,18 @@
         align-items: center;
         justify-content: center;
         background: linear-gradient(135deg, $background-gray 0%, $border-color 100%);
-        
+
         .placeholder-icon {
           font-size: 4rem;
           opacity: 0.5;
         }
       }
-      
+
       .recipe-difficulty {
         position: absolute;
         top: $spacing-sm;
         right: $spacing-sm;
-        
+
         .difficulty-badge {
           display: inline-block;
           padding: $spacing-xs $spacing-sm;
@@ -302,17 +306,17 @@
           font-weight: $font-weight-semibold;
           text-transform: uppercase;
           backdrop-filter: blur(8px);
-          
+
           &.difficulty-easy {
             background: rgba($secondary-color, 0.9);
             color: white;
           }
-          
+
           &.difficulty-medium {
             background: rgba($accent-color, 0.9);
             color: white;
           }
-          
+
           &.difficulty-hard {
             background: rgba(#ef4444, 0.9);
             color: white;
@@ -320,10 +324,10 @@
         }
       }
     }
-    
+
     .recipe-content {
       padding: $spacing-md;
-      
+
       .recipe-title {
         font-size: 1.25rem;
         font-weight: $font-weight-semibold;
@@ -331,7 +335,7 @@
         margin-bottom: $spacing-xs;
         line-height: 1.4;
       }
-      
+
       .recipe-description {
         font-size: 0.875rem;
         color: $text-secondary;
@@ -342,18 +346,18 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
-      
+
       .recipe-meta {
         display: flex;
         gap: $spacing-md;
         font-size: 0.875rem;
         color: $text-secondary;
-        
+
         .meta-item {
           display: flex;
           align-items: center;
           gap: $spacing-xs;
-          
+
           .meta-icon {
             font-size: 1rem;
           }
@@ -361,12 +365,12 @@
       }
     }
   }
-  
+
   // Loading State
   .loading-state {
     text-align: center;
     padding: $spacing-2xl 0;
-    
+
     .spinner {
       width: 48px;
       height: 48px;
@@ -376,37 +380,37 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-    
+
     p {
       color: $text-secondary;
       font-size: 1rem;
     }
   }
-  
+
   @keyframes spin {
     to {
       transform: rotate(360deg);
     }
   }
-  
+
   // Empty State
   .empty-state {
     text-align: center;
     padding: $spacing-2xl 0;
-    
+
     .empty-icon {
       font-size: 4rem;
       margin-bottom: $spacing-md;
       opacity: 0.5;
     }
-    
+
     h3 {
       font-size: 1.5rem;
       font-weight: $font-weight-semibold;
       color: $text-primary;
       margin-bottom: $spacing-sm;
     }
-    
+
     p {
       color: $text-secondary;
       font-size: 1rem;
@@ -425,34 +429,34 @@
   transition: all $transition-fast;
   border: 2px solid transparent;
   cursor: pointer;
-  
+
   &.btn-lg {
     padding: $spacing-md $spacing-xl;
     font-size: 1.125rem;
   }
-  
+
   &.btn-primary {
     background: $primary-color;
     color: white;
-    
+
     &:hover:not(:disabled) {
       background: $primary-dark;
       transform: translateY(-2px);
       box-shadow: $shadow-md;
     }
-    
+
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
     }
   }
-  
+
   &.btn-outline {
     background: transparent;
     color: $primary-color;
     border-color: $primary-color;
-    
+
     &:hover {
       background: $primary-color;
       color: white;
@@ -460,7 +464,7 @@
       box-shadow: $shadow-md;
     }
   }
-  
+
   .btn-spinner {
     display: inline-block;
     width: 16px;
