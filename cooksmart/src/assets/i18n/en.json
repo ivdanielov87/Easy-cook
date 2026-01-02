@@ -55,6 +55,7 @@
     "INGREDIENT_NAME": "Ingredient Name",
     "QUANTITY": "Quantity",
     "UNIT": "Unit",
+    "SELECT_UNIT": "Select unit",
     "STEP_DESCRIPTION": "Step Description",
     "FEATURED_RECIPES": "Featured Recipes",
     "ALL_RECIPES": "All Recipes",

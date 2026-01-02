@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { IngredientService } from '../../../core/services/ingredient.service';
-import { Recipe, Ingredient, RecipeIngredient, IngredientCategory, INGREDIENT_CATEGORY_LABELS } from '../../../core/models';
+import { Recipe, Ingredient, RecipeIngredient, IngredientCategory, INGREDIENT_CATEGORY_LABELS, IngredientUnit, INGREDIENT_UNIT_LABELS } from '../../../core/models';
 import { fadeIn } from '../../../shared/animations';
 
 @Component({
@@ -416,5 +416,14 @@ export class RecipeForm implements OnInit {
   getCategoryLabel(category: IngredientCategory): string {
     const currentLang = this.translate.currentLang || 'en';
     return INGREDIENT_CATEGORY_LABELS[category][currentLang as 'en' | 'bg'];
+  }
+
+  getIngredientUnits(): IngredientUnit[] {
+    return Object.values(IngredientUnit);
+  }
+
+  getUnitLabel(unit: IngredientUnit): string {
+    const currentLang = this.translate.currentLang || 'en';
+    return INGREDIENT_UNIT_LABELS[unit][currentLang as 'en' | 'bg'];
   }
 }

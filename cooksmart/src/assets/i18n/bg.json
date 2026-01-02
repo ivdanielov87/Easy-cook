@@ -55,6 +55,7 @@
     "INGREDIENT_NAME": "Име на съставка",
     "QUANTITY": "Количество",
     "UNIT": "Мерна единица",
+    "SELECT_UNIT": "Изберете мерна единица",
     "STEP_DESCRIPTION": "Описание на стъпка",
     "FEATURED_RECIPES": "Препоръчани рецепти",
     "ALL_RECIPES": "Всички рецепти",

@@ -98,7 +98,7 @@
                   />
                   <label [for]="'ingredient-' + i" class="ingredient-content">
                     <span class="ingredient-name">{{ getIngredientName(ingredient) }}</span>
-                    <span class="ingredient-quantity">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
+                    <span class="ingredient-quantity">{{ ingredient.quantity }} {{ getUnitLabel(ingredient.unit) }}</span>
                   </label>
                 </li>
               }

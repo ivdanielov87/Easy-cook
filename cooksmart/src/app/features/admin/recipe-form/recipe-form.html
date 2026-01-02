@@ -221,13 +221,16 @@
                   (input)="updateIngredientQuantity(ingredient.ingredient_id, $any($event.target).value)"
                   [placeholder]="'RECIPE.QUANTITY' | translate"
                 />
-                <input
-                  type="text"
+                <select
                   class="form-input-small"
                   [value]="ingredient.unit"
-                  (input)="updateIngredientUnit(ingredient.ingredient_id, $any($event.target).value)"
-                  [placeholder]="'RECIPE.UNIT' | translate"
-                />
+                  (change)="updateIngredientUnit(ingredient.ingredient_id, $any($event.target).value)"
+                >
+                  <option value="">{{ 'RECIPE.SELECT_UNIT' | translate }}</option>
+                  @for (unit of getIngredientUnits(); track unit) {
+                    <option [value]="unit">{{ getUnitLabel(unit) }}</option>
+                  }
+                </select>
                 <button
                   type="button"
                   class="btn-icon btn-danger"

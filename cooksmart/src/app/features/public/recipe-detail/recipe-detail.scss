@@ -361,7 +361,7 @@
       
       .ingredient-item {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: $spacing-md;
         padding: $spacing-sm 0;
         
@@ -371,6 +371,7 @@
           height: 20px;
           cursor: pointer;
           accent-color: $primary-color;
+          margin-top: 4px;
         }
         
         .ingredient-content {
@@ -389,6 +390,7 @@
           .ingredient-quantity {
             color: $primary-color;
             min-width: 80px;
+            text-align: end;
           }
         }
       }

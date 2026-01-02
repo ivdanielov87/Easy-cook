@@ -6,7 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslateService } from '../../../core/services/translate.service';
-import { RecipeWithIngredients, RecipeIngredientDetail } from '../../../core/models';
+import { RecipeWithIngredients, RecipeIngredientDetail, IngredientUnit, INGREDIENT_UNIT_LABELS } from '../../../core/models';
 import { fadeIn } from '../../../shared/animations';
 
 @Component({
@@ -98,5 +98,15 @@ export class RecipeDetail implements OnInit {
   getIngredientName(ingredient: RecipeIngredientDetail): string {
     const currentLang = this.translateService.getCurrentLanguage();
     return currentLang === 'bg' ? ingredient.name_bg : ingredient.name_en;
+  }
+
+  getUnitLabel(unit: string): string {
+    const currentLang = this.translateService.getCurrentLanguage();
+    // Check if unit is a valid IngredientUnit enum value
+    if (Object.values(IngredientUnit).includes(unit as IngredientUnit)) {
+      return INGREDIENT_UNIT_LABELS[unit as IngredientUnit][currentLang as 'en' | 'bg'];
+    }
+    // Fallback to the original unit string if not found in enum
+    return unit;
   }
 }
